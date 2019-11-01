@@ -41,12 +41,15 @@
 
 ## 実行方法
 
-実行するPythonファイルは、stepsファルダにあります。
-本リポジトリの一番上の階層から、もしくはstepsフォルダへ移動してから、Pythonコマンドを実行します。
+本書で説明するPythonファイルは、stepsファルダにあります。
+実行するためには、本リポジトリの一番上の階層からPythonコマンドを実行します。
 
 ```
+# OK =============
 $ python steps/step01.py
+$ python steps/step31.py
 
+# NG ==============
 $ cd steps
 $ python step31.py
 ```
