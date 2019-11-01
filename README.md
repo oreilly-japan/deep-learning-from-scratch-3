@@ -5,7 +5,9 @@
 書籍『[ゼロから作るDeep Learning ❸ ―フレームワーク編](https://www.oreilly.co.jp/books/978487311xxxx/)★』(オライリー・ジャパン発行)のサポートサイトです。本書籍で使用するソースコードがまとめられています。
 
 
-# <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/images/dezero_logo.png" width="300px" />
+## フレームワーク編
+
+<img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/images/dezero_logo.png" width="300px" />
 
 [![pypi](https://img.shields.io/pypi/v/dezero.svg)](https://pypi.python.org/pypi/dezero)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/oreilly-japan/deep-learning-from-scratch-3/blob/master/LICENSE.md)
