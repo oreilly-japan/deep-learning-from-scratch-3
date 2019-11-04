@@ -8,6 +8,7 @@ dezero.egg-info/
 *.dot
 *.json
 src/.idea/*
+.idea/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
