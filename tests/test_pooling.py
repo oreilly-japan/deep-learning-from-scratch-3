@@ -29,7 +29,7 @@ class TestPooling_simple(unittest.TestCase):
     def test_backward1(self):
         n, c, h, w = 1, 5, 16, 16
         ksize, stride, pad = 2, 2, 0
-        x = np.random.randn(n, c, h, w).astype('f')
+        x = np.random.randn(n, c, h, w).astype('f') * 100
         f = lambda x: F.pooling_simple(x, ksize, stride, pad)
         self.assertTrue(check_backward(f, x))
 
