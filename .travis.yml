@@ -4,6 +4,7 @@ python:
 install:
   - pip install numpy
   - pip install matplotlib
+  - pip install chainer
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
   - python -m unittest discover tests
