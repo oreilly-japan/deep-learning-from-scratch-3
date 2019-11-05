@@ -5,4 +5,4 @@ install:
   - pip install numpy
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
-  - python -m unittest
+  - python -m unittest discover tests
