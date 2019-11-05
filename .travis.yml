@@ -3,6 +3,7 @@ python:
   - 3.6
 install:
   - pip install numpy
+  - pip install matplotlib
 script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)
   - python -m unittest discover tests
