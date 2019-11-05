@@ -87,17 +87,6 @@ def square(x):
     return f(x)
 
 
-class Add(Function):
-
-    def forward(self, x0, x1):
-        y = x0 + x1
-        return y
-
-    def backward(self, gy):
-        return gy, gy
-
-
-def add(x0, x1):
-    f = Add()
-    y = f(x0, x1)
-    return y
+for i in range(10):
+    x = Variable(np.random.randn(10000))  # 巨大なデータ
+    y = square(square(square(square(x))))  # 複雑な計算をする
