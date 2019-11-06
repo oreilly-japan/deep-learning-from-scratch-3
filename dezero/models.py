@@ -4,7 +4,6 @@ import dezero.layers as L
 
 
 class Sequential(Model):
-
     def __init__(self, *layers):
         self.layers = []
         for layer in layers:
@@ -17,7 +16,6 @@ class Sequential(Model):
 
 
 class TwoLayerNet(Model):
-
     def __init__(self, in_size, hidden_size, out_size, activation=F.sigmoid):
         super().__init__()
         self.f = activation
@@ -31,7 +29,6 @@ class TwoLayerNet(Model):
 
 
 class VGG(Model):
-
     def __init__(self):
         super().__init__()
         self.conv1_1 = L.Conv2d(3, 64, 3, 1, 1)

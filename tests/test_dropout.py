@@ -6,7 +6,6 @@ from dezero.utils import check_backward
 
 
 class TestDropout(unittest.TestCase):
-
     def test_forward1(self):
         x = np.random.randn(100, 100)
         y = F.dropout(Variable(x), dropout_ratio=0.0)

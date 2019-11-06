@@ -37,7 +37,6 @@ def test_mode():
 # Variable / Function
 # =============================================================================
 class Variable:
-
     def __init__(self, data, name=None):
         self.data = data
         self.name = name
@@ -135,7 +134,6 @@ class Parameter(Variable):
 
 
 class Function:
-
     def __call__(self, *inputs):
         inputs = [as_variable(x) for x in inputs]
 
@@ -177,7 +175,6 @@ def _broadcast_backward(gx0, gx1, x0_shape, x1_shape):
 
 
 class Add(Function):
-
     def forward(self, x0, x1):
         self.x0_shape, self.x1_shape = x0.shape, x1.shape
         y = x0 + x1
@@ -200,7 +197,6 @@ def add(x0, x1):
 
 
 class Mul(Function):
-
     def forward(self, x0, x1):
         y = x0 * x1
         return y
@@ -224,7 +220,6 @@ def mul(x0, x1):
 
 
 class Neg(Function):
-
     def forward(self, x):
         return -x
 
@@ -238,7 +233,6 @@ def neg(x):
 
 
 class Sub(Function):
-
     def forward(self, x0, x1):
         self.x0_shape, self.x1_shape = x0.shape, x1.shape
         y = x0 - x1
@@ -268,7 +262,6 @@ def rsub(x0, x1):
 
 
 class Div(Function):
-
     def forward(self, x0, x1):
         y = x0 / x1
         return y
@@ -299,7 +292,6 @@ def rdiv(x0, x1):
 
 
 class Pow(Function):
-
     def __init__(self, c):
         self.c = c
 

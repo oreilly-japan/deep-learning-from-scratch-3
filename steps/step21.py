@@ -110,7 +110,6 @@ def as_variable(obj):
 
 
 class Function:
-
     def __call__(self, *inputs):
         inputs = [as_variable(x) for x in inputs]
 
@@ -137,7 +136,6 @@ class Function:
 
 
 class Add(Function):
-
     def forward(self, x0, x1):
         y = x0 + x1
         return y
@@ -153,7 +151,6 @@ def add(x0, x1):
 
 
 class Mul(Function):
-
     def forward(self, x0, x1):
         y = x0 * x1
         return y

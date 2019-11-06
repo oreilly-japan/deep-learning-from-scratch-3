@@ -6,7 +6,6 @@ from dezero.utils import check_backward
 
 
 class TestGetitem(unittest.TestCase):
-
     def test_forward1(self):
         x_data = np.arange(12).reshape((2, 2, 3))
         x = Variable(x_data)

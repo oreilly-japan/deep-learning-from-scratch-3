@@ -108,7 +108,6 @@ class Variable:
 
 
 class Function:
-
     def __call__(self, *inputs):
         inputs = [as_variable(x) for x in inputs]
 
@@ -147,7 +146,6 @@ def as_variable(obj):
 # =============================================================================
 
 class Add(Function):
-
     def forward(self, x0, x1):
         y = x0 + x1
         return y
@@ -163,7 +161,6 @@ def add(x0, x1):
 
 
 class Mul(Function):
-
     def forward(self, x0, x1):
         y = x0 * x1
         return y
@@ -179,7 +176,6 @@ def mul(x0, x1):
 
 
 class Neg(Function):
-
     def forward(self, x):
         return -x
 
@@ -193,7 +189,6 @@ def neg(x):
 
 
 class Sub(Function):
-
     def forward(self, x0, x1):
         y = x0 - x1
         return y
@@ -212,7 +207,6 @@ def rsub(x0, x1):
 
 
 class Div(Function):
-
     def forward(self, x0, x1):
         y = x0 / x1
         return y
@@ -234,7 +228,6 @@ def rdiv(x0, x1):
 
 
 class Pow(Function):
-
     def __init__(self, c):
         self.c = c
 

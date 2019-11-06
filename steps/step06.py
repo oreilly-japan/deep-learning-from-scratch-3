@@ -2,14 +2,12 @@ import numpy as np
 
 
 class Variable:
-
     def __init__(self, data):
         self.data = data
         self.grad = None
 
 
 class Function:
-
     def __call__(self, input):
         x = input.data
         y = self.forward(x)
@@ -26,7 +24,6 @@ class Function:
 
 
 class Square(Function):
-
     def forward(self, x):
         y = x ** 2
         return y
@@ -38,7 +35,6 @@ class Square(Function):
 
 
 class Exp(Function):
-
     def forward(self, x):
         y = np.exp(x)
         return y

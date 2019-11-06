@@ -2,7 +2,6 @@ import numpy as np
 
 
 class Variable:
-
     def __init__(self, data):
         self.data = data
         self.grad = None
@@ -37,7 +36,6 @@ class Variable:
 
 
 class Function:
-
     def __call__(self, *inputs):
         xs = [x.data for x in inputs]
         ys = self.forward(*xs)
@@ -59,7 +57,6 @@ class Function:
 
 
 class Add(Function):
-
     def forward(self, x0, x1):
         y = x0 + x1
         return y

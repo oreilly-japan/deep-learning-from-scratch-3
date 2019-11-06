@@ -5,7 +5,6 @@ from dezero import cuda
 
 
 class Dataset:
-
     def __getitem__(self, index):
         raise NotImplementedError
 
@@ -14,7 +13,6 @@ class Dataset:
 
 
 class DatasetLoader:
-
     def __init__(self, dataset, batch_size, shuffle=True, gpu=False):
         self.dataset = dataset
         self.batch_size = batch_size

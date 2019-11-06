@@ -7,7 +7,6 @@ import chainer.functions as CF
 
 
 class TestPooling_simple(unittest.TestCase):
-
     def test_forward1(self):
         n, c, h, w = 1, 5, 16, 16
         ksize, stride, pad = 2, 2, 0
@@ -35,7 +34,6 @@ class TestPooling_simple(unittest.TestCase):
 
 
 class TestPooling(unittest.TestCase):
-
     def test_forward1(self):
         n, c, h, w = 1, 5, 16, 16
         ksize, stride, pad = 2, 2, 0

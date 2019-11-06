@@ -3,7 +3,6 @@ import numpy as np
 
 
 class Variable:
-
     def __init__(self, data):
         self.data = data
         self.grad = None
@@ -50,7 +49,6 @@ class Variable:
 
 
 class Function:
-
     def __call__(self, *inputs):
         xs = [x.data for x in inputs]
         ys = self.forward(*xs)
@@ -73,7 +71,6 @@ class Function:
 
 
 class Square(Function):
-
     def forward(self, x):
         return x ** 2
 

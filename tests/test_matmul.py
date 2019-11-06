@@ -6,7 +6,6 @@ from dezero.utils import check_backward
 
 
 class TestMatmul(unittest.TestCase):
-
     def test_forward1(self):
         x = Variable(np.array([[1, 2, 3], [4, 5, 6]]))
         w = Variable(x.data.T)

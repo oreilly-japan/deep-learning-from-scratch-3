@@ -16,7 +16,6 @@ test_loader = DatasetLoader(test_set, batch_size, shuffle=False)
 
 
 class TwoLayerNet(Model):
-
     def __init__(self, in_size, hidden_size, out_size, activation=F.sigmoid):
         super().__init__()
         self.f = activation

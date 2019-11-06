@@ -6,7 +6,6 @@ from dezero.utils import check_backward
 
 
 class TestSum(unittest.TestCase):
-
     def test_forward1(self):
         x = Variable(np.random.rand(10))
         y = F.sum(x)
@@ -47,7 +46,6 @@ class TestSum(unittest.TestCase):
 
 
 class TestSumTo(unittest.TestCase):
-
     def test_forward1(self):
         x = Variable(np.random.rand(10))
         y = F.sum_to(x, (1,))

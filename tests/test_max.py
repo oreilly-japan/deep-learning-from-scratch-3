@@ -6,7 +6,6 @@ from dezero.utils import check_backward
 
 
 class TestMax(unittest.TestCase):
-
     def test_forward1(self):
         x = Variable(np.random.rand(10))
         y = F.max(x)

@@ -10,7 +10,6 @@ from dezero.datasets import load_shakespear
 
 
 class SimpleRNN(Chain):
-
     def __init__(self, in_size, hidden_size, out_size):
         super().__init__()
 

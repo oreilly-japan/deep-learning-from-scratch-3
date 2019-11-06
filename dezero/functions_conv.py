@@ -54,7 +54,6 @@ def pooling_simple(x, kernel_size, stride=1, pad=0):
 #  conv2d / deconv2d / pooling
 # =============================================================================
 class Conv2d(Function):
-
     def __init__(self, stride=1, pad=0):
         super().__init__()
         self.stride = _pair(stride)
@@ -92,7 +91,6 @@ def conv2d(x, W, b=None, stride=1, pad=0):
 
 
 class Deconv2d(Function):
-
     def __init__(self, stride=1, pad=0, outsize=None):
         super().__init__()
         self.stride = _pair(stride)
@@ -141,7 +139,6 @@ def deconv2d(x, W, b=None, stride=1, pad=0, outsize=None):
 
 
 class Conv2DGradW(Function):
-
     def __init__(self, conv2d):
         W = conv2d.inputs[1]
         kh, kw = W.shape[2:]
@@ -166,7 +163,6 @@ class Conv2DGradW(Function):
 
 
 class Pooling(Function):
-
     def __init__(self, kernel_size, stride=1, pad=0):
         super().__init__()
         self.kernel_size = kernel_size
@@ -188,7 +184,6 @@ class Pooling(Function):
 
 
 class Pooling2DGrad(Function):
-
     def __init__(self, mpool2d):
         self.mpool2d = mpool2d
         self.kernel_size = mpool2d.kernel_size
@@ -223,7 +218,6 @@ class Pooling2DGrad(Function):
 
 
 class Pooling2DWithIndexes(Function):
-
     def __init__(self, mpool2d):
         self.kernel_size = mpool2d.kernel_size
         self.stride = mpool2d.stride
@@ -251,7 +245,6 @@ def pooling(x, kernel_size, stride=1, pad=0):
 #  im2col / col2im
 # =============================================================================
 class Im2col(Function):
-
     def __init__(self, kernel_size, stride, pad):
         super().__init__()
         self.input_shape = None
@@ -276,7 +269,6 @@ def im2col(x, kernel_size, stride=1, pad=0):
 
 
 class Col2im(Function):
-
     def __init__(self, input_shape, kernel_size, stride, pad):
         super().__init__()
         self.input_shape = input_shape

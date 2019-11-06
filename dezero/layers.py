@@ -8,7 +8,6 @@ from dezero.utils import _pair
 # Layer / Model
 # =============================================================================
 class Layer:
-
     def __init__(self):
         self._params = set()
 
@@ -71,7 +70,6 @@ class Model(Layer):
 # Linear / Conv / EmbedID / RNN / LSTM
 # =============================================================================
 class Linear(Layer):
-
     def __init__(self, in_size, out_size, nobias=False):
         super().__init__()
 
@@ -89,7 +87,6 @@ class Linear(Layer):
 
 
 class Conv2d(Layer):
-
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
                  pad=0, nobias=False):
         super().__init__()
@@ -114,7 +111,6 @@ class Conv2d(Layer):
 
 
 class EmbedID(Layer):
-
     def __init__(self, in_size, out_size):
         super().__init__()
         self.W = Parameter(np.random.randn(in_size, out_size), name='W')
@@ -125,7 +121,6 @@ class EmbedID(Layer):
 
 
 class RNN(Layer):
-
     def __init__(self, in_size, hidden_size):
         super().__init__()
         I, H = in_size, hidden_size
@@ -147,7 +142,6 @@ class RNN(Layer):
 
 
 class LSTM(Layer):
-
     def __init__(self, in_size, hidden_size):
         super().__init__()
 

@@ -5,7 +5,6 @@ from dezero.utils import check_backward
 
 
 class TestAdd(unittest.TestCase):
-
     def test_forward1(self):
         x0 = np.array([1, 2, 3])
         x1 = Variable(np.array([1, 2, 3]))

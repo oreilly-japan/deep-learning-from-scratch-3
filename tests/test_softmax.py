@@ -7,7 +7,6 @@ import chainer.functions as CF
 
 
 class TestSoftmax(unittest.TestCase):
-
     def test_forward1(self):
         x = np.array([[0, 1, 2], [0, 2, 4]], np.float32)
         y2 = CF.softmax(x, axis=1)
@@ -50,7 +49,6 @@ class TestSoftmax(unittest.TestCase):
 
 
 class TestSoftmaxCrossEntropy(unittest.TestCase):
-
     def test_forward1(self):
         x = np.array([[-1, 0, 1, 2], [2, 0, 1, -1]], np.float32)
         t = np.array([3, 0]).astype(np.int32)

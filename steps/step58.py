@@ -10,7 +10,6 @@ np.random.seed(0)
 
 
 class SimpleRNN(Chain):
-
     def __init__(self, in_size, hidden_size, out_size):
         super().__init__()
 

@@ -3,7 +3,6 @@ from dezero import cuda
 
 
 class Optimizer:
-
     def setup(self, link):
         self.target = link
         return self
@@ -17,7 +16,6 @@ class Optimizer:
 
 
 class SGD(Optimizer):
-
     def __init__(self, lr=0.01):
         self.lr = lr
 
@@ -26,7 +24,6 @@ class SGD(Optimizer):
 
 
 class MomentumSGD(Optimizer):
-
     def __init__(self, lr=0.01, momentum=0.9):
         self.lr = lr
         self.momentum = momentum
@@ -45,7 +42,6 @@ class MomentumSGD(Optimizer):
 
 
 class AdaGrad(Optimizer):
-
     def __init__(self, lr=0.001, eps=1e-8):
         self.lr = lr
         self.eps = eps
@@ -68,7 +64,6 @@ class AdaGrad(Optimizer):
 
 
 class AdaDelta(Optimizer):
-
     def __init__(self, rho=0.95, eps=1e-6):
         self.rho = rho
         self.eps = eps
@@ -97,7 +92,6 @@ class AdaDelta(Optimizer):
 
 
 class Adam(Optimizer):
-
     def __init__(self, alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
         self.t = 0
         self.alpha = alpha

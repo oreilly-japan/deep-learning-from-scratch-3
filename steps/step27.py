@@ -5,7 +5,6 @@ from dezero.utils import get_dot_graph
 
 
 class Sin(Function):
-
     def forward(self, x):
         y = np.sin(x)
         return y

@@ -8,7 +8,6 @@ from dezero.core import Function, Variable, as_variable
 # sin / cos / tanh / exp / log
 # =============================================================================
 class Sin(Function):
-
     def forward(self, x):
         xp = cuda.get_array_module(x)
         y = xp.sin(x)
@@ -26,7 +25,6 @@ def sin(x):
 
 
 class Cos(Function):
-
     def forward(self, x):
         xp = cuda.get_array_module(x)
         y = xp.cos(x)
@@ -44,7 +42,6 @@ def cos(x):
 
 
 class Tanh(Function):
-
     def forward(self, x):
         xp = cuda.get_array_module(x)
         return xp.tanh(x)
@@ -61,7 +58,6 @@ def tanh(x):
 
 
 class Exp(Function):
-
     def forward(self, x):
         xp = cuda.get_array_module(x)
         return xp.exp(x)
@@ -78,7 +74,6 @@ def exp(x):
 
 
 class Log(Function):
-
     def forward(self, x):
         xp = cuda.get_array_module(x)
         return xp.log(x)
@@ -98,7 +93,6 @@ def log(x):
 # Tensor operations: sum / repeat / reshape / sum_to / broadcast_to / get_item
 # =============================================================================
 class Reshape(Function):
-
     def __init__(self, shape):
         self.shape = shape
 
@@ -126,7 +120,6 @@ def expand_dims(x, axis):
 
 
 class Sum(Function):
-
     def __init__(self, axis, keepdims):
         self.axis = axis
         self.keepdims = keepdims
@@ -149,7 +142,6 @@ def sum(x, axis=None, keepdims=False):
 
 
 class SumTo(Function):
-
     def __init__(self, shape):
         self.shape = shape
 
@@ -171,7 +163,6 @@ def sum_to(x, shape):
 
 
 class BroadcastTo(Function):
-
     def __init__(self, shape):
         self.shape = shape
 
@@ -194,7 +185,6 @@ def broadcast_to(x, shape):
 
 
 class MatMul(Function):
-
     def forward(self, x, W):
         y = x.dot(W)
         return y
@@ -225,7 +215,6 @@ def linear(x, W, b=None):
 
 
 class Transpose(Function):
-
     def __init__(self, axes=None):
         self.axes = axes
 
@@ -248,7 +237,6 @@ def transpose(x, axes=None):
 
 
 class GetItem(Function):
-
     def __init__(self, slices):
         self.slices = slices
 
@@ -261,7 +249,6 @@ class GetItem(Function):
 
 
 class GetItemGrad(Function):
-
     def __init__(self, slices, in_shape):
         self.slices = slices
         self.in_shape = in_shape
@@ -298,7 +285,6 @@ def mean_squared_error(y1, y2):
 
 
 class Sigmoid(Function):
-
     def forward(self, x):
         xp = cuda.get_array_module(x)
         y = 1 / (1 + xp.exp(-x))
@@ -322,7 +308,6 @@ def sigmoid_naive(x):
 
 
 class ReLU(Function):
-
     def forward(self, x):
         xp = cuda.get_array_module(x)
         y = xp.maximum(x, 0.0)
@@ -341,7 +326,6 @@ def relu(x):
 
 
 class Softmax(Function):
-
     def __init__(self, axis=1):
         self.axis = axis
 
@@ -425,7 +409,6 @@ def batch_nrom(x):
 # max / min
 # =============================================================================
 class Max(Function):
-
     def __init__(self, axis=None, keepdims=False):
         self.axis = axis
         self.keepdims = keepdims
@@ -446,7 +429,6 @@ class Max(Function):
 
 
 class Min(Max):
-
     def forward(self, x):
         return x.min(axis=self.axis, keepdims=self.keepdims)
 

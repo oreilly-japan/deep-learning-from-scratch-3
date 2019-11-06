@@ -7,7 +7,6 @@ import chainer.functions as CF
 
 
 class TestSigmoid(unittest.TestCase):
-
     def test_forward1(self):
         x = np.array([[0, 1, 2], [0, 2, 4]], np.float32)
         y2 = CF.sigmoid(x)

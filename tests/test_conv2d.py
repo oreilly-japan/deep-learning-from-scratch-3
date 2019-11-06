@@ -7,7 +7,6 @@ import chainer.functions as CF
 
 
 class TestConv2d_simple(unittest.TestCase):
-
     def test_forward1(self):
         n, c, h, w = 1, 5, 15, 15
         o, k, s, p = 8, (3, 3), (1, 1), (1, 1)
@@ -77,7 +76,6 @@ class TestConv2d_simple(unittest.TestCase):
 
 
 class TestConv2d(unittest.TestCase):
-
     def test_forward1(self):
         n, c, h, w = 1, 5, 15, 15
         o, k, s, p = 8, (3, 3), (1, 1), (1, 1)

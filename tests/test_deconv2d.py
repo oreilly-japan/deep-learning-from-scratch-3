@@ -7,7 +7,6 @@ import chainer.functions as CF
 
 
 class TestDeconv2d(unittest.TestCase):
-
     def test_forward1(self):
         n, c_i, c_o = 10, 1, 3
         h_i, w_i = 5, 10

@@ -24,7 +24,6 @@ def no_grad():
 
 
 class Variable:
-
     def __init__(self, data, name=None):
         self.data = data
         self.name = name
@@ -103,7 +102,6 @@ class Variable:
 
 
 class Function:
-
     def __call__(self, *inputs):
         xs = [x.data for x in inputs]
         ys = self.forward(*xs)
@@ -128,7 +126,6 @@ class Function:
 
 
 class Square(Function):
-
     def forward(self, x):
         return x ** 2
 
@@ -143,7 +140,6 @@ def square(x):
 
 
 class Add(Function):
-
     def forward(self, x0, x1):
         y = x0 + x1
         return y
