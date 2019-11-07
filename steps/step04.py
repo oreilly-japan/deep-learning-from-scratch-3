@@ -43,7 +43,7 @@ dy = numerical_diff(f, x)
 print(dy)  # 4.000000000004
 
 
-def F(x):
+def f(x):
     A = Square()
     B = Exp()
     C = Square()
@@ -51,5 +51,5 @@ def F(x):
 
 
 x = Variable(np.array(0.5))
-dy = numerical_diff(F, x)
+dy = numerical_diff(f, x)
 print(dy)  # 3.2974426293330694
