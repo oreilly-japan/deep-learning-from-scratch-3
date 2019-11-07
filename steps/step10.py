@@ -52,8 +52,7 @@ class Square(Function):
 
 
 def square(x):
-    f = Square()
-    return f(x)
+    return Square()(x)
 
 
 def numerical_diff(f, x, eps=1e-4):

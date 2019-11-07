@@ -74,9 +74,7 @@ class Add(Function):
 
 
 def add(x0, x1):
-    f = Add()
-    y = f(x0, x1)
-    return y
+    return Add()(x0, x1)
 
 
 x = Variable(np.array(2.0))

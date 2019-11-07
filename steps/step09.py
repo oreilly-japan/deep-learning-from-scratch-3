@@ -60,13 +60,11 @@ class Exp(Function):
 
 
 def square(x):
-    f = Square()
-    return f(x)
+    return Square()(x)
 
 
 def exp(x):
-    f = Exp()
-    return f(x)
+    return Exp()(x)
 
 
 x = Variable(np.array(0.5))

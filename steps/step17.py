@@ -80,8 +80,7 @@ class Square(Function):
 
 
 def square(x):
-    f = Square()
-    return f(x)
+    return Square()(x)
 
 
 for i in range(10):

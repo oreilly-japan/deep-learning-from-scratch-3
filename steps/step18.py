@@ -107,8 +107,7 @@ class Square(Function):
 
 
 def square(x):
-    f = Square()
-    return f(x)
+    return Square()(x)
 
 
 class Add(Function):
@@ -121,9 +120,7 @@ class Add(Function):
 
 
 def add(x0, x1):
-    f = Add()
-    y = f(x0, x1)
-    return y
+    return Add()(x0, x1)
 
 
 with using_config('enable_backprop', False):

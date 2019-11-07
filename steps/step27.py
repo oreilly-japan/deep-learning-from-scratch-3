@@ -16,8 +16,7 @@ class Sin(Function):
 
 
 def sin(x):
-    f = Sin()
-    return f(x)
+    return Sin()(x)
 
 
 x = Variable(np.array(np.pi / 4))

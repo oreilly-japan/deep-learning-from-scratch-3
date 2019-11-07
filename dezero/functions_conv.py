@@ -86,8 +86,7 @@ class Conv2d(Function):
 
 
 def conv2d(x, W, b=None, stride=1, pad=0):
-    f = Conv2d(stride, pad)
-    return f(x, W, b)
+    return Conv2d(stride, pad)(x, W, b)
 
 
 class Deconv2d(Function):
@@ -134,8 +133,7 @@ class Deconv2d(Function):
 
 
 def deconv2d(x, W, b=None, stride=1, pad=0, outsize=None):
-    f = Deconv2d(stride, pad, outsize)
-    return f(x, W, b)
+    return Deconv2d(stride, pad, outsize)(x, W, b)
 
 
 class Conv2DGradW(Function):
@@ -237,8 +235,7 @@ class Pooling2DWithIndexes(Function):
 
 
 def pooling(x, kernel_size, stride=1, pad=0):
-    f = Pooling(kernel_size, stride, pad)
-    return f(x)
+    return Pooling(kernel_size, stride, pad)(x)
 
 
 # =============================================================================
@@ -264,8 +261,7 @@ class Im2col(Function):
 
 
 def im2col(x, kernel_size, stride=1, pad=0):
-    f = Im2col(kernel_size, stride, pad)
-    return f(x)
+    return Im2col(kernel_size, stride, pad)(x)
 
 
 class Col2im(Function):
@@ -287,8 +283,7 @@ class Col2im(Function):
 
 
 def col2im(x, input_shape, kernel_size, stride=1, pad=0):
-    f = Col2im(input_shape, kernel_size, stride, pad)
-    return f(x)
+    return Col2im(input_shape, kernel_size, stride, pad)(x)
 
 
 def get_deconv_outsize(size, k, s, p):

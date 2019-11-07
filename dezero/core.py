@@ -191,9 +191,7 @@ def add(x0, x1):
     if np.isscalar(x1):
         xp = dezero.cuda.get_array_module(x0.data)
         x1 = xp.array(x1)
-    f = Add()
-    y = f(x0, x1)
-    return y
+    return Add()(x0, x1)
 
 
 class Mul(Function):
@@ -215,8 +213,7 @@ def mul(x0, x1):
     if np.isscalar(x1):
         xp = dezero.cuda.get_array_module(x0.data)
         x1 = xp.array(x1)
-    f = Mul()
-    return f(x0, x1)
+    return Mul()(x0, x1)
 
 
 class Neg(Function):
@@ -228,8 +225,7 @@ class Neg(Function):
 
 
 def neg(x):
-    f = Neg()
-    return f(x)
+    return Neg()(x)
 
 
 class Sub(Function):
@@ -250,8 +246,7 @@ def sub(x0, x1):
     if np.isscalar(x1):
         xp = dezero.cuda.get_array_module(x0.data)
         x1 = xp.array(x1)
-    f = Sub()
-    return f(x0, x1)
+    return Sub()(x0, x1)
 
 
 def rsub(x0, x1):
@@ -280,8 +275,7 @@ def div(x0, x1):
     if np.isscalar(x1):
         xp = dezero.cuda.get_array_module(x0.data)
         x1 = xp.array(x1)
-    f = Div()
-    return f(x0, x1)
+    return Div()(x0, x1)
 
 
 def rdiv(x0, x1):
@@ -308,8 +302,7 @@ class Pow(Function):
 
 
 def pow(x, c):
-    f = Pow(c)
-    return f(x)
+    return Pow(c)(x)
 
 
 def setup_variable():

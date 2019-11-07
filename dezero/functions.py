@@ -20,8 +20,7 @@ class Sin(Function):
 
 
 def sin(x):
-    f = Sin()
-    return f(x)
+    return Sin()(x)
 
 
 class Cos(Function):
@@ -37,8 +36,7 @@ class Cos(Function):
 
 
 def cos(x):
-    f = Cos()
-    return f(x)
+    return Cos()(x)
 
 
 class Tanh(Function):
@@ -53,8 +51,7 @@ class Tanh(Function):
 
 
 def tanh(x):
-    f = Tanh()
-    return f(x)
+    return Tanh()(x)
 
 
 class Exp(Function):
@@ -69,8 +66,7 @@ class Exp(Function):
 
 
 def exp(x):
-    f = Exp()
-    return f(x)
+    return Exp()(x)
 
 
 class Log(Function):
@@ -85,8 +81,7 @@ class Log(Function):
 
 
 def log(x):
-    f = Log()
-    return f(x)
+    return Log()(x)
 
 
 # =============================================================================
@@ -108,8 +103,7 @@ def reshape(x, shape):
     x = as_variable(x)
     if x.shape == shape:
         return x
-    f = Reshape(shape)
-    return f(x)
+    return Reshape(shape)(x)
 
 
 def expand_dims(x, axis):
@@ -137,8 +131,7 @@ class Sum(Function):
 
 
 def sum(x, axis=None, keepdims=False):
-    f = Sum(axis, keepdims)
-    return f(x)
+    return Sum(axis, keepdims)(x)
 
 
 class SumTo(Function):
@@ -158,8 +151,7 @@ class SumTo(Function):
 def sum_to(x, shape):
     if x.shape == shape:
         return as_variable(x)
-    f = SumTo(shape)
-    return f(x)
+    return SumTo(shape)(x)
 
 
 class BroadcastTo(Function):
@@ -180,8 +172,7 @@ class BroadcastTo(Function):
 def broadcast_to(x, shape):
     if x.shape == shape:
         return as_variable(x)
-    f = BroadcastTo(shape)
-    return f(x)
+    return BroadcastTo(shape)(x)
 
 
 class MatMul(Function):
@@ -197,8 +188,7 @@ class MatMul(Function):
 
 
 def matmul(x, W):
-    f = MatMul()
-    return f(x, W)
+    return MatMul()(x, W)
 
 
 def linear(x, W, b=None):
@@ -232,8 +222,7 @@ class Transpose(Function):
 
 
 def transpose(x, axes=None):
-    f = Transpose(axes)
-    return f(x)
+    return Transpose(axes)(x)
 
 
 class GetItem(Function):
@@ -297,11 +286,10 @@ class Sigmoid(Function):
 
 
 def sigmoid(x):
-    f = Sigmoid()
-    return f(x)
+    return Sigmoid()(x)
 
 
-def sigmoid_naive(x):
+def sigmoid_simple(x):
     x = as_variable(x)
     y = 1 / (1 + exp(-x))
     return y
@@ -321,8 +309,7 @@ class ReLU(Function):
 
 
 def relu(x):
-    f = ReLU()
-    return f(x)
+    return ReLU()(x)
 
 
 class Softmax(Function):
@@ -345,11 +332,10 @@ class Softmax(Function):
 
 
 def softmax(x, axis=1):
-    f = Softmax(axis)
-    return f(x)
+    return Softmax(axis)(x)
 
 
-def softmax_naive(x, axis=1):
+def softmax_simple(x, axis=1):
     x = as_variable(x)
     y = exp(x)
     sum_shape = list(y.shape)
@@ -434,13 +420,11 @@ class Min(Max):
 
 
 def max(x, axis=None, keepdims=False):
-    f = Max(axis, keepdims)
-    return f(x)
+    return Max(axis, keepdims)(x)
 
 
 def min(x, axis=None, keepdims=False):
-    f = Min(axis, keepdims)
-    return f(x)
+    return Min(axis, keepdims)(x)
 
 
 # =============================================================================

@@ -133,9 +133,7 @@ class Add(Function):
 
 
 def add(x0, x1):
-    f = Add()
-    y = f(x0, x1)
-    return y
+    return Add()(x0, x1)
 
 
 class Mul(Function):
@@ -149,8 +147,7 @@ class Mul(Function):
 
 
 def mul(x0, x1):
-    f = Mul()
-    return f(x0, x1)
+    return Mul()(x0, x1)
 
 
 Variable.__add__ = add
