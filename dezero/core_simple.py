@@ -139,9 +139,7 @@ class Function:
 def as_variable(obj):
     if isinstance(obj, Variable):
         return obj
-    elif isinstance(obj, np.ndarray):
-        return Variable(obj)
-    return Variable(np.array(obj))
+    return Variable(obj)
 
 
 # =============================================================================
