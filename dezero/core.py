@@ -37,6 +37,8 @@ def test_mode():
 # Variable / Function
 # =============================================================================
 class Variable:
+    __array_priority__ = 200
+
     def __init__(self, data, name=None):
         self.data = data
         self.name = name
@@ -125,8 +127,6 @@ class Variable:
 
     def to_gpu(self):
         self.data = dezero.cuda.as_cupy(self.data)
-
-    __array_priority__ = 200
 
 
 class Parameter(Variable):
