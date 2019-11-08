@@ -253,7 +253,7 @@ def rsub(x0, x1):
     if np.isscalar(x1):
         xp = dezero.cuda.get_array_module(x0.data)
         x1 = xp.array(x1)
-    return sub(x1, x0)
+    return Sub()(x1, x0)
 
 
 class Div(Function):
@@ -282,7 +282,7 @@ def rdiv(x0, x1):
     if np.isscalar(x1):
         xp = dezero.cuda.get_array_module(x0.data)
         x1 = xp.array(x1)
-    return div(x1, x0)
+    return Div()(x1, x0)
 
 
 class Pow(Function):

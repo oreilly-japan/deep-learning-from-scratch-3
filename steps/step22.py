@@ -146,6 +146,8 @@ class Add(Function):
 
 
 def add(x0, x1):
+    if np.isscalar(x1):
+        x1 = np.array(x1)
     return Add()(x0, x1)
 
 
@@ -160,6 +162,8 @@ class Mul(Function):
 
 
 def mul(x0, x1):
+    if np.isscalar(x1):
+        x1 = np.array(x1)
     return Mul()(x0, x1)
 
 
@@ -189,6 +193,8 @@ def sub(x0, x1):
 
 
 def rsub(x0, x1):
+    if np.isscalar(x1):
+        x1 = np.array(x1)
     return sub(x1, x0)
 
 

@@ -145,7 +145,6 @@ def as_variable(obj):
 # =============================================================================
 # 四則演算 / 演算子のオーバーロード
 # =============================================================================
-
 class Add(Function):
     def forward(self, x0, x1):
         y = x0 + x1
@@ -156,6 +155,8 @@ class Add(Function):
 
 
 def add(x0, x1):
+    if np.isscalar(x1):
+        x1 = np.array(x1)
     return Add()(x0, x1)
 
 
@@ -170,6 +171,8 @@ class Mul(Function):
 
 
 def mul(x0, x1):
+    if np.isscalar(x1):
+        x1 = np.array(x1)
     return Mul()(x0, x1)
 
 
@@ -195,11 +198,15 @@ class Sub(Function):
 
 
 def sub(x0, x1):
+    if np.isscalar(x1):
+        x1 = np.array(x1)
     return Sub()(x0, x1)
 
 
 def rsub(x0, x1):
-    return sub(x1, x0)
+    if np.isscalar(x1):
+        x1 = np.array(x1)
+    return Sub()(x1, x0)
 
 
 class Div(Function):
@@ -215,11 +222,15 @@ class Div(Function):
 
 
 def div(x0, x1):
+    if np.isscalar(x1):
+        x1 = np.array(x1)
     return Div()(x0, x1)
 
 
 def rdiv(x0, x1):
-    return div(x1, x0)
+    if np.isscalar(x1):
+        x1 = np.array(x1)
+    return Div()(x1, x0)
 
 
 class Pow(Function):
