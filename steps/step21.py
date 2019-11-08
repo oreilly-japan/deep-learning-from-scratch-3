@@ -56,7 +56,10 @@ class Variable:
         return len(self.data)
 
     def __repr__(self):
-        return '%s(%s)' % ('variable', np.array2string(self.data))
+        if self.data is None:
+            return 'variable(None)'
+        p = str(self.data).replace('\n', '\n' + ' ' * 9)
+        return 'variable(' + p + ')'
 
     def set_creator(self, func):
         self.creator = func

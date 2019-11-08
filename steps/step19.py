@@ -55,8 +55,10 @@ class Variable:
         return len(self.data)
 
     def __repr__(self):
-        name = '' if self.name is None else ' ' + self.name
-        return '%s%s(%s)' % ('variable', name, np.array2string(self.data))
+        if self.data is None:
+            return 'variable(None)'
+        p = str(self.data).replace('\n', '\n' + ' ' * 9)
+        return 'variable(' + p + ')'
 
     def set_creator(self, func):
         self.creator = func
@@ -152,12 +154,10 @@ def add(x0, x1):
 
 
 x = Variable(np.array([[1, 2, 3], [4, 5, 6]]))
-print(x.shape)  # (2, 3)
+x.name = 'x'
 
-x = Variable(np.array(2.0), 'x')
-t = square(x)
-y = add(square(t), square(t))
-y.name = 'y'
-print(x)  # variable x(2.)
-print(t)  # variable(4.)
-print(y)  # variable y(32.)
+print(x.name)  # x
+print(x.shape)  # (2, 3)
+print(x)
+# variable([[1 2 3]
+#           [4 5 6]])
