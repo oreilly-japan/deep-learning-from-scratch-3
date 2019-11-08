@@ -181,7 +181,7 @@ class Sub(Function):
         return y
 
     def backward(self, gy):
-        return gy * 1, gy * -1
+        return gy, -gy
 
 
 def sub(x0, x1):
