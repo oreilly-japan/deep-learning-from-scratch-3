@@ -169,10 +169,5 @@ Variable.__mul__ = mul
 Variable.__rmul__ = mul
 
 x = Variable(np.array(2.0))
-
-# y = 2.0 * a
-y = 3.0 * x + 1.0
-
-y.backward()
-print(y)  # variable(7.)
-print(x.grad)  # 3.0
+y = x + np.array(3.0)
+print(y)
