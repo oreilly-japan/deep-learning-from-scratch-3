@@ -82,5 +82,5 @@ class SquareTest(unittest.TestCase):
         y = square(x)
         y.backward()
         num_grad = numerical_diff(square, x)
-        flg = np.isclose(x.grad, num_grad)
+        flg = np.allclose(x.grad, num_grad)
         self.assertTrue(flg)
