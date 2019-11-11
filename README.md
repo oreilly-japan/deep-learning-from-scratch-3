@@ -7,9 +7,9 @@
 :mag_right: PDF形式のより鮮明なデータは[pdf](/pdf)ファルダにあります。
 
 
-| 1階微分 | 2階微分 | 3階微分 | 4階微分 |
-|---|---|---|---|
-|<img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh1.png" height="300px">| <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh2.png" height="300px"> | <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh3.png" height="300px"> | <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh4.png" height="300px">|
+| 元の計算（順伝播） | 1階微分 | 2階微分 | 3階微分 | 4階微分 |
+|---|---|---|---|---|
+|<img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh0.png" height="300px">|<img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh1.png" height="300px">| <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh2.png" height="300px"> | <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh3.png" height="300px"> | <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/tanh/thumbnails/tanh4.png" height="300px">|
 
 
 | 5階微分 | 6階微分 |
