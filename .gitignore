@@ -4,6 +4,7 @@
 build/
 dist/
 dezero.egg-info/
+tmp/
 
 *.dot
 *.json
