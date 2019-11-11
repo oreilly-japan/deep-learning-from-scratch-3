@@ -102,7 +102,7 @@ class Variable:
 
             if not retain_grad:
                 for y in f.outputs:
-                    y().cleargrad()  # y is weakref
+                    y().grad = None  # y is weakref
 
 
 def as_variable(obj):
