@@ -1,6 +1,6 @@
 # tanhの高階微分
 
-本書の「ステップ35」では、`y = tanh(x)` の高階微分を求め、その計算グラフの可視化を行います。
+本書の[「ステップ35」](https://github.com/oreilly-japan/deep-learning-from-scratch-3/blob/master/steps/step35.py)では、`y = tanh(x)` の高階微分を求め、その計算グラフの可視化を行います。
 ここでは、その結果画像を示します。
 
 
