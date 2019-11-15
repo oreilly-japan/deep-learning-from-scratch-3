@@ -90,19 +90,19 @@ def log(x):
 class Reshape(Function):
     def __init__(self, shape):
         self.shape = shape
+        self.input_shape = None
 
     def forward(self, x):
-        self.x_shape = x.shape
+        self.input_shape = x.shape
         return x.reshape(self.shape)
 
     def backward(self, gy):
-        return reshape(gy, self.x_shape)
+        return reshape(gy, self.input_shape)
 
 
 def reshape(x, shape):
-    x = as_variable(x)
     if x.shape == shape:
-        return x
+        return as_variable(x)
     return Reshape(shape)(x)
 
 
@@ -119,14 +119,14 @@ class Sum(Function):
         self.keepdims = keepdims
 
     def forward(self, x):
+        self.x_shape = x.shape
         y = x.sum(axis=self.axis, keepdims=self.keepdims)
         return y
 
     def backward(self, gy):
-        x, = self.inputs
-        shape = utils.sum_backward_shape(gy, x, self.axis, self.keepdims)
-        gy = reshape(gy, shape)
-        gx = broadcast_to(gy, x.shape)
+        gy = utils.reshape_sum_backward(gy, self.x_shape, self.axis,
+                                        self.keepdims)
+        gx = broadcast_to(gy, self.x_shape)
         return gx
 
 

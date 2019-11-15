@@ -73,8 +73,26 @@ def sum_to(x, shape):
     return y
 
 
-def sum_backward_shape(gy, x, axis, keepdims):
-    ndim = len(x.shape)
+def reshape_sum_backward(gy, x_shape, axis, keepdims):
+    """dezero.functions.sum関数の逆伝播で伝わる勾配を適切な形状に変換する。
+
+    Parameters
+    ----------
+    gy : dezero.Variable
+        逆伝播で出力側から伝わる勾配
+    x_shape : tuple
+        順伝播のsum関数で使用した入力変数の形状
+    axis : None or int or tuple of ints
+        順伝播のsum関数の引数で指定した axis
+    keepdims : bool
+        順伝播のsum関数の引数で指定した keepdims
+
+    Returns
+    -------
+    gy : dezero.Variable
+        形状変換後の勾配
+    """
+    ndim = len(x_shape)
     tupled_axis = axis
     if axis is None:
         tupled_axis = None
@@ -88,7 +106,9 @@ def sum_backward_shape(gy, x, axis, keepdims):
             shape.insert(a, 1)
     else:
         shape = gy.shape
-    return shape
+
+    gy = gy.reshape(shape)  # reshape
+    return gy
 
 
 def max_backward_shape(x, axis):
