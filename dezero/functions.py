@@ -377,7 +377,7 @@ def embed_id(x, W):
 def dropout(x, dropout_ratio=0.5):
     x = as_variable(x)
 
-    if dezero.config.train:
+    if dezero.Config.train:
         xp = cuda.get_array_module(x)
         mask = xp.random.rand(*x.shape) > dropout_ratio
         scale = 1.0 - dropout_ratio
