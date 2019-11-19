@@ -10,17 +10,14 @@ class Config:
     enable_backprop = True
 
 
-config = Config()
-
-
 @contextlib.contextmanager
 def using_config(name, value):
-    old_value = getattr(config, name)
-    setattr(config, name, value)
+    old_value = getattr(Config, name)
+    setattr(Config, name, value)
     try:
         yield
     finally:
-        setattr(config, name, old_value)
+        setattr(Config, name, old_value)
 
 
 def no_grad():
@@ -121,7 +118,7 @@ class Function:
             ys = (ys,)
         outputs = [Variable(y) for y in ys]
 
-        if config.enable_backprop:
+        if Config.enable_backprop:
             self.priority = max([x.priority for x in inputs])
             for output in outputs:
                 output.set_creator(self)
