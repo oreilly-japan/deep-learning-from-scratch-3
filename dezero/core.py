@@ -160,7 +160,7 @@ def as_variable(obj):
     return Variable(obj)
 
 
-def as_ndarray(x, array_module=np):
+def as_array(x, array_module=np):
     if np.isscalar(x):
         return array_module.array(x)
     return x
@@ -174,7 +174,7 @@ class Function:
         ys = self.forward(*xs)
         if not isinstance(ys, tuple):
             ys = (ys,)
-        outputs = [Variable(as_ndarray(y)) for y in ys]
+        outputs = [Variable(as_array(y)) for y in ys]
 
         if Config.enable_backprop:
             self.priority = max([x.priority for x in inputs])
@@ -215,7 +215,7 @@ class Add(Function):
 
 
 def add(x0, x1):
-    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
+    x1 = as_array(x1, dezero.cuda.get_array_module(x0.data))
     return Add()(x0, x1)
 
 
@@ -235,7 +235,7 @@ class Mul(Function):
 
 
 def mul(x0, x1):
-    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
+    x1 = as_array(x1, dezero.cuda.get_array_module(x0.data))
     return Mul()(x0, x1)
 
 
@@ -266,12 +266,12 @@ class Sub(Function):
 
 
 def sub(x0, x1):
-    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
+    x1 = as_array(x1, dezero.cuda.get_array_module(x0.data))
     return Sub()(x0, x1)
 
 
 def rsub(x0, x1):
-    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
+    x1 = as_array(x1, dezero.cuda.get_array_module(x0.data))
     return Sub()(x1, x0)
 
 
@@ -291,12 +291,12 @@ class Div(Function):
 
 
 def div(x0, x1):
-    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
+    x1 = as_array(x1, dezero.cuda.get_array_module(x0.data))
     return Div()(x0, x1)
 
 
 def rdiv(x0, x1):
-    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
+    x1 = as_array(x1, dezero.cuda.get_array_module(x0.data))
     return Div()(x1, x0)
 
 

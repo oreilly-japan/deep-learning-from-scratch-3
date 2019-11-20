@@ -28,7 +28,7 @@ class Variable:
                 funcs.append(x.creator)
 
 
-def as_ndarray(x):
+def as_array(x):
     if np.isscalar(x):
         return np.array(x)
     return x
@@ -38,7 +38,7 @@ class Function:
     def __call__(self, input):
         x = input.data
         y = self.forward(x)
-        output = Variable(as_ndarray(y))
+        output = Variable(as_array(y))
         output.set_creator(self)  # 親を覚えさせる
         self.input = input
         self.output = output  # 出力を覚える
@@ -81,3 +81,5 @@ x = Variable(np.array(0.5))
 y = square(exp(square(x)))
 y.backward()
 print(x.grad)  # 3.297442541400256
+
+x = Variable(1.0)  # NG

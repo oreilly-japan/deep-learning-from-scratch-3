@@ -112,7 +112,7 @@ def as_variable(obj):
     return Variable(obj)
 
 
-def as_ndarray(x):
+def as_array(x):
     if np.isscalar(x):
         return np.array(x)
     return x
@@ -126,7 +126,7 @@ class Function:
         ys = self.forward(*xs)
         if not isinstance(ys, tuple):
             ys = (ys,)
-        outputs = [Variable(as_ndarray(y)) for y in ys]
+        outputs = [Variable(as_array(y)) for y in ys]
 
         if Config.enable_backprop:
             self.priority = max([x.priority for x in inputs])
