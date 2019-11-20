@@ -1,5 +1,9 @@
 import numpy as np
-from dezero import Variable
+# core_simple を明示的にインポート
+# （dezero/__init__.py の is_simple_core = False でも動作させるため）
+from dezero.core_simple import Variable
+from dezero.core_simple import setup_variable
+setup_variable()
 
 
 def f(x):
@@ -22,4 +26,4 @@ for i in range(iters):
     x.cleargrad()
     y.backward()
 
-    x.data -= 0.01 * x.grad.data
+    x.data -= 0.01 * x.grad

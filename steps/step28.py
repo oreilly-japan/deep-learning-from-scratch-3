@@ -1,5 +1,9 @@
 import numpy as np
-from dezero import Variable
+# core_simple を明示的にインポート
+# （dezero/__init__.py の is_simple_core = False でも動作させるため）
+from dezero.core_simple import Variable
+from dezero.core_simple import setup_variable
+setup_variable()
 
 
 def rosenbrock(x0, x1):
@@ -27,7 +31,7 @@ for i in range(iters):
     x0.data -= lr * x0.grad
     x1.data -= lr * x1.grad
 
-'''
+
 import matplotlib.pyplot as plt
 
 #R = 0.01
@@ -55,4 +59,3 @@ plt.scatter([1], [1],marker="*",s=100,linewidths="2", c='blue')#,c="yellow", edg
 
 plt.savefig("rosenbrock_gd10000.eps", bbox_inches="tight")
 plt.show()
-'''

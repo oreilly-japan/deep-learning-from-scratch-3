@@ -29,14 +29,25 @@ def no_grad():
 def test_mode():
     return using_config('train', False)
 
-
 # =============================================================================
 # Variable / Function
 # =============================================================================
+array_types = (np.ndarray)
+try:
+    import cupy
+    array_types = (np.ndarray, cupy.ndarray)
+except ImportError:
+    pass
+
+
 class Variable:
     __array_priority__ = 200
 
     def __init__(self, data, name=None):
+        if data is not None:
+            if not isinstance(data, array_types):
+                raise TypeError('{} is not supported'.format(type(data)))
+
         self.data = data
         self.name = name
         self.grad = None
@@ -143,6 +154,18 @@ class Parameter(Variable):
     pass
 
 
+def as_variable(obj):
+    if isinstance(obj, Variable):
+        return obj
+    return Variable(obj)
+
+
+def as_ndarray(x, array_module=np):
+    if np.isscalar(x):
+        return array_module.array(x)
+    return x
+
+
 class Function:
     def __call__(self, *inputs):
         inputs = [as_variable(x) for x in inputs]
@@ -151,7 +174,7 @@ class Function:
         ys = self.forward(*xs)
         if not isinstance(ys, tuple):
             ys = (ys,)
-        outputs = [Variable(y) for y in ys]
+        outputs = [Variable(as_ndarray(y)) for y in ys]
 
         if Config.enable_backprop:
             self.priority = max([x.priority for x in inputs])
@@ -167,12 +190,6 @@ class Function:
 
     def backward(self, gys):
         raise NotImplementedError()
-
-
-def as_variable(obj):
-    if isinstance(obj, Variable):
-        return obj
-    return Variable(obj)
 
 
 # =============================================================================
@@ -198,9 +215,7 @@ class Add(Function):
 
 
 def add(x0, x1):
-    if np.isscalar(x1):
-        xp = dezero.cuda.get_array_module(x0.data)
-        x1 = xp.array(x1)
+    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
     return Add()(x0, x1)
 
 
@@ -220,9 +235,7 @@ class Mul(Function):
 
 
 def mul(x0, x1):
-    if np.isscalar(x1):
-        xp = dezero.cuda.get_array_module(x0.data)
-        x1 = xp.array(x1)
+    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
     return Mul()(x0, x1)
 
 
@@ -253,16 +266,12 @@ class Sub(Function):
 
 
 def sub(x0, x1):
-    if np.isscalar(x1):
-        xp = dezero.cuda.get_array_module(x0.data)
-        x1 = xp.array(x1)
+    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
     return Sub()(x0, x1)
 
 
 def rsub(x0, x1):
-    if np.isscalar(x1):
-        xp = dezero.cuda.get_array_module(x0.data)
-        x1 = xp.array(x1)
+    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
     return Sub()(x1, x0)
 
 
@@ -282,16 +291,12 @@ class Div(Function):
 
 
 def div(x0, x1):
-    if np.isscalar(x1):
-        xp = dezero.cuda.get_array_module(x0.data)
-        x1 = xp.array(x1)
+    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
     return Div()(x0, x1)
 
 
 def rdiv(x0, x1):
-    if np.isscalar(x1):
-        xp = dezero.cuda.get_array_module(x0.data)
-        x1 = xp.array(x1)
+    x1 = as_ndarray(x1, dezero.cuda.get_array_module(x0.data))
     return Div()(x1, x0)
 
 

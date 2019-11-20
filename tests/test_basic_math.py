@@ -14,6 +14,12 @@ class TestAdd(unittest.TestCase):
         expected = np.array([2, 4, 6])
         self.assertTrue(np.array_equal(res, expected))
 
+    def test_datatype(self):
+        x = Variable(np.array(2.0))
+        y = x ** 2
+        # np.float64ではなく0次元のnp.ndarrayを返す
+        self.assertFalse(np.isscalar(y))
+
     def test_backward1(self):
         x = np.random.randn(3, 3)
         w = np.random.randn(3, 3)

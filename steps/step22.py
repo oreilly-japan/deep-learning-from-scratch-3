@@ -25,6 +25,10 @@ class Variable:
     __array_priority__ = 200
 
     def __init__(self, data):
+        if data is not None:
+            if not isinstance(data, np.ndarray):
+                raise TypeError('{} is not supported'.format(type(data)))
+
         self.data = data
         self.grad = None
         self.creator = None
@@ -108,6 +112,12 @@ def as_variable(obj):
     return Variable(obj)
 
 
+def as_ndarray(x):
+    if np.isscalar(x):
+        return np.array(x)
+    return x
+
+
 class Function:
     def __call__(self, *inputs):
         inputs = [as_variable(x) for x in inputs]
@@ -116,7 +126,7 @@ class Function:
         ys = self.forward(*xs)
         if not isinstance(ys, tuple):
             ys = (ys,)
-        outputs = [Variable(y) for y in ys]
+        outputs = [Variable(as_ndarray(y)) for y in ys]
 
         if Config.enable_backprop:
             self.priority = max([x.priority for x in inputs])
@@ -144,8 +154,7 @@ class Add(Function):
 
 
 def add(x0, x1):
-    if np.isscalar(x1):
-        x1 = np.array(x1)
+    x1 = as_ndarray(x1)
     return Add()(x0, x1)
 
 
@@ -160,8 +169,7 @@ class Mul(Function):
 
 
 def mul(x0, x1):
-    if np.isscalar(x1):
-        x1 = np.array(x1)
+    x1 = as_ndarray(x1)
     return Mul()(x0, x1)
 
 
@@ -187,12 +195,12 @@ class Sub(Function):
 
 
 def sub(x0, x1):
+    x1 = as_ndarray(x1)
     return Sub()(x0, x1)
 
 
 def rsub(x0, x1):
-    if np.isscalar(x1):
-        x1 = np.array(x1)
+    x1 = as_ndarray(x1)
     return sub(x1, x0)
 
 
@@ -209,10 +217,12 @@ class Div(Function):
 
 
 def div(x0, x1):
+    x1 = as_ndarray(x1)
     return Div()(x0, x1)
 
 
 def rdiv(x0, x1):
+    x1 = as_ndarray(x1)
     return div(x1, x0)
 
 
@@ -250,13 +260,13 @@ Variable.__pow__ = pow
 x = Variable(np.array(2.0))
 y = -x
 y.backward()
-print(y)  # variable(-2.)
+print(y)  # variable(-2.0)
 print(x.grad)  # -1.0
 
 x = Variable(np.array(2.0))
 y = 2.0 - x
 y.backward()
-print(y)  # variable(0.)
+print(y)  # variable(0.0)
 
 x = Variable(np.array(2.0))
 y = 3.0 / x

@@ -25,6 +25,10 @@ class Variable:
     __array_priority__ = 200
 
     def __init__(self, data):
+        if data is not None:
+            if not isinstance(data, np.ndarray):
+                raise TypeError('{} is not supported'.format(type(data)))
+
         self.data = data
         self.grad = None
         self.creator = None
@@ -108,6 +112,12 @@ def as_variable(obj):
     return Variable(obj)
 
 
+def as_ndarray(x):
+    if np.isscalar(x):
+        return np.array(x)
+    return x
+
+
 class Function:
     def __call__(self, *inputs):
         inputs = [as_variable(x) for x in inputs]
@@ -116,7 +126,7 @@ class Function:
         ys = self.forward(*xs)
         if not isinstance(ys, tuple):
             ys = (ys,)
-        outputs = [Variable(y) for y in ys]
+        outputs = [Variable(as_ndarray(y)) for y in ys]
 
         if Config.enable_backprop:
             self.priority = max([x.priority for x in inputs])

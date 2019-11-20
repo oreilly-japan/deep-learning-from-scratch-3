@@ -6,8 +6,14 @@ from dezero.utils import check_backward
 
 
 class TestSum(unittest.TestCase):
-    def test_forward1(self):
+    def test_datatype(self):
         x = Variable(np.random.rand(10))
+        y = F.sum(x)
+        # np.float64ではなく0次元のnp.ndarrayを返す
+        self.assertFalse(np.isscalar(y))
+
+    def test_forward1(self):
+        x = Variable(np.array(2.0))
         y = F.sum(x)
         expected = np.sum(x.data)
         self.assertTrue(np.allclose(y.data, expected))
