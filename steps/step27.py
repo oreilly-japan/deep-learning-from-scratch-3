@@ -27,18 +27,11 @@ print(y.data)
 print(x.grad)
 
 
-def my_sin(x, iters=5):
-    y = 0
-    for i in range(iters):
-        t = (-1) ** i * x ** (2 * i + 1) / math.factorial(2 * i + 1)
-        y = y + t
-    return y
-
-
 def my_sin(x, threshould=0.0001):
     y = 0
     for i in range(100000):
-        t = (-1) ** i * x ** (2 * i + 1) / math.factorial(2 * i + 1)
+        c = (-1) ** i / math.factorial(2 * i + 1)
+        t = c * x ** (2 * i + 1)
         y = y + t
         if abs(t.data) < threshould:
             break
