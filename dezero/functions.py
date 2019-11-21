@@ -364,7 +364,7 @@ def accuracy(y, t):
     pred = y.data.argmax(axis=1).reshape(t.shape)
     result = (pred == t.data)
     acc = result.mean()
-    return Variable(acc)
+    return acc
 
 
 # =============================================================================

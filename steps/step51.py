@@ -27,7 +27,7 @@ for epoch in range(max_epoch):
         optimizer.update()
 
         sum_loss += float(loss.data) * len(t)
-        sum_acc += float(acc.data) * len(t)
+        sum_acc += float(acc) * len(t)
 
     print('epoch: {}'.format(epoch))
     print('train loss: {}, accuracy: {}'.format(
@@ -40,7 +40,7 @@ for epoch in range(max_epoch):
             loss = F.softmax_cross_entropy(y, t)
             acc = F.accuracy(y, t)
             sum_loss += float(loss.data) * len(t)
-            sum_acc += float(acc.data) * len(t)
+            sum_acc += float(acc) * len(t)
 
     print('test loss: {}, accuracy: {}'.format(
         sum_loss / len(test_set), sum_acc / len(test_set)))
