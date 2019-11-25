@@ -61,7 +61,18 @@ def get_dot_graph(y):
 # =============================================================================
 # Utility functions (numpy magic)
 # =============================================================================
-def sum_to(x, shape):
+def np_sum_to(x, shape):
+    """x が shape の形状になるように和を求める。
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+    shape : None or int or tuple of ints
+
+    Returns
+    -------
+    y : numpy.ndarray
+    """
     ndim = len(shape)
     lead = x.ndim - ndim
     lead_axis = tuple(range(lead))
@@ -272,6 +283,15 @@ def _col2im_gpu(col, img_shape, kernel_size, stride, pad):
 # =============================================================================
 # Gradient check
 # =============================================================================
+def gradient_check(f, x, eps=0.001, atol=1e-5, rtol=1e-4):
+    y = f(x)
+    y.backward()
+    grad_num = numerical_grad(f, x, eps=eps)
+    grad = x.grad if isinstance(x.grad, np.ndarray) else x.grad.data
+    flg = np.allclose(grad, grad_num, atol=atol, rtol=rtol)
+    return flg
+
+
 def check_backward(func, x_data, y_grad=None, eps=0.001,
                    atol=1e-5, rtol=1e-4, verbose=True):
     x_data = _as_tuple(x_data)
