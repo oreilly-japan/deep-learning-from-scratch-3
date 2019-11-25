@@ -8,7 +8,7 @@ t = x + c
 y = F.sum(t)
 
 y.backward(retain_grad=True)
-print(y.grad.data)
-print(t.grad.data)
-print(x.grad.data)
-print(c.grad.data)
+print(y.grad)
+print(t.grad)
+print(x.grad)
+print(c.grad)
