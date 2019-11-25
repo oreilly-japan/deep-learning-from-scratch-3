@@ -182,8 +182,8 @@ class MatMul(Function):
 
     def backward(self, gy):
         x, W = self.inputs
-        gx = matmul(gy, transpose(W))
-        gW = matmul(transpose(x), gy)
+        gx = matmul(gy, W.T)
+        gW = matmul(x.T, gy)
         return gx, gW
 
 
