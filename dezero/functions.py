@@ -139,7 +139,7 @@ class SumTo(Function):
         self.shape = shape
 
     def forward(self, x):
-        y = utils.np_sum_to(x, self.shape)
+        y = utils.sum_to(x, self.shape)
         return y
 
     def backward(self, gy):
