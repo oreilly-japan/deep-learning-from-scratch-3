@@ -15,17 +15,21 @@ class Sequential(Model):
         return x
 
 
-class TwoLayerNet(Model):
-    def __init__(self, in_size, hidden_size, out_size, activation=F.sigmoid):
+class MLP(Model):
+    def __init__(self, sizes, activation=F.sigmoid):
         super().__init__()
-        self.f = activation
-        self.l1 = L.Linear(in_size, hidden_size)
-        self.l2 = L.Linear(hidden_size, out_size)
+        self.activation = activation
+        self.layers = []
+
+        for i, (in_size, out_size) in enumerate(zip(sizes[:-1], sizes[1:])):
+            layer = L.Linear(in_size, out_size)
+            setattr(self, 'l' + str(i), layer)
+            self.layers.append(layer)
 
     def __call__(self, x):
-        y = self.f(self.l1(x))
-        y = self.l2(y)
-        return y
+        for l in self.layers[:-1]:
+            x = self.activation(l(x))
+        return self.layers[-1](x)
 
 
 class VGG(Model):
