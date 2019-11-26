@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dezero import Variable
 import dezero.functions as F
-import dezero
 
 # トイ・データセット
 np.random.seed(0)
@@ -10,10 +9,8 @@ x = np.random.rand(100, 1)
 y = 5 + 2 * x + np.random.rand(100, 1)
 x, y = Variable(x), Variable(y)
 
-N, I = x.shape
-N, O = y.shape
-W = Variable(np.zeros((I, O)))
-b = Variable(np.zeros(O))
+W = Variable(np.zeros((1, 1)))
+b = Variable(np.zeros(1))
 
 
 def predict(x):
@@ -21,11 +18,9 @@ def predict(x):
     return y
 
 
-def mean_squared_error(y1, y2):
-    N = y1.shape[0]
-    diff = y1 - y2
-    loss = F.sum(diff * diff) / N
-    return loss
+def mean_squared_error(x0, x1):
+    diff = x0 - x1
+    return F.sum(diff ** 2) / diff.size
 
 
 lr = 0.1
@@ -39,14 +34,12 @@ for i in range(iters):
     b.cleargrad()
     loss.backward()
 
-    with dezero.no_grad():
-        W -= W.grad.data * lr
-        b -= b.grad.data * lr
-    # W.data -= lr * W.grad
-    # b.data -= lr * b.grad
+    # .data 属性で更新を行う（パラメータの更新時は、計算グラフの作成は不要）
+    W.data -= lr * W.grad.data
+    b.data -= lr * b.grad.data
     print(loss)
 
-'''
+
 # グラフの描画
 plt.scatter(x.data, y.data, s=10)
 plt.xlabel('x')
@@ -54,4 +47,3 @@ plt.ylabel('y')
 y_pred = predict(x)
 plt.plot(x.data, y_pred.data, color='r')
 plt.show()
-'''
