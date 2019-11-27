@@ -2,7 +2,7 @@ import dezero
 import dezero.functions as F
 from dezero import optimizers
 from dezero.dataset import DatasetLoader
-from dezero.models import TwoLayerNet
+from dezero.models import MLP
 
 
 max_epoch = 3
@@ -10,7 +10,7 @@ batch_size = 100
 
 train_set, test_set = dezero.datasets.get_mnist()
 train_loader = DatasetLoader(train_set, batch_size)
-model = TwoLayerNet(784, 1000, 10)
+model = MLP((784, 1000, 10))
 optimizer = optimizers.SGD().setup(model)
 
 # パラーメタの読み込み
