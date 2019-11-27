@@ -18,7 +18,7 @@ class DatasetLoader:
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.data_size = len(dataset)
-        self.max_iter_per_epoch = math.ceil(self.data_size / batch_size)
+        self.max_iter = math.ceil(self.data_size / batch_size)
         self.gpu = gpu
 
         self.reset()
@@ -32,11 +32,11 @@ class DatasetLoader:
         return self
 
     def __next__(self):
-        if self.iteration >= self.max_iter_per_epoch:
+        if self.iteration >= self.max_iter:
             self.reset()
             raise StopIteration
 
-        i = self.iteration % self.max_iter_per_epoch
+        i = self.iteration % self.max_iter
         start_idx = i * self.batch_size
         end_idx = (i + 1) * self.batch_size
         batch = self.dataset[start_idx:end_idx]
