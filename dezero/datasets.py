@@ -3,13 +3,14 @@ import urllib.request
 import os.path
 import gzip
 import os
-
+import dezero
 
 def get_spiral(seed=1984):
     np.random.seed(seed)
-    N = 100  # クラスごとのサンプル数
+    N = 200  # クラスごとのサンプル数
     DIM = 2  # データの要素数
     CLS_NUM = 3  # クラス数
+    TRAIN_SIZE = 100  # 訓練データのサイズ
 
     x = np.zeros((N * CLS_NUM, DIM))
     t = np.zeros((N * CLS_NUM), dtype=np.int)
@@ -25,7 +26,16 @@ def get_spiral(seed=1984):
                               radius * np.cos(theta)]).flatten()
             t[ix] = j
 
-    return x, t
+    # shuffle
+    indices = np.random.permutation(N*CLS_NUM)
+    x = x[indices]
+    t = t[indices]
+
+    # tupled dataset
+    train_size = TRAIN_SIZE*CLS_NUM
+    train_set = [(x, t) for x, t in zip(x[:train_size], t[:train_size])]
+    test_set = [(x, t) for x, t in zip(x[:train_size], t[train_size:])]
+    return train_set, test_set
 
 
 cache_dir = os.path.dirname(os.path.abspath(__file__)) + '/.cache'
