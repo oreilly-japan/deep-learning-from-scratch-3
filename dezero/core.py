@@ -134,8 +134,8 @@ class Variable:
     def transpose(self, *axes):
         if len(axes) == 0:
             axes = None
-        elif len(axes) == 1 and (isinstance(axes[0], (tuple, list)) or
-                                 axes[0] is None):
+        elif len(axes) == 1 and (isinstance(axes[0], (tuple, list))
+                                 or axes[0] is None):
             axes = axes[0]
         return dezero.functions.transpose(self, axes)
 
@@ -232,7 +232,7 @@ class Mul(Function):
         x0, x1 = self.inputs
         gx0 = gy * x1
         gx1 = gy * x0
-        gx0, gx1 = _broadcast_backward(gx0, gx1,x0.shape, x1.shape)
+        gx0, gx1 = _broadcast_backward(gx0, gx1, x0.shape, x1.shape)
         return gx0, gx1
 
 
