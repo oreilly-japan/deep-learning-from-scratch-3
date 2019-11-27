@@ -31,31 +31,19 @@ for i in range(iters):
     x0.data -= lr * x0.grad
     x1.data -= lr * x1.grad
 
-
+# 図を描画
 import matplotlib.pyplot as plt
 
-#R = 0.01
 R = 0.01
 x = np.arange(-2.0, 2.0, R)
 y = np.arange(-1.0, 3.0, R)
-
 X, Y = np.meshgrid(x, y)
 Z = rosenbrock(X, Y)
-
-
-XX, YY, ZZ = [float(d[0]) for d in logs], [float(d[1]) for d in logs], [float(d[2]) for d in logs]
-#ax.plot(XX, YY, ZZ, c='red')
-#ax.scatter(XX, YY, ZZ, c='red')
-
-
-plt.contour(X, Y, Z, alpha=0.5, levels=[0, 1, 2, 4, 8, 16, 32, 64, 128, 256], colors ='#377eb8')#, cmap='Blues')
-
+XX = [float(d[0]) for d in logs]
+YY = [float(d[1]) for d in logs]
+ZZ = [float(d[2]) for d in logs]
 plt.plot(XX, YY, c='orange', alpha=0.8)
 plt.scatter(XX, YY, c='red', alpha=0.5)
-plt.scatter([1], [1],marker="*",s=100,linewidths="2", c='blue')#,c="yellow", edgecolors="orange")
-#plt.xlim(-3, 3.0)
-#plt.ylim(-3, 3.0)
-# 散布図を描画
-
-plt.savefig("rosenbrock_gd10000.eps", bbox_inches="tight")
+plt.scatter([1], [1],marker="*",s=100,linewidths="2", c='blue')
+plt.contour(X, Y, Z, alpha=0.5, levels=[0, 1, 2, 4, 8, 16, 32, 64, 128, 256])
 plt.show()
