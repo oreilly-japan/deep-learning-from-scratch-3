@@ -198,9 +198,8 @@ def linear(x, W, b=None):
         return t
 
     y = t + b
-    # t の ndarray はリリースできる
-    # （matmul関数の逆伝播では出力データは不要、かつadd関数の逆伝播では入力データは不要）
-    t.data = None
+    # matmul関数の逆伝播では出力データは不要、かつadd関数の逆伝播では入力データは不要
+    t.data = None  # t のデータ（ndarray）を消去
     return y
 
 
@@ -264,13 +263,29 @@ def get_item(x, slices):
 # =============================================================================
 # activation / loss function
 # =============================================================================
-def mean_squared_error(y1, y2):
-    y1, y2 = as_variable(y1), as_variable(y2)
+def mean_squared_error_simple(x0, x1):
+    x0, x1 = as_variable(x0), as_variable(x1)
+    diff = x0 - x1
+    return sum(diff ** 2) / diff.size
 
-    N = y1.shape[0]
-    diff = y1 - y2
-    loss = sum(diff * diff) / N
-    return loss
+
+class MeanSquaredError(Function):
+    def forward(self, x0, x1):
+        diff = x0 - x1
+        y = (diff ** 2).sum() / diff.size
+        return y
+
+    def backward(self, gy):
+        x0, x1 = self.inputs
+        diff = x0 - x1
+        gy = broadcast_to(gy, diff.shape)
+        gx0 = gy * diff * (2. / diff.size)
+        gx1 = -gx0
+        return gx0, gx1
+
+
+def mean_squared_error(x0, x1):
+    return MeanSquaredError()(x0, x1)
 
 
 class Sigmoid(Function):
@@ -338,9 +353,7 @@ def softmax(x, axis=1):
 def softmax_simple(x, axis=1):
     x = as_variable(x)
     y = exp(x)
-    sum_shape = list(y.shape)
-    sum_shape[axis] = 1
-    sum_y = sum_to(y, sum_shape)
+    sum_y = sum(y, axis=axis, keepdims=True)
     return y / sum_y
 
 
