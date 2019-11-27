@@ -261,54 +261,12 @@ def get_item(x, slices):
 
 
 # =============================================================================
-# activation / loss function
+# activation function
 # =============================================================================
-def mean_squared_error_simple(x0, x1):
-    x0, x1 = as_variable(x0), as_variable(x1)
-    diff = x0 - x1
-    return sum(diff ** 2) / diff.size
-
-def softmax_simple(x, axis=1):
-    x = as_variable(x)
-    y = exp(x)
-    sum_y = sum(y, axis=axis, keepdims=True)
-    return y / sum_y
-
-
-def softmax_cross_entropy_simple(x, t):
-    x, t = as_variable(x), as_variable(t)
-    N = x.shape[0]
-    p = softmax(x)
-    p = clip(p, 1e-15, 1.0)  # log(0)を防ぐために、p の値を 1e-15 以上とする
-    log_p = log(p)
-    tlog_p = log_p[np.arange(N), t.data]
-    y = -1 * sum(tlog_p) / N
-    return y
-
-
 def sigmoid_simple(x):
     x = as_variable(x)
     y = 1 / (1 + exp(-x))
     return y
-
-
-class MeanSquaredError(Function):
-    def forward(self, x0, x1):
-        diff = x0 - x1
-        y = (diff ** 2).sum() / diff.size
-        return y
-
-    def backward(self, gy):
-        x0, x1 = self.inputs
-        diff = x0 - x1
-        gy = broadcast_to(gy, diff.shape)
-        gx0 = gy * diff * (2. / diff.size)
-        gx1 = -gx0
-        return gx0, gx1
-
-
-def mean_squared_error(x0, x1):
-    return MeanSquaredError()(x0, x1)
 
 
 class Sigmoid(Function):
@@ -342,6 +300,13 @@ class ReLU(Function):
 
 def relu(x):
     return ReLU()(x)
+
+
+def softmax_simple(x, axis=1):
+    x = as_variable(x)
+    y = exp(x)
+    sum_y = sum(y, axis=axis, keepdims=True)
+    return y / sum_y
 
 
 class Softmax(Function):
@@ -386,6 +351,45 @@ def log_softmax(x, axis=1):
     return LogSoftmax(axis)(x)
 
 
+# =============================================================================
+# loss function
+# =============================================================================
+def mean_squared_error_simple(x0, x1):
+    x0, x1 = as_variable(x0), as_variable(x1)
+    diff = x0 - x1
+    return sum(diff ** 2) / diff.size
+
+
+class MeanSquaredError(Function):
+    def forward(self, x0, x1):
+        diff = x0 - x1
+        y = (diff ** 2).sum() / diff.size
+        return y
+
+    def backward(self, gy):
+        x0, x1 = self.inputs
+        diff = x0 - x1
+        gy = broadcast_to(gy, diff.shape)
+        gx0 = gy * diff * (2. / diff.size)
+        gx1 = -gx0
+        return gx0, gx1
+
+
+def mean_squared_error(x0, x1):
+    return MeanSquaredError()(x0, x1)
+
+
+def softmax_cross_entropy_simple(x, t):
+    x, t = as_variable(x), as_variable(t)
+    N = x.shape[0]
+    p = softmax(x)
+    p = clip(p, 1e-15, 1.0)  # log(0)を防ぐために、p の値を 1e-15 以上とする
+    log_p = log(p)
+    tlog_p = log_p[np.arange(N), t.data]
+    y = -1 * sum(tlog_p) / N
+    return y
+
+
 class SoftmaxCrossEntropy(Function):
     def forward(self, x, t):
         N = x.shape[0]
@@ -412,6 +416,9 @@ def softmax_cross_entropy(x, t):
     return SoftmaxCrossEntropy()(x, t)
 
 
+# =============================================================================
+# utility function
+# =============================================================================
 def accuracy(y, t):
     """
     [WAR] この関数は微分可能ではありません
