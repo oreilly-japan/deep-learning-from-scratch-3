@@ -21,5 +21,5 @@ print(y)
 print(x.grad)
 
 x = Variable(np.random.randn(2, 3, 4, 5))
-y = F.sum(x, keepdims=True)
+y = x.sum(keepdims=True)
 print(y.shape)

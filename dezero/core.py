@@ -143,6 +143,9 @@ class Variable:
     def T(self):
         return dezero.functions.transpose(self)
 
+    def sum(self, axis=None, keepdims=False):
+        return dezero.functions.sum(self, axis, keepdims)
+
     def to_cpu(self):
         self.data = dezero.cuda.as_numpy(self.data)
 
@@ -328,7 +331,6 @@ def setup_variable():
     Variable.__pow__ = pow
     Variable.__getitem__ = dezero.functions.get_item
 
-    Variable.sum = dezero.functions.sum
     Variable.matmaul = dezero.functions.matmul
     Variable.dot = dezero.functions.matmul
     Variable.max = dezero.functions.max
