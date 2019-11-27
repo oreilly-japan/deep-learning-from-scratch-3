@@ -1,7 +1,7 @@
 import numpy as np
 import dezero
 from dezero import cuda, utils
-from dezero.core import Function, Variable, as_variable
+from dezero.core import Function, Variable, as_variable, as_array
 
 
 # =============================================================================
@@ -377,7 +377,7 @@ def accuracy(y, t):
     pred = y.data.argmax(axis=1).reshape(t.shape)
     result = (pred == t.data)
     acc = result.mean()
-    return Variable(acc)
+    return Variable(as_array(acc))
 
 
 # =============================================================================
