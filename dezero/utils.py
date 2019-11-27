@@ -122,6 +122,17 @@ def reshape_sum_backward(gy, x_shape, axis, keepdims):
     return gy
 
 
+def logsumexp(x, axis=1):
+    xp = cuda.get_array_module(x)
+    m = x.max(axis=axis, keepdims=True)
+    y = x - m
+    xp.exp(y, out=y)
+    s = y.sum(axis=axis, keepdims=True)
+    xp.log(s, out=s)
+    m += s
+    return m
+
+
 def max_backward_shape(x, axis):
     if axis is None:
         axis = range(x.ndim)
@@ -369,59 +380,3 @@ def numerical_grad(f, inputs, grad_output=None, eps=0.001):
             it.iternext()
 
     return _as_tuple(grads)
-
-
-# =============================================================================
-# Plot
-# =============================================================================
-def plot_surface(func, x0_arange=[-2.0, 2.0, 0.01],
-                 x1_arange=[-2.0, 2.0, 0.01]):
-    xs = np.arange(*x0_arange)
-    ys = np.arange(*x1_arange)
-
-    X, Y = np.meshgrid(xs, ys)
-    Z = func(X, Y)
-
-    fig = plt.figure()
-    ax = Axes3D(fig, azim=-128, elev=43)
-
-    ax.set_xlabel("x0")
-    ax.set_ylabel("x1")
-    ax.set_zlabel("y")
-
-    ax.plot_wireframe(X, Y, Z)
-    # ax.contour(X, Y, Z, offset=1)#, colors="black", offset=-1)
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, norm=LogNorm(),
-                    linewidth=0, edgecolor='none', cmap="viridis", alpha=0.8)
-    plt.show()
-    # plt.savefig("Rosenbrock1.svg", bbox_inches="tight")
-
-
-def plot_grad(xlist):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
-    THRESHOUD_SCALE = 1.0
-    max_scale = -1
-    for xs in xlist:
-        x0, x1 = xs
-        scale = np.square(x0.grad ** 2 + x1.grad ** 2)
-        if max_scale < scale:
-            max_scale = scale
-    grad_scale = THRESHOUD_SCALE / max_scale
-
-    for xs in xlist:
-        x0, x1 = xs
-
-        start = (float(x0.data), float(x1.data))
-        end = (float(x0.data + grad_scale * x0.grad),
-               float(x1.data + grad_scale * x1.grad))
-        print(start, end)
-        ax.annotate('', xy=end, xytext=start,
-                    arrowprops=dict(shrink=0, width=1, headwidth=8,
-                                    headlength=10, connectionstyle='arc3',
-                                    facecolor='gray', edgecolor='gray')
-                    )
-    ax.set_xlim([-5, 5])
-    ax.set_ylim([-5, 5])
-    plt.show()
