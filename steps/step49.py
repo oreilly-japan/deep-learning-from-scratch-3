@@ -3,14 +3,14 @@ import numpy as np
 import dezero
 import dezero.functions as F
 from dezero import optimizers
-from dezero.models import TwoLayerNet
+from dezero.models import MLP
 
 max_epoch = 20
 batch_size = 100
 hidden_size = 1000
 
 train_set, test_set = dezero.datasets.get_mnist()
-model = TwoLayerNet(784, hidden_size, 10)
+model = MLP((784, hidden_size, 10))
 optimizer = optimizers.SGD().setup(model)
 
 data_size = len(train_set)

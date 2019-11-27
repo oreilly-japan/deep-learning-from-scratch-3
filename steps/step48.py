@@ -5,7 +5,12 @@ import dezero
 from dezero import optimizers
 import dezero.functions as F
 from dezero.datasets import get_spiral
-from dezero.models import TwoLayerNet
+from dezero.models import MLP
+
+
+train_set, test_set = get_spiral()
+x = np.array([example[0] for example in train_set])
+t = np.array([example[1] for example in train_set])
 
 # ハイパーパラメータの設定
 max_epoch = 300
@@ -13,13 +18,11 @@ batch_size = 30
 hidden_size = 10
 lr = 1.0
 
-x, t = get_spiral()
-model = TwoLayerNet(2, hidden_size, 3)
+model = MLP((2, hidden_size, 3))
 optimizer = optimizers.SGD(lr).setup(model)
 
 data_size = len(x)
 max_iter = math.ceil(data_size / batch_size)  # 小数点の切り上げ
-loss_list = []
 
 for epoch in range(max_epoch):
     # データのシャッフル
@@ -44,13 +47,7 @@ for epoch in range(max_epoch):
     # エポック的に学習経過を出力
     avg_loss = sum_loss / data_size
     print('epoch %d, loss %.2f' % (epoch + 1, avg_loss))
-    loss_list.append(avg_loss)
 
-# 学習結果のプロット
-plt.plot(np.arange(len(loss_list)), loss_list, label='train')
-plt.xlabel('epoch')
-plt.ylabel('loss')
-plt.show()
 
 # 境界領域のプロット
 h = 0.001
@@ -66,11 +63,11 @@ Z = predict_cls.reshape(xx.shape)
 plt.contourf(xx, yy, Z)
 
 # データ点のプロット
-x, t = get_spiral()
-N = 100
 CLS_NUM = 3
+N = len(x) / CLS_NUM
 markers = ['o', 'x', '^']
-for i in range(CLS_NUM):
-    plt.scatter(x[i * N:(i + 1) * N, 0], x[i * N:(i + 1) * N, 1], s=40,
-                marker=markers[i])
+colors = ['orange', 'blue', 'green']
+for i in range(len(x)):
+    c = t[i]
+    plt.scatter(x[i][0], x[i][1],s=40,  marker=markers[c], c=colors[c])
 plt.show()

@@ -2,7 +2,7 @@ import dezero
 import dezero.functions as F
 from dezero import optimizers
 from dezero.dataset import DatasetLoader
-from dezero.models import TwoLayerNet
+from dezero.models import MLP
 
 max_epoch = 20
 batch_size = 100
@@ -12,8 +12,10 @@ train_set, test_set = dezero.datasets.get_mnist()
 train_loader = DatasetLoader(train_set, batch_size)
 test_loader = DatasetLoader(test_set, batch_size, shuffle=False)
 
-model = TwoLayerNet(784, hidden_size, 10)
-optimizer = optimizers.SGD().setup(model)
+# model = MLP((784, hidden_size, 10))
+# optimizer = optimizers.SGD().setup(model)
+model = MLP((784, hidden_size, hidden_size, 10), activation=F.relu)
+optimizer = optimizers.Adam().setup(model)
 
 for epoch in range(max_epoch):
     sum_loss, sum_acc = 0, 0
