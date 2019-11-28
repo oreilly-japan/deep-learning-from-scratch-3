@@ -134,9 +134,9 @@ class Variable:
     def transpose(self, *axes):
         if len(axes) == 0:
             axes = None
-        elif len(axes) == 1 and (isinstance(axes[0], (tuple, list)) or
-                                 axes[0] is None):
-            axes = axes[0]
+        elif len(axes) == 1:
+            if isinstance(axes[0], (tuple, list) or axes[0] is None):
+                axes = axes[0]
         return dezero.functions.transpose(self, axes)
 
     @property
