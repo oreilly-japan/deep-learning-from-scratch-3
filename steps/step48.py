@@ -4,11 +4,10 @@ import matplotlib.pyplot as plt
 import dezero
 from dezero import optimizers
 import dezero.functions as F
-from dezero.datasets import get_spiral
 from dezero.models import MLP
 
 
-train_set, test_set = get_spiral()
+train_set, test_set = dezero.datasets.get_spiral()
 x = np.array([example[0] for example in train_set])
 t = np.array([example[1] for example in train_set])
 
@@ -44,7 +43,7 @@ for epoch in range(max_epoch):
 
         sum_loss += float(loss.data) * len(batch_t)
 
-    # エポック的に学習経過を出力
+    # エポックごとに学習経過を出力
     avg_loss = sum_loss / data_size
     print('epoch %d, loss %.2f' % (epoch + 1, avg_loss))
 
@@ -63,11 +62,10 @@ Z = predict_cls.reshape(xx.shape)
 plt.contourf(xx, yy, Z)
 
 # データ点のプロット
-CLS_NUM = 3
-N = len(x) / CLS_NUM
+N, CLS_NUM = 100, 3
 markers = ['o', 'x', '^']
 colors = ['orange', 'blue', 'green']
 for i in range(len(x)):
     c = t[i]
-    plt.scatter(x[i][0], x[i][1],s=40,  marker=markers[c], c=colors[c])
+    plt.scatter(x[i][0], x[i][1], s=40,  marker=markers[c], c=colors[c])
 plt.show()
