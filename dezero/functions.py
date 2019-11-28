@@ -90,14 +90,13 @@ def log(x):
 class Reshape(Function):
     def __init__(self, shape):
         self.shape = shape
-        self.input_shape = None
 
     def forward(self, x):
-        self.input_shape = x.shape
+        self.x_shape = x.shape
         return x.reshape(self.shape)
 
     def backward(self, gy):
-        return reshape(gy, self.input_shape)
+        return reshape(gy, self.x_shape)
 
 
 def reshape(x, shape):
@@ -139,12 +138,12 @@ class SumTo(Function):
         self.shape = shape
 
     def forward(self, x):
+        self.x_shape = x.shape
         y = utils.sum_to(x, self.shape)
         return y
 
     def backward(self, gy):
-        x, = self.inputs
-        gx = broadcast_to(gy, x.shape)
+        gx = broadcast_to(gy, self.x_shape)
         return gx
 
 
@@ -159,13 +158,13 @@ class BroadcastTo(Function):
         self.shape = shape
 
     def forward(self, x):
+        self.x_shape = x.shape
         xp = dezero.cuda.get_array_module(x)
         y = xp.broadcast_to(x, self.shape)
         return y
 
     def backward(self, gy):
-        x, = self.inputs
-        gx = sum_to(gy, x.shape)
+        gx = sum_to(gy, self.x_shape)
         return gx
 
 
