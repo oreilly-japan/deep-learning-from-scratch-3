@@ -74,12 +74,12 @@ class Linear(Layer):
         super().__init__()
 
         I, O = in_size, out_size
-        W_data = np.random.randn(I, O).astype('f') * np.sqrt(1 / I)
+        W_data = np.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
         self.W = Parameter(W_data, name='W')
         if nobias:
             self.b = None
         else:
-            self.b = Parameter(np.zeros(O, dtype='f'), name='b')
+            self.b = Parameter(np.zeros(O, dtype=np.float32), name='b')
 
     def __call__(self, x):
         y = F.linear(x, self.W, self.b)
@@ -97,13 +97,13 @@ class Conv2d(Layer):
         I, O = in_channels, out_channels
         KH, KW = self.kernel_size
 
-        W_data = np.random.randn(O, I, KH, KW).astype('f') * np.sqrt(
+        W_data = np.random.randn(O, I, KH, KW).astype(np.float32) * np.sqrt(
             1 / I * KH * KW)
         self.W = Parameter(W_data, name='W')
         if nobias:
             self.b = None
         else:
-            self.b = Parameter(np.zeros(O).astype('f'), name='b')
+            self.b = Parameter(np.zeros(O).astype(np.float32), name='b')
 
     def __call__(self, x):
         y = F.conv2d(x, self.W, self.b, self.stride, self.pad)
