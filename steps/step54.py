@@ -2,7 +2,7 @@ import numpy as np
 from dezero import test_mode
 import dezero.functions as F
 
-x = np.random.rand(10)
+x = np.ones(5)
 print(x)
 
 # 学習時
