@@ -14,7 +14,7 @@ model = MLP((784, 1000, 10))
 optimizer = optimizers.SGD().setup(model)
 
 # パラーメタの読み込み
-model.load_weights('two_layer_net.npz')
+# model.load_weights('my_mlp.npz')
 
 for epoch in range(max_epoch):
     sum_loss = 0
@@ -30,4 +30,4 @@ for epoch in range(max_epoch):
     print('epoch: {}, loss: {:.4f}'.format(
         epoch + 1, sum_loss / len(train_set)))
 
-model.save_weights('two_layer_net.npz')
+model.save_weights('my_mlp.npz')
