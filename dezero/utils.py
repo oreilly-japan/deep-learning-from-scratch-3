@@ -146,8 +146,7 @@ def max_backward_shape(x, axis):
 
 
 def get_conv_outsize(input_size, kernel_size, stride, pad):
-    i, k, s, p = input_size, kernel_size, stride, pad
-    return (i + p * 2 - k) // s + 1
+    return (input_size + pad * 2 - kernel_size) // stride + 1
 
 
 def im2col(img, kernel_size, stride, pad):
