@@ -32,9 +32,8 @@
 |[steps](/steps)|各stepファイル（step01.py ~ step60.py）|
 |[tests](/tests)|DeZeroのユニットテスト|
 
-- 各stepファイルの概要については[「stepファイルの説明」](../../wiki/Step%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E8%AA%AC%E6%98%8E)をご覧ください。
+- 各stepファイルの概要については「[stepファイルの説明](../../wiki/Step%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E8%AA%AC%E6%98%8E)」をご覧ください。
 
-- 本書のステップ35で行う実験結果は[「tanhの高階微分」](https://github.com/oreilly-japan/deep-learning-from-scratch-3/tree/tanh)をご覧ください。
 
 ## 必要な外部ライブラリ
 
@@ -75,6 +74,6 @@ DeZeroの他の実装例は[examples](/examples)にあります。
 
 ## 正誤表
 
-本書の正誤情報は、[「:mag_right: 正誤表ページ」](../../wiki/Errata)に掲載しています。
+本書の正誤情報は、[:mag_right: 正誤表ページ](../../wiki/Errata)に掲載しています。
 
 正誤表ページに掲載されていない誤植や間違いなどを見つけた方は、[:email: japan＠oreilly.co.jp](<mailto:japan＠oreilly.co.jp>)までお知らせください。
