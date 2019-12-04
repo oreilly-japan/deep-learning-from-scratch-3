@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import dezero
 from dezero import Variable
 import dezero.functions as F
 from dezero.utils import check_backward
@@ -9,6 +10,13 @@ class TestDropout(unittest.TestCase):
     def test_forward1(self):
         x = np.random.randn(100, 100)
         y = F.dropout(Variable(x), dropout_ratio=0.0)
+        res = np.array_equal(y.data, x.data)
+        self.assertTrue(res)
+
+    def test_forward2(self):
+        x = np.random.randn(100, 100)
+        with dezero.test_mode():
+            y = F.dropout(x)
         res = np.array_equal(y.data, x.data)
         self.assertTrue(res)
 
