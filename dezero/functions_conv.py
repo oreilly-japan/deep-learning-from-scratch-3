@@ -10,9 +10,10 @@ from dezero.functions import linear
 # =============================================================================
 def conv2d_simple(x, W, b=None, stride=1, pad=0):
     x, W = as_variable(x), as_variable(W)
+    Weight = W
 
     N, C, H, W = x.shape
-    OC, C, KH, KW = W.shape
+    OC, C, KH, KW = Weight.shape
     SH, SW = _pair(stride)
     PH, PW = _pair(pad)
     OH = utils.get_conv_outsize(H, KH, SH, PH)
@@ -21,9 +22,9 @@ def conv2d_simple(x, W, b=None, stride=1, pad=0):
     col = im2col(x, (KH, KW), stride, pad)
 
     col = col.transpose((0, 4, 5, 1, 2, 3)).reshape((N * OH * OW, -1))
-    W = W.reshape((OC, -1)).transpose()
+    Weight = Weight.reshape((OC, -1)).transpose()
 
-    t = linear(col, W, b)
+    t = linear(col, Weight, b)
 
     y = t.reshape((N, OH, OW, -1)).transpose((0, 3, 1, 2))
     return y
@@ -97,9 +98,10 @@ class Deconv2d(Function):
         self.outsize = outsize
 
     def forward(self, x, W, b):
+        Weight = W
         SH, SW = self.stride
         PH, PW = self.pad
-        C, OC, KH, KW = W.shape
+        C, OC, KH, KW = Weight.shape
         N, C, H, W = x.shape
         if self.outsize is None:
             out_h = get_deconv_outsize(H, KH, SH, PH)
@@ -108,7 +110,7 @@ class Deconv2d(Function):
             out_h, out_w = _pair(self.outsize)
         img_shape = (N, OC, out_h, out_w)
 
-        gcol = np.tensordot(W, x, (0, 1))
+        gcol = np.tensordot(Weight, x, (0, 1))
         gcol = np.rollaxis(gcol, 3)
         y = utils.col2im(gcol, img_shape, (KH, KW), self.stride, self.pad)
         # b, k, h, w
