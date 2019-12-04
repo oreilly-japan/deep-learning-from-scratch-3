@@ -32,7 +32,7 @@ class MLP(Model):
         return self.layers[-1](x)
 
 
-class VGG(Model):
+class VGG16(Model):
     def __init__(self):
         super().__init__()
         self.conv1_1 = L.Conv2d(3, 64, 3, 1, 1)
@@ -72,9 +72,7 @@ class VGG(Model):
         x = F.relu(self.conv5_3(x))
         x = F.pooling(x, 2, 2)
         x = F.reshape(x, (x.shape[0], -1))
-        x = F.relu(self.fc6(x))
-        x = F.dropout(x)
-        x = F.relu(self.fc7(x))
-        x = F.dropout(x)
+        x = F.dropout(F.relu(self.fc6(x)))
+        x = F.dropout(F.relu(self.fc7(x)))
         x = self.fc8(x)
         return x
