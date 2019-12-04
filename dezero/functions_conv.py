@@ -11,41 +11,41 @@ from dezero.functions import linear
 def conv2d_simple(x, W, b=None, stride=1, pad=0):
     x, W = as_variable(x), as_variable(W)
 
-    n, c, h, w = x.shape
-    out_c, c, kh, kw = W.shape
-    sh, sw = _pair(stride)
-    ph, pw = _pair(pad)
-    out_h = utils.get_conv_outsize(h, kh, sh, ph)
-    out_w = utils.get_conv_outsize(w, kw, sw, pw)
+    N, C, H, W = x.shape
+    OC, C, KH, KW = W.shape
+    SH, SW = _pair(stride)
+    PH, PW = _pair(pad)
+    OH = utils.get_conv_outsize(H, KH, SH, PH)
+    OW = utils.get_conv_outsize(W, KW, SW, PW)
 
-    col = im2col(x, (kh, kw), stride, pad)
+    col = im2col(x, (KH, KW), stride, pad)
 
-    col = col.transpose((0, 4, 5, 1, 2, 3)).reshape((n * out_h * out_w, -1))
-    W = W.reshape((out_c, -1)).transpose()
+    col = col.transpose((0, 4, 5, 1, 2, 3)).reshape((N * OH * OW, -1))
+    W = W.reshape((OC, -1)).transpose()
 
     t = linear(col, W, b)
 
-    y = t.reshape((n, out_h, out_w, -1)).transpose((0, 3, 1, 2))
+    y = t.reshape((N, OH, OW, -1)).transpose((0, 3, 1, 2))
     return y
 
 
 def pooling_simple(x, kernel_size, stride=1, pad=0):
     x = as_variable(x)
 
-    n, c, h, w = x.shape
-    kh, kw = _pair(kernel_size)
-    ph, pw = _pair(pad)
-    sh, sw = _pair(stride)
-    out_h = (h + ph * 2 - kh) // sh + 1
-    out_w = (h + pw * 2 - kw) // sw + 1
+    N, C, H, W = x.shape
+    KH, KW = _pair(kernel_size)
+    PH, PW = _pair(pad)
+    SH, SW = _pair(stride)
+    OH = (H + PH * 2 - KH) // SH + 1
+    OW = (H + PW * 2 - KW) // SW + 1
 
     col = im2col(x, kernel_size, stride, pad)
 
-    col = col.transpose((0, 4, 5, 1, 2, 3)).reshape((-1, kh * kw))
+    col = col.transpose((0, 4, 5, 1, 2, 3)).reshape((-1, KH * KW))
 
     y = col.max(axis=1)
 
-    y = y.reshape((n, out_h, out_w, c))
+    y = y.reshape((N, OH, OW, C))
     y = y.transpose((0, 3, 1, 2))
     return y
 
@@ -60,8 +60,8 @@ class Conv2d(Function):
         self.pad = _pair(pad)
 
     def forward(self, x, W, b):
-        kh, kw = W.shape[2:]
-        col = utils.im2col(x, (kh, kw), self.stride, self.pad)
+        KH, KW = W.shape[2:]
+        col = utils.im2col(x, (KH, KW), self.stride, self.pad)
 
         y = np.tensordot(col, W, ((1, 2, 3), (1, 2, 3)))
         if b is not None:
@@ -97,20 +97,20 @@ class Deconv2d(Function):
         self.outsize = outsize
 
     def forward(self, x, W, b):
-        sy, sx = self.stride
-        ph, pw = self.pad
-        in_c, out_c, kh, kw = W.shape
-        n, in_c, in_h, in_w = x.shape
+        SH, SW = self.stride
+        PH, PW = self.pad
+        C, OC, KH, KW = W.shape
+        N, C, H, W = x.shape
         if self.outsize is None:
-            out_h = get_deconv_outsize(in_h, kh, sy, ph)
-            out_w = get_deconv_outsize(in_w, kw, sx, pw)
+            out_h = get_deconv_outsize(H, KH, SH, PH)
+            out_w = get_deconv_outsize(W, KW, SW, PW)
         else:
             out_h, out_w = _pair(self.outsize)
-        img_shape = (n, out_c, out_h, out_w)
+        img_shape = (N, OC, out_h, out_w)
 
         gcol = np.tensordot(W, x, (0, 1))
         gcol = np.rollaxis(gcol, 3)
-        y = utils.col2im(gcol, img_shape, (kh, kw), self.stride, self.pad)
+        y = utils.col2im(gcol, img_shape, (KH, KW), self.stride, self.pad)
         # b, k, h, w
         if b is not None:
             self.no_bias = True
@@ -170,8 +170,8 @@ class Pooling(Function):
     def forward(self, x):
         col = utils.im2col(x, self.kernel_size, self.stride, self.pad)
 
-        n, c, kh, kw, out_h, out_w = col.shape
-        col = col.reshape(n, c, kh * kw, out_h, out_w)
+        N, C, KH, KW, OH, OW = col.shape
+        col = col.reshape(N, C, KH * KW, OH, OW)
         self.indexes = col.argmax(axis=2)
         y = col.max(axis=2)
         return y
@@ -192,22 +192,22 @@ class Pooling2DGrad(Function):
         self.indexes = mpool2d.indexes
 
     def forward(self, gy):
-        n, c, out_h, out_w = gy.shape
-        h, w = self.input_shpae[2:]
-        kh, kw = _pair(self.kernel_size)
+        N, C, OH, OW = gy.shape
+        H, W = self.input_shpae[2:]
+        KH, KW = _pair(self.kernel_size)
 
-        gcol = np.zeros((n * c * out_h * out_w * kh * kw), dtype=self.dtype)
+        gcol = np.zeros((N * C * OH * OW * KH * KW), dtype=self.dtype)
 
         indexes = self.indexes.ravel() + np.arange(
-            0, self.indexes.size * kh * kw, kh * kw)
+            0, self.indexes.size * KH * KW, KH * KW)
 
         gcol[indexes] = gy[0].ravel()
-        gcol = gcol.reshape(n, c, out_h, out_w, kh, kw)
+        gcol = gcol.reshape(N, C, OH, OW, KH, KW)
         gcol = np.swapaxes(gcol, 2, 4)
         gcol = np.swapaxes(gcol, 3, 5)
 
-        gx = utils.col2im(gcol, (n, c, h, w), self.kernel_size, self.stride,
-                          self.pad)  # self.sy, self.sx, self.ph, self.pw, h, w)
+        gx = utils.col2im(gcol, (N, C, H, W), self.kernel_size, self.stride,
+                          self.pad)
         return gx
 
     def backward(self, ggx):
@@ -226,12 +226,12 @@ class Pooling2DWithIndexes(Function):
 
     def forward(self, x):
         col = utils.im2col(x, self.kernel_size, self.stride, self.pad)
-        n, c, kh, kw, out_h, out_w = col.shape
-        col = col.reshape(n, c, kh * kw, out_h, out_w)
-        col = col.transpose(0, 1, 3, 4, 2).reshape(-1, kh * kw)
+        N, C, KH, KW, OH, OW = col.shape
+        col = col.reshape(N, C, KH * KW, OH, OW)
+        col = col.transpose(0, 1, 3, 4, 2).reshape(-1, KH * KW)
         indexes = self.indexes.ravel()
         col = col[np.arange(len(indexes)), indexes]
-        return col.reshape(n, c, out_h, out_w)
+        return col.reshape(N, C, OH, OW)
 
 
 def pooling(x, kernel_size, stride=1, pad=0):
@@ -290,6 +290,3 @@ def get_deconv_outsize(size, k, s, p):
     return s * (size - 1) + k - 2 * p
 
 
-def get_conv_outsize(input_size, kernel_size, stride, pad):
-    i, k, s, p = input_size, kernel_size, stride, pad
-    return (i + p * 2 - k) // s + 1

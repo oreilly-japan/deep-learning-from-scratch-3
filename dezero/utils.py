@@ -155,22 +155,22 @@ def im2col(img, kernel_size, stride, pad):
         col = _im2col_gpu(img, kernel_size, stride, pad)
         return col
 
-    n, c, h, w = img.shape
-    kh, kw = _pair(kernel_size)
-    sh, sw = _pair(stride)
-    ph, pw = _pair(pad)
-    oh = get_conv_outsize(h, kh, sh, ph)
-    ow = get_conv_outsize(w, kw, sw, pw)
+    N, C, H, W = img.shape
+    KH, KW = _pair(kernel_size)
+    SH, SW = _pair(stride)
+    PH, PW = _pair(pad)
+    OH = get_conv_outsize(H, KH, SH, PH)
+    OW = get_conv_outsize(W, KW, SW, PW)
 
-    img = np.pad(img, ((0, 0), (0, 0), (ph, ph + sh - 1), (pw, pw + sw - 1)),
+    img = np.pad(img, ((0, 0), (0, 0), (PH, PH + SH - 1), (PW, PW + SW - 1)),
                  mode='constant', constant_values=(0,))
-    col = np.ndarray((n, c, kh, kw, oh, ow), dtype=img.dtype)
+    col = np.ndarray((N, C, KH, KW, OH, OW), dtype=img.dtype)
 
-    for j in range(kh):
-        j_lim = j + sh * oh
-        for i in range(kw):
-            i_lim = i + sw * ow
-            col[:, :, j, i, :, :] = img[:, :, j:j_lim:sh, i:i_lim:sw]
+    for j in range(KH):
+        j_lim = j + SH * OH
+        for i in range(KW):
+            i_lim = i + SW * OW
+            col[:, :, j, i, :, :] = img[:, :, j:j_lim:SH, i:i_lim:SW]
     return col
 
 
@@ -180,22 +180,22 @@ def col2im(col, img_shape, kernel_size, stride, pad):
         img = _col2im_gpu(col, img_shape, kernel_size, stride, pad)
         return img
 
-    n, c, h, w = img_shape
-    kh, kw = _pair(kernel_size)
-    sh, sw = _pair(stride)
-    ph, pw = _pair(pad)
-    oh = get_conv_outsize(h, kh, sh, ph)
-    ow = get_conv_outsize(w, kw, sw, pw)
+    N, C, H, W = img_shape
+    KH, KW = _pair(kernel_size)
+    SH, SW = _pair(stride)
+    PH, PW = _pair(pad)
+    OH = get_conv_outsize(H, KH, SH, PH)
+    OW = get_conv_outsize(W, KW, SW, PW)
 
-    img = np.zeros((n, c, h + 2 * ph + sh - 1, w + 2 * pw + sw - 1),
+    img = np.zeros((N, C, H + 2 * PH + SH - 1, W + 2 * PW + SW - 1),
                    dtype=col.dtype)
-    for j in range(kh):
-        j_lim = j + sh * oh
-        for i in range(kw):
-            i_lim = i + sw * ow
-            img[:, :, j:j_lim:sh, i:i_lim:sw] += col[:, :, j, i, :, :]
+    for j in range(KH):
+        j_lim = j + SH * OH
+        for i in range(KW):
+            i_lim = i + SW * OW
+            img[:, :, j:j_lim:SH, i:i_lim:SW] += col[:, :, j, i, :, :]
 
-    return img[:, :, ph:h + ph, pw:w + pw]
+    return img[:, :, PH:H + PH, PW:W + PW]
 
 
 def _pair(x):
@@ -250,8 +250,6 @@ def _col2im_gpu(col, img_shape, kernel_size, stride, pad):
     out_h = get_conv_outsize(h, kh, sy, ph)
     out_w = get_conv_outsize(w, kw, sx, pw)
     dx, dy = 1, 1
-
-    # col = col.reshape(n, out_h, out_w, c, kh, kw).transpose(0, 3, 4, 5, 1, 2)
 
     img = cuda.cupy.empty((n, c, h, w), dtype=col.dtype)
 
