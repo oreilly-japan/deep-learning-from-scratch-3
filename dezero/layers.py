@@ -90,20 +90,20 @@ class Conv2d(Layer):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
                  pad=0, nobias=False):
         super().__init__()
-        self.kernel_size = _pair(kernel_size)
         self.stride = stride
         self.pad = pad
 
-        I, O = in_channels, out_channels
-        KH, KW = self.kernel_size
+        C, OC = in_channels, out_channels
+        KH, KW = _pair(kernel_size)
 
-        W_data = np.random.randn(O, I, KH, KW).astype(np.float32) * np.sqrt(
-            1 / I * KH * KW)
+        W_data = np.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
+            1 / C * KH * KW)
         self.W = Parameter(W_data, name='W')
         if nobias:
             self.b = None
         else:
-            self.b = Parameter(np.zeros(O).astype(np.float32), name='b')
+            b_data = np.zeros(OC).astype(np.float32)
+            self.b = Parameter(b_data, name='b')
 
     def __call__(self, x):
         y = F.conv2d(x, self.W, self.b, self.stride, self.pad)
@@ -111,6 +111,7 @@ class Conv2d(Layer):
 
 
 class EmbedID(Layer):
+
     def __init__(self, in_size, out_size):
         super().__init__()
         self.W = Parameter(np.random.randn(in_size, out_size), name='W')

@@ -6,12 +6,12 @@ from dezero.functions import linear
 
 
 # =============================================================================
-# conv2d_simple / pooling_simple (simple version)
+# [simple version] conv2d_simple / pooling_simple
 # =============================================================================
 def conv2d_simple(x, W, b=None, stride=1, pad=0):
     x, W = as_variable(x), as_variable(W)
-    Weight = W
 
+    Weight = W
     N, C, H, W = x.shape
     OC, C, KH, KW = Weight.shape
     SH, SW = _pair(stride)
@@ -19,14 +19,10 @@ def conv2d_simple(x, W, b=None, stride=1, pad=0):
     OH = utils.get_conv_outsize(H, KH, SH, PH)
     OW = utils.get_conv_outsize(W, KW, SW, PW)
 
-    col = im2col(x, (KH, KW), stride, pad)
-
-    col = col.transpose((0, 4, 5, 1, 2, 3)).reshape((N * OH * OW, -1))
-    Weight = Weight.reshape((OC, -1)).transpose()
-
+    col = im2col(x, (KH, KW), stride, pad, to_matrix=True)
+    Weight = Weight.reshape(OC, -1).transpose()
     t = linear(col, Weight, b)
-
-    y = t.reshape((N, OH, OW, -1)).transpose((0, 3, 1, 2))
+    y = t.reshape(N, OH, OW, OC).transpose(0, 3, 1, 2)
     return y
 
 
@@ -40,14 +36,10 @@ def pooling_simple(x, kernel_size, stride=1, pad=0):
     OH = (H + PH * 2 - KH) // SH + 1
     OW = (H + PW * 2 - KW) // SW + 1
 
-    col = im2col(x, kernel_size, stride, pad)
-
-    col = col.transpose((0, 4, 5, 1, 2, 3)).reshape((-1, KH * KW))
-
+    col = im2col(x, kernel_size, stride, pad, to_matrix=True)
+    col = col.reshape(-1, KH * KW)
     y = col.max(axis=1)
-
-    y = y.reshape((N, OH, OW, C))
-    y = y.transpose((0, 3, 1, 2))
+    y = y.reshape(N, OH, OW, C).transpose(0, 3, 1, 2)
     return y
 
 
@@ -62,7 +54,7 @@ class Conv2d(Function):
 
     def forward(self, x, W, b):
         KH, KW = W.shape[2:]
-        col = utils.im2col(x, (KH, KW), self.stride, self.pad)
+        col = utils.im2col(x, (KH, KW), self.stride, self.pad, to_matrix=False)
 
         y = np.tensordot(col, W, ((1, 2, 3), (1, 2, 3)))
         if b is not None:
@@ -112,7 +104,8 @@ class Deconv2d(Function):
 
         gcol = np.tensordot(Weight, x, (0, 1))
         gcol = np.rollaxis(gcol, 3)
-        y = utils.col2im(gcol, img_shape, (KH, KW), self.stride, self.pad)
+        y = utils.col2im(gcol, img_shape, (KH, KW), self.stride, self.pad,
+                         to_matrix=False)
         # b, k, h, w
         if b is not None:
             self.no_bias = True
@@ -147,7 +140,8 @@ class Conv2DGradW(Function):
         self.pad = conv2d.pad
 
     def forward(self, x, gy):
-        col = utils.im2col(x, self.kernel_size, self.stride, self.pad)
+        col = utils.im2col(x, self.kernel_size, self.stride, self.pad,
+                           to_matrix=False)
         gW = np.tensordot(gy, col, ((0, 2, 3), (0, 4, 5)))
         return gW
 
@@ -170,7 +164,8 @@ class Pooling(Function):
         self.pad = pad
 
     def forward(self, x):
-        col = utils.im2col(x, self.kernel_size, self.stride, self.pad)
+        col = utils.im2col(x, self.kernel_size, self.stride, self.pad,
+                           to_matrix=False)
 
         N, C, KH, KW, OH, OW = col.shape
         col = col.reshape(N, C, KH * KW, OH, OW)
@@ -209,7 +204,7 @@ class Pooling2DGrad(Function):
         gcol = np.swapaxes(gcol, 3, 5)
 
         gx = utils.col2im(gcol, (N, C, H, W), self.kernel_size, self.stride,
-                          self.pad)
+                          self.pad, to_matrix=False)
         return gx
 
     def backward(self, ggx):
@@ -227,7 +222,8 @@ class Pooling2DWithIndexes(Function):
         self.indexes = mpool2d.indexes
 
     def forward(self, x):
-        col = utils.im2col(x, self.kernel_size, self.stride, self.pad)
+        col = utils.im2col(x, self.kernel_size, self.stride, self.pad,
+                           to_matrix=False)
         N, C, KH, KW, OH, OW = col.shape
         col = col.reshape(N, C, KH * KW, OH, OW)
         col = col.transpose(0, 1, 3, 4, 2).reshape(-1, KH * KW)
@@ -244,48 +240,72 @@ def pooling(x, kernel_size, stride=1, pad=0):
 #  im2col / col2im
 # =============================================================================
 class Im2col(Function):
-    def __init__(self, kernel_size, stride, pad):
+    def __init__(self, kernel_size, stride, pad, to_matrix):
         super().__init__()
         self.input_shape = None
         self.kernel_size = kernel_size
         self.stride = stride
         self.pad = pad
+        self.to_matrix = to_matrix
 
     def forward(self, x):
         self.input_shape = x.shape
-        y = utils.im2col(x, self.kernel_size, self.stride, self.pad)
+        y = utils.im2col(x, self.kernel_size, self.stride, self.pad,
+                         self.to_matrix)
         return y
 
     def backward(self, gy):
         gx = col2im(gy, self.input_shape, self.kernel_size, self.stride,
-                    self.pad)
+                    self.pad, self.to_matrix)
         return gx
 
 
-def im2col(x, kernel_size, stride=1, pad=0):
-    return Im2col(kernel_size, stride, pad)(x)
+def im2col(x, kernel_size, stride=1, pad=0, to_matrix=True):
+    """
+
+    Parameters
+    ----------
+    x : dezero.Variable or numpy.ndarray
+        入データ。形状は(N, C, H, W)
+    kernel_size : int or (int, int)
+        カーネルのサイズ
+    stride : int or (int, int)
+        ストライド
+    pad : int or (int, int)
+        パディング
+    to_matrix : bool
+        カーネルを適用する領域を抽出後、行列へと整形するかどうか
+    Returns
+    -------
+    col : dezero.Variable
+
+    """
+    y = Im2col(kernel_size, stride, pad, to_matrix)(x)
+    return y
 
 
 class Col2im(Function):
-    def __init__(self, input_shape, kernel_size, stride, pad):
+    def __init__(self, input_shape, kernel_size, stride, pad, to_matrix):
         super().__init__()
         self.input_shape = input_shape
         self.kernel_size = kernel_size
         self.stride = stride
         self.pad = pad
+        self.to_matrix = to_matrix
 
     def forward(self, x):
         y = utils.col2im(x, self.input_shape, self.kernel_size, self.stride,
-                         self.pad)
+                         self.pad, self.to_matrix)
         return y
 
     def backward(self, gy):
-        gx = im2col(gy, self.kernel_size, self.stride, self.pad)
+        gx = im2col(gy, self.kernel_size, self.stride, self.pad,
+                    self.to_matrix)
         return gx
 
 
-def col2im(x, input_shape, kernel_size, stride=1, pad=0):
-    return Col2im(input_shape, kernel_size, stride, pad)(x)
+def col2im(x, input_shape, kernel_size, stride=1, pad=0, to_matrix=True):
+    return Col2im(input_shape, kernel_size, stride, pad, to_matrix)(x)
 
 
 def get_deconv_outsize(size, k, s, p):
