@@ -1,7 +1,7 @@
 from dezero import Model
 import dezero.functions as F
 import dezero.layers as L
-
+from dezero import utils
 
 class Sequential(Model):
     def __init__(self, *layers):
@@ -33,7 +33,9 @@ class MLP(Model):
 
 
 class VGG16(Model):
-    def __init__(self):
+    WEIGHTS_PATH = 'https://github.com/koki0702/dezero-models/releases/download/v0.1/vgg16.npz'
+
+    def __init__(self, weights='imagenet'):
         super().__init__()
         self.conv1_1 = L.Conv2d(3, 64, 3, 1, 1)
         self.conv1_2 = L.Conv2d(64, 64, 3, 1, 1)
@@ -48,9 +50,13 @@ class VGG16(Model):
         self.conv5_1 = L.Conv2d(512, 512, 3, 1, 1)
         self.conv5_2 = L.Conv2d(512, 512, 3, 1, 1)
         self.conv5_3 = L.Conv2d(512, 512, 3, 1, 1)
-        self.fc6 = L.Linear(512 * 7 * 7, 4096)
-        self.fc7 = L.Linear(4096, 4096)
-        self.fc8 = L.Linear(4096, 1000)
+        self.fc6 = L.Linear(4096)
+        self.fc7 = L.Linear(4096)
+        self.fc8 = L.Linear(1000)
+
+        if weights == 'imagenet':
+            weights_path = utils.get_file(VGG16.WEIGHTS_PATH)
+            self.load_weights(weights_path)
 
     def __call__(self, x):
         x = F.relu(self.conv1_1(x))
