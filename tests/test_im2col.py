@@ -12,7 +12,6 @@ class TestIm2col(unittest.TestCase):
         n, c, h, w = 1, 1, 3, 3
         x = np.arange(n * c * h * w).reshape((n, c, h, w))
         y = F.im2col(x, 3, 3, 0, to_matrix=True)
-        print('y.shape', y.shape)
         expected = np.array([[0, 1, 2, 3, 4, 5, 6, 7, 8]])
 
         res = np.array_equal(y.data, expected)

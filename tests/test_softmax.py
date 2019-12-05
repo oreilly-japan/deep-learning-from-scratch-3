@@ -12,7 +12,6 @@ class TestSoftmaxSimple(unittest.TestCase):
         y2 = CF.softmax(x, axis=1)
         y = F.softmax_simple(Variable(x))
         res = np.allclose(y.data, y2.data)
-        print(y, y2)
         self.assertTrue(res)
 
     def test_forward2(self):
