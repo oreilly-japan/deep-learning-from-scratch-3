@@ -1,9 +1,9 @@
 import numpy as np
-import urllib.request
 import os.path
 import gzip
 import os
-import dezero
+from dezero.utils import download_cache, cache_dir
+
 
 def get_spiral(seed=1984):
     np.random.seed(seed)
@@ -38,25 +38,6 @@ def get_spiral(seed=1984):
     return train_set, test_set
 
 
-cache_dir = os.path.dirname(os.path.abspath(__file__)) + '/.cache'
-
-
-def download_cache(url, file_name=None):
-    if file_name is None:
-        file_name = url[url.rfind('/') + 1:]
-    file_path = cache_dir + '/' + file_name
-
-    if not os.path.exists(cache_dir):
-        os.mkdir(cache_dir)
-
-    if os.path.exists(file_path):
-        return
-
-    print("Downloading MNIST(" + file_name + ") ... ", end="")
-    urllib.request.urlretrieve(url, file_path)
-    print("Done")
-
-
 class MNIST:
     url_base = 'http://yann.lecun.com/exdb/mnist/'
     key_file = {
@@ -69,14 +50,14 @@ class MNIST:
     test_num = 10000
     img_dim = (1, 28, 28)
     img_size = 784
-    save_path = cache_dir + "/mnist.npz"
+    save_path = os.path.join(cache_dir, "mnist.npz")
 
     def download_mnist(self):
         for v in MNIST.key_file.values():
             download_cache(MNIST.url_base + v)
 
     def _load_label(self, file_name):
-        file_path = cache_dir + "/" + file_name
+        file_path = os.path.join(cache_dir, file_name)
 
         with gzip.open(file_path, 'rb') as f:
             labels = np.frombuffer(f.read(), np.uint8, offset=8)
@@ -84,7 +65,7 @@ class MNIST:
         return labels
 
     def _load_img(self, file_name):
-        file_path = cache_dir + "/" + file_name
+        file_path = os.path.join(cache_dir, file_name)
 
         with gzip.open(file_path, 'rb') as f:
             data = np.frombuffer(f.read(), np.uint8, offset=16)
@@ -139,7 +120,7 @@ def load_shakespear():
     file_name = 'shakespear.txt'
     download_cache(url, file_name)
 
-    with open(cache_dir + '/' + file_name, 'r') as f:
+    with open(os.path.join(cache_dir, file_name), 'r') as f:
         data = f.read()
     chars = list(data)
 

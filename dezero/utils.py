@@ -1,7 +1,6 @@
+import os
+import urllib.request
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
 from dezero import as_variable
 from dezero import Variable
 from dezero import cuda
@@ -383,3 +382,35 @@ def numerical_grad(f, inputs, grad_output=None, eps=0.001):
             it.iternext()
 
     return _as_tuple(grads)
+
+
+# =============================================================================
+# download function
+# =============================================================================
+
+cache_dir = os.path.expanduser('~/.dezero')
+
+def download_cache(url, file_name=None):
+    """ファイルをダウンロードする。
+    すでにダウンロード済みの場合は、そのファイルを使用する。
+
+    Parameters
+    ----------
+    url : str
+        ダウンロード先のURL
+    file_name : str
+        保存するファイル名
+    """
+    if file_name is None:
+        file_name = url[url.rfind('/') + 1:]
+    file_path = os.path.join(cache_dir, file_name)
+
+    if not os.path.exists(cache_dir):
+        os.mkdir(cache_dir)
+
+    if os.path.exists(file_path):
+        return
+
+    print("Downloading (" + file_name + ") ... ", end="")
+    urllib.request.urlretrieve(url, file_path)
+    print("Done")
