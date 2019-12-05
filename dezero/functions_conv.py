@@ -203,7 +203,7 @@ class Pooling2DGrad(Function):
 
         gcol = xp.zeros((N * C * OH * OW * KH * KW), dtype=self.dtype)
 
-        indexes = self.indexes.ravel() + np.arange(
+        indexes = self.indexes.ravel() + xp.arange(
             0, self.indexes.size * KH * KW, KH * KW)
 
         gcol[indexes] = gy[0].ravel()
