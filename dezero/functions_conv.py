@@ -33,8 +33,8 @@ def pooling_simple(x, kernel_size, stride=1, pad=0):
     KH, KW = _pair(kernel_size)
     PH, PW = _pair(pad)
     SH, SW = _pair(stride)
-    OH = (H + PH * 2 - KH) // SH + 1
-    OW = (H + PW * 2 - KW) // SW + 1
+    OH = utils.get_conv_outsize(H, KH, SH, PH)
+    OW = utils.get_conv_outsize(W, KW, SW, PW)
 
     col = im2col(x, kernel_size, stride, pad, to_matrix=True)
     col = col.reshape(-1, KH * KW)
