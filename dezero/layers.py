@@ -1,6 +1,6 @@
 import numpy as np
 import dezero.functions as F
-from dezero import cuda, as_variable
+from dezero import cuda
 from dezero.core import Parameter
 from dezero.utils import _pair
 
@@ -107,15 +107,13 @@ class Linear(Layer):
 
     def _init_W(self, x):
         self.in_size = x.shape[1]
-        xp = cuda.get_array_module(x.data)
+        xp = cuda.get_array_module(x)
 
         I, O = self.in_size, self.out_size
         W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
         self.W.data = W_data
 
     def __call__(self, x):
-        x = as_variable(x)
-
         if self.W.data is None:
             self._init_W(x)
         y = F.linear(x, self.W, self.b)
@@ -158,7 +156,7 @@ class Conv2d(Layer):
 
     def _init_W(self, x):
         self.in_channels = x.shape[1]
-        xp = cuda.get_array_module(x.data)
+        xp = cuda.get_array_module(x)
 
         C, OC = self.in_channels, self.out_channels
         KH, KW = _pair(self.kernel_size)
@@ -167,8 +165,6 @@ class Conv2d(Layer):
         self.W.data = W_data
 
     def __call__(self, x):
-        x = as_variable(x)
-
         if self.W.data is None:
             self._init_W(x)
         y = F.conv2d(x, self.W, self.b, self.stride, self.pad)
