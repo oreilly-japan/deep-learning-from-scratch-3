@@ -1,6 +1,6 @@
 import numpy as np
 import dezero.functions as F
-from dezero import cuda
+from dezero import cuda, as_variable
 from dezero.core import Parameter
 from dezero.utils import _pair
 
@@ -114,6 +114,8 @@ class Linear(Layer):
         self.W.data = W_data
 
     def __call__(self, x):
+        x = as_variable(x)
+
         if self.W.data is None:
             self._init_W(x)
         y = F.linear(x, self.W, self.b)
@@ -165,6 +167,8 @@ class Conv2d(Layer):
         self.W.data = W_data
 
     def __call__(self, x):
+        x = as_variable(x)
+
         if self.W.data is None:
             self._init_W(x)
         y = F.conv2d(x, self.W, self.b, self.stride, self.pad)
