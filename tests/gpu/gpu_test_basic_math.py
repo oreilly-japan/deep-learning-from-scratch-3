@@ -1,8 +1,19 @@
 import unittest
-import cupy as np  # !! CUPY !!
 from dezero import Variable
 from dezero.utils import check_backward
-
+# ==========  for CUPY =============
+import cupy
+import numpy
+np = cupy
+def array_equal(x, y):
+  x, y = cupy.asnumpy(x), cupy.asnumpy(y)
+  return numpy.array_equal(x, y)
+def allclose(x, y, atol, rtol):
+    x, y = cupy.asnumpy(x), cupy.asnumpy(y)
+    return numpy.allclose(x, y, atol=atol, rtol=rtol)
+cupy.array_equal = array_equal
+cupy.allclose = allclose
+# ==================================
 
 class TestAdd(unittest.TestCase):
     def test_forward1(self):
