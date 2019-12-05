@@ -37,28 +37,31 @@ class Layer:
         for param in self.params():
             param.to_gpu()
 
-    def _flatten_params(self, data, parent_key=""):
+    def _flatten_params(self, params_dict, parent_key=""):
         for name in self._params:
             obj = self.__dict__[name]
             key = parent_key + '/' + name if parent_key else name
 
             if isinstance(obj, Layer):
-                obj._flatten_params(data, key)
+                obj._flatten_params(params_dict, key)
             else:
-                data[key] = obj.data
+                params_dict[key] = obj
 
     def save_weights(self, path):
         self.to_cpu()
-        data = {}
-        self._flatten_params(data)
-        np.savez_compressed(path, **data)
+
+        params_dict = {}
+        self._flatten_params(params_dict)
+        array_dict = {key: param.data for key, param in params_dict.items()
+                      if param is not None}
+        np.savez_compressed(path, **array_dict)
 
     def load_weights(self, path):
         npz = np.load(path)
-        data = {}
-        self._flatten_params(data)
-        for key, param in data.items():
-            param[...] = npz[key]
+        params_dict = {}
+        self._flatten_params(params_dict)
+        for key, param in params_dict.items():
+            param.data = npz[key]
 
 
 # alias
@@ -69,7 +72,7 @@ class Model(Layer):
 # =============================================================================
 # Linear / Conv / EmbedID / RNN / LSTM
 # =============================================================================
-class Linear(Layer):
+class Linear_simple(Layer):
     def __init__(self, in_size, out_size, nobias=False):
         super().__init__()
 
@@ -86,26 +89,76 @@ class Linear(Layer):
         return y
 
 
-class Conv2d(Layer):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
-                 pad=0, nobias=False):
+class Linear(Layer):
+    def __init__(self, in_size, out_size=None, nobias=False):
         super().__init__()
-        self.stride = stride
-        self.pad = pad
 
-        C, OC = in_channels, out_channels
-        KH, KW = _pair(kernel_size)
+        if out_size is None:
+            in_size, out_size = None, in_size
+        self.in_size = in_size
+        self.out_size = out_size
 
-        W_data = np.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
-            1 / C * KH * KW)
-        self.W = Parameter(W_data, name='W')
+        self.W = Parameter(None, name='W')
         if nobias:
             self.b = None
         else:
-            b_data = np.zeros(OC).astype(np.float32)
-            self.b = Parameter(b_data, name='b')
+            self.b = Parameter(np.zeros(out_size, dtype=np.float32), name='b')
+
+    def _init_W(self):
+        I, O = self.in_size, self.out_size
+        W_data = np.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
+        self.W.data = W_data
 
     def __call__(self, x):
+        if self.W.data is None:
+            self.in_size = x.shape[1]
+            self._init_W()
+
+        y = F.linear(x, self.W, self.b)
+        return y
+
+
+class Conv2d(Layer):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
+                 pad=0, nobias=False):
+        """
+
+        Parameters
+        ----------
+        in_channels : int or None
+            入力データのチャンネル数。Noneの場合はforward時のxからin_channelsを取得する
+        out_channels : int
+        kernel_size : int or (int, int)
+        stride : int or (int, int)
+        pad : int or (int, int)
+        nobias : bool
+        """
+        super().__init__()
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.kernel_size = kernel_size
+        self.stride = stride
+        self.pad = pad
+
+        self.W = Parameter(None, name='W')
+        if nobias:
+            self.b = None
+        else:
+            b_data = np.zeros(out_channels).astype(np.float32)
+            self.b = Parameter(b_data, name='b')
+
+    def _init_W(self):
+        C, OC = self.in_channels, self.out_channels
+        KH, KW = _pair(self.kernel_size)
+        W_data = np.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
+            1 / C * KH * KW)
+        self.W.data = W_data
+
+    def __call__(self, x):
+        if self.W.data is None:
+            self.in_channels = x.shape[1]
+            self._init_W()
+
         y = F.conv2d(x, self.W, self.b, self.stride, self.pad)
         return y
 
