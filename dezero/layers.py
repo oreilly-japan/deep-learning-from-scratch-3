@@ -107,7 +107,7 @@ class Linear(Layer):
 
     def _init_W(self, x):
         self.in_size = x.shape[1]
-        xp = cuda.get_array_module(x)
+        xp = cuda.get_array_module(x.data)
 
         I, O = self.in_size, self.out_size
         W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
@@ -156,7 +156,7 @@ class Conv2d(Layer):
 
     def _init_W(self, x):
         self.in_channels = x.shape[1]
-        xp = cuda.get_array_module(x)
+        xp = cuda.get_array_module(x.data)
 
         C, OC = self.in_channels, self.out_channels
         KH, KW = _pair(self.kernel_size)
