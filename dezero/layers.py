@@ -1,5 +1,6 @@
 import numpy as np
 import dezero.functions as F
+from dezero import cuda
 from dezero.core import Parameter
 from dezero.utils import _pair
 
@@ -104,16 +105,17 @@ class Linear(Layer):
         else:
             self.b = Parameter(np.zeros(out_size, dtype=np.float32), name='b')
 
-    def _init_W(self):
+    def _init_W(self, x):
+        self.in_size = x.shape[1]
+        xp = cuda.get_array_module(x)
+
         I, O = self.in_size, self.out_size
-        W_data = np.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
+        W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
         self.W.data = W_data
 
     def __call__(self, x):
         if self.W.data is None:
-            self.in_size = x.shape[1]
             self._init_W()
-
         y = F.linear(x, self.W, self.b)
         return y
 
@@ -131,7 +133,7 @@ class Conv2d(Layer):
             出力データのチャンネル数。
         kernel_size : int or (int, int)
             ：カーネルサイズ。
-        stride : int or (int, int)
+        stride : int or (int, int)ƒ
             ストライド。
         pad : int or (int, int)
             パディング。
@@ -152,18 +154,19 @@ class Conv2d(Layer):
             b_data = np.zeros(out_channels).astype(np.float32)
             self.b = Parameter(b_data, name='b')
 
-    def _init_W(self):
+    def _init_W(self, x):
+        self.in_channels = x.shape[1]
+        xp = cuda.get_array_module(x)
+
         C, OC = self.in_channels, self.out_channels
         KH, KW = _pair(self.kernel_size)
-        W_data = np.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
+        W_data = xp.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
             1 / C * KH * KW)
         self.W.data = W_data
 
     def __call__(self, x):
         if self.W.data is None:
-            self.in_channels = x.shape[1]
-            self._init_W()
-
+            self._init_W(x)
         y = F.conv2d(x, self.W, self.b, self.stride, self.pad)
         return y
 
