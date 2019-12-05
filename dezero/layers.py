@@ -123,22 +123,22 @@ class Linear(Layer):
 class Conv2d(Layer):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
                  pad=0, nobias=False):
-        """
+        """畳込みレイヤ
 
         Parameters
         ----------
         in_channels : int or None
             入力データのチャンネル数。Noneの場合はforward時のxからin_channelsを取得する
         out_channels : int
-            出力データのチャンネル数。
+            出力データのチャンネル数
         kernel_size : int or (int, int)
-            ：カーネルサイズ。
-        stride : int or (int, int)ƒ
-            ストライド。
+            ：カーネルサイズ
+        stride : int or (int, int)
+            ストライド
         pad : int or (int, int)
-            パディング。
+            パディング
         nobias : bool
-            バイアスを使用するかどうか。
+            バイアスを使用するかどうか
         """
         super().__init__()
         self.in_channels = in_channels
