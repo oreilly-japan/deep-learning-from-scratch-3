@@ -2,7 +2,7 @@ import numpy as np
 import os.path
 import gzip
 import os
-from dezero.utils import download_cache, cache_dir
+from dezero.utils import get_file, cache_dir
 
 
 def get_spiral(seed=1984):
@@ -54,7 +54,7 @@ class MNIST:
 
     def download_mnist(self):
         for v in MNIST.key_file.values():
-            download_cache(MNIST.url_base + v)
+            get_file(MNIST.url_base + v)
 
     def _load_label(self, file_name):
         file_path = os.path.join(cache_dir, file_name)
@@ -118,7 +118,7 @@ def get_mnist(ndim=1, scale=1.0, dtype=np.float32):
 def load_shakespear():
     url = 'https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt'
     file_name = 'shakespear.txt'
-    download_cache(url, file_name)
+    get_file(url, file_name)
 
     with open(os.path.join(cache_dir, file_name), 'r') as f:
         data = f.read()
