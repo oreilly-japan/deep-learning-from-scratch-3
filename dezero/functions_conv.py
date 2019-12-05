@@ -1,5 +1,5 @@
 import numpy as np
-from dezero import utils
+from dezero import cuda, utils
 from dezero.core import Function, as_variable
 from dezero.utils import _pair
 from dezero.functions import linear
@@ -53,13 +53,15 @@ class Conv2d(Function):
         self.pad = _pair(pad)
 
     def forward(self, x, W, b):
+        xp = cuda.get_array_module(x)
+
         KH, KW = W.shape[2:]
         col = utils.im2col(x, (KH, KW), self.stride, self.pad, to_matrix=False)
 
-        y = np.tensordot(col, W, ((1, 2, 3), (1, 2, 3)))
+        y = xp.tensordot(col, W, ((1, 2, 3), (1, 2, 3)))
         if b is not None:
             y += b
-        y = np.rollaxis(y, 3, 1)
+        y = xp.rollaxis(y, 3, 1)
         # y = np.transpose(y, (0, 3, 1, 2))
         return y
 
@@ -90,6 +92,8 @@ class Deconv2d(Function):
         self.outsize = outsize
 
     def forward(self, x, W, b):
+        xp = cuda.get_array_module(x)
+
         Weight = W
         SH, SW = self.stride
         PH, PW = self.pad
@@ -102,8 +106,8 @@ class Deconv2d(Function):
             out_h, out_w = _pair(self.outsize)
         img_shape = (N, OC, out_h, out_w)
 
-        gcol = np.tensordot(Weight, x, (0, 1))
-        gcol = np.rollaxis(gcol, 3)
+        gcol = xp.tensordot(Weight, x, (0, 1))
+        gcol = xp.rollaxis(gcol, 3)
         y = utils.col2im(gcol, img_shape, (KH, KW), self.stride, self.pad,
                          to_matrix=False)
         # b, k, h, w
@@ -140,9 +144,11 @@ class Conv2DGradW(Function):
         self.pad = conv2d.pad
 
     def forward(self, x, gy):
+        xp = cuda.get_array_module(x)
+
         col = utils.im2col(x, self.kernel_size, self.stride, self.pad,
                            to_matrix=False)
-        gW = np.tensordot(gy, col, ((0, 2, 3), (0, 4, 5)))
+        gW = xp.tensordot(gy, col, ((0, 2, 3), (0, 4, 5)))
         return gW
 
     def backward(self, gys):
@@ -189,19 +195,21 @@ class Pooling2DGrad(Function):
         self.indexes = mpool2d.indexes
 
     def forward(self, gy):
+        xp = cuda.get_array_module(gy)
+
         N, C, OH, OW = gy.shape
         H, W = self.input_shpae[2:]
         KH, KW = _pair(self.kernel_size)
 
-        gcol = np.zeros((N * C * OH * OW * KH * KW), dtype=self.dtype)
+        gcol = xp.zeros((N * C * OH * OW * KH * KW), dtype=self.dtype)
 
         indexes = self.indexes.ravel() + np.arange(
             0, self.indexes.size * KH * KW, KH * KW)
 
         gcol[indexes] = gy[0].ravel()
         gcol = gcol.reshape(N, C, OH, OW, KH, KW)
-        gcol = np.swapaxes(gcol, 2, 4)
-        gcol = np.swapaxes(gcol, 3, 5)
+        gcol = xp.swapaxes(gcol, 2, 4)
+        gcol = xp.swapaxes(gcol, 3, 5)
 
         gx = utils.col2im(gcol, (N, C, H, W), self.kernel_size, self.stride,
                           self.pad, to_matrix=False)
