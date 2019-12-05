@@ -387,10 +387,18 @@ def numerical_grad(f, inputs, grad_output=None, eps=0.001):
 # =============================================================================
 # download function
 # =============================================================================
+def show_progress(block_num, block_size, total_size):
+    bar_template = "\r[{}] {:.2f}%"
 
-cache_dir = os.path.expanduser('~/.dezero')
+    downloaded = block_num * block_size
+    p = downloaded / total_size * 100
+    i = int(downloaded / total_size * 30)
+    bar = "#" * i + "." * (30 - i)
+    print(bar_template.format(bar, p), end='')
 
-def download_cache(url, file_name=None):
+cache_dir = os.path.join(os.path.expanduser('~'), '.dezero')
+
+def get_file(url, file_name=None):
     """ファイルをダウンロードする。
     すでにダウンロード済みの場合は、そのファイルを使用する。
 
@@ -405,12 +413,20 @@ def download_cache(url, file_name=None):
         file_name = url[url.rfind('/') + 1:]
     file_path = os.path.join(cache_dir, file_name)
 
+
     if not os.path.exists(cache_dir):
         os.mkdir(cache_dir)
 
     if os.path.exists(file_path):
-        return
+        return file_path
 
-    print("Downloading (" + file_name + ") ... ", end="")
-    urllib.request.urlretrieve(url, file_path)
-    print("Done")
+    print("Downloading: " + file_name)
+    try:
+        urllib.request.urlretrieve(url, file_path, show_progress)
+    except (Exception, KeyboardInterrupt) as e:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        raise
+    print(" Done")
+
+    return file_path
