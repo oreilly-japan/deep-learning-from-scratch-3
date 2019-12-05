@@ -147,10 +147,12 @@ class Variable:
         return dezero.functions.sum(self, axis, keepdims)
 
     def to_cpu(self):
-        self.data = dezero.cuda.as_numpy(self.data)
+        if self.data is not None:
+            self.data = dezero.cuda.as_numpy(self.data)
 
     def to_gpu(self):
-        self.data = dezero.cuda.as_cupy(self.data)
+        if self.data is not None:
+            self.data = dezero.cuda.as_cupy(self.data)
 
 
 class Parameter(Variable):
