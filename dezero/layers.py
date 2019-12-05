@@ -128,10 +128,15 @@ class Conv2d(Layer):
         in_channels : int or None
             入力データのチャンネル数。Noneの場合はforward時のxからin_channelsを取得する
         out_channels : int
+            出力データのチャンネル数。
         kernel_size : int or (int, int)
+            ：カーネルサイズ。
         stride : int or (int, int)
+            ストライド。
         pad : int or (int, int)
+            パディング。
         nobias : bool
+            バイアスを使用するかどうか。
         """
         super().__init__()
         self.in_channels = in_channels
