@@ -115,7 +115,7 @@ class Linear(Layer):
 
     def __call__(self, x):
         if self.W.data is None:
-            self._init_W()
+            self._init_W(x)
         y = F.linear(x, self.W, self.b)
         return y
 
