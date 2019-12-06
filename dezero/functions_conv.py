@@ -1,7 +1,7 @@
 import numpy as np
 from dezero import cuda, utils
 from dezero.core import Function, as_variable
-from dezero.utils import _pair
+from dezero.utils import pair
 from dezero.functions import linear
 
 
@@ -14,8 +14,8 @@ def conv2d_simple(x, W, b=None, stride=1, pad=0):
     Weight = W
     N, C, H, W = x.shape
     OC, C, KH, KW = Weight.shape
-    SH, SW = _pair(stride)
-    PH, PW = _pair(pad)
+    SH, SW = pair(stride)
+    PH, PW = pair(pad)
     OH = utils.get_conv_outsize(H, KH, SH, PH)
     OW = utils.get_conv_outsize(W, KW, SW, PW)
 
@@ -30,9 +30,9 @@ def pooling_simple(x, kernel_size, stride=1, pad=0):
     x = as_variable(x)
 
     N, C, H, W = x.shape
-    KH, KW = _pair(kernel_size)
-    PH, PW = _pair(pad)
-    SH, SW = _pair(stride)
+    KH, KW = pair(kernel_size)
+    PH, PW = pair(pad)
+    SH, SW = pair(stride)
     OH = utils.get_conv_outsize(H, KH, SH, PH)
     OW = utils.get_conv_outsize(W, KW, SW, PW)
 
@@ -49,8 +49,8 @@ def pooling_simple(x, kernel_size, stride=1, pad=0):
 class Conv2d(Function):
     def __init__(self, stride=1, pad=0):
         super().__init__()
-        self.stride = _pair(stride)
-        self.pad = _pair(pad)
+        self.stride = pair(stride)
+        self.pad = pair(pad)
 
     def forward(self, x, W, b):
         xp = cuda.get_array_module(x)
@@ -87,8 +87,8 @@ def conv2d(x, W, b=None, stride=1, pad=0):
 class Deconv2d(Function):
     def __init__(self, stride=1, pad=0, outsize=None):
         super().__init__()
-        self.stride = _pair(stride)
-        self.pad = _pair(pad)
+        self.stride = pair(stride)
+        self.pad = pair(pad)
         self.outsize = outsize
 
     def forward(self, x, W, b):
@@ -103,7 +103,7 @@ class Deconv2d(Function):
             out_h = get_deconv_outsize(H, KH, SH, PH)
             out_w = get_deconv_outsize(W, KW, SW, PW)
         else:
-            out_h, out_w = _pair(self.outsize)
+            out_h, out_w = pair(self.outsize)
         img_shape = (N, OC, out_h, out_w)
 
         gcol = xp.tensordot(Weight, x, (0, 1))
@@ -199,7 +199,7 @@ class Pooling2DGrad(Function):
 
         N, C, OH, OW = gy.shape
         H, W = self.input_shpae[2:]
-        KH, KW = _pair(self.kernel_size)
+        KH, KW = pair(self.kernel_size)
 
         gcol = xp.zeros((N * C * OH * OW * KH * KW), dtype=self.dtype)
 

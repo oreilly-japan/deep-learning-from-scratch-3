@@ -150,9 +150,9 @@ def get_conv_outsize(input_size, kernel_size, stride, pad):
 
 def im2col(img, kernel_size, stride, pad, to_matrix=True):
     N, C, H, W = img.shape
-    KH, KW = _pair(kernel_size)
-    SH, SW = _pair(stride)
-    PH, PW = _pair(pad)
+    KH, KW = pair(kernel_size)
+    SH, SW = pair(stride)
+    PH, PW = pair(pad)
     OH = get_conv_outsize(H, KH, SH, PH)
     OW = get_conv_outsize(W, KW, SW, PW)
 
@@ -178,9 +178,9 @@ def im2col(img, kernel_size, stride, pad, to_matrix=True):
 
 def col2im(col, img_shape, kernel_size, stride, pad, to_matrix=True):
     N, C, H, W = img_shape
-    KH, KW = _pair(kernel_size)
-    SH, SW = _pair(stride)
-    PH, PW = _pair(pad)
+    KH, KW = pair(kernel_size)
+    SH, SW = pair(stride)
+    PH, PW = pair(pad)
     OH = get_conv_outsize(H, KH, SH, PH)
     OW = get_conv_outsize(W, KW, SW, PW)
 
@@ -202,10 +202,14 @@ def col2im(col, img_shape, kernel_size, stride, pad, to_matrix=True):
     return img[:, :, PH:H + PH, PW:W + PW]
 
 
-def _pair(x):
-    if hasattr(x, '__iter__'):
+def pair(x):
+    if isinstance(x, int):
+        return (x, x)
+    elif isinstance(x, tuple):
+        assert len(x) is 2
         return x
-    return (x, x)
+    else:
+        raise ValueError
 
 
 def _im2col_gpu(img, kernel_size, stride, pad):
@@ -214,9 +218,9 @@ def _im2col_gpu(img, kernel_size, stride, pad):
     https://github.com/chainer/chainer/blob/v6.4.0/chainer/utils/conv.py
     """
     n, c, h, w = img.shape
-    kh, kw = _pair(kernel_size)
-    sy, sx = _pair(stride)
-    ph, pw = _pair(pad)
+    kh, kw = pair(kernel_size)
+    sy, sx = pair(stride)
+    ph, pw = pair(pad)
     out_h = get_conv_outsize(h, kh, sy, ph)
     out_w = get_conv_outsize(w, kw, sx, pw)
     dy, dx = 1, 1
@@ -250,9 +254,9 @@ def _im2col_gpu(img, kernel_size, stride, pad):
 def _col2im_gpu(col, img_shape, kernel_size, stride, pad):
     n, c, kh, kw, out_h, out_w = col.shape
     n, c, h, w = img_shape
-    kh, kw = _pair(kernel_size)
-    sy, sx = _pair(stride)
-    ph, pw = _pair(pad)
+    kh, kw = pair(kernel_size)
+    sy, sx = pair(stride)
+    ph, pw = pair(pad)
     dx, dy = 1, 1
 
     img = cuda.cupy.empty((n, c, h, w), dtype=col.dtype)

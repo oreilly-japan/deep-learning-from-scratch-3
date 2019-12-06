@@ -2,7 +2,7 @@ import numpy as np
 import dezero.functions as F
 from dezero import cuda
 from dezero.core import Parameter
-from dezero.utils import _pair
+from dezero.utils import pair
 
 
 # =============================================================================
@@ -159,7 +159,7 @@ class Conv2d(Layer):
         xp = cuda.get_array_module(x)
 
         C, OC = self.in_channels, self.out_channels
-        KH, KW = _pair(self.kernel_size)
+        KH, KW = pair(self.kernel_size)
         W_data = xp.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
             1 / C * KH * KW)
         self.W.data = W_data
