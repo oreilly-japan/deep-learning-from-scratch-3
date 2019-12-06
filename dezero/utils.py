@@ -370,7 +370,12 @@ def numerical_grad(f, x, *args, **kwargs):
 
     x = x.data if isinstance(x, Variable) else x
     xp = cuda.get_array_module(x)
-    grad = xp.zeros_like(x)
+    if xp is not np:
+        x = cuda.as_numpy(x)
+        args = [cuda.as_numpy(arg) for arg in args]
+        kwargs = {key: cuda.as_numpy(val) for key, val in kwargs.items()}
+
+    grad = np.zeros_like(x)
 
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
@@ -390,6 +395,8 @@ def numerical_grad(f, x, *args, **kwargs):
 
         x[idx] = tmp_val
         it.iternext()
+
+
     return grad
 
 
