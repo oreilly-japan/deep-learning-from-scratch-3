@@ -61,7 +61,7 @@ def get_dot_graph(y):
 # Utility functions (numpy magic)
 # =============================================================================
 def sum_to(x, shape):
-    """x が shape の形状になるように和を求める。
+    """x が shape の形状になるように和を求める
 
     Parameters
     ----------
@@ -84,7 +84,7 @@ def sum_to(x, shape):
 
 
 def reshape_sum_backward(gy, x_shape, axis, keepdims):
-    """dezero.functions.sum関数の逆伝播で伝わる勾配を適切な形状に変換する。
+    """dezero.functions.sum 関数の逆伝播で伝わる勾配を適切な形状に変換する
 
     Parameters
     ----------
@@ -299,94 +299,134 @@ def _col2im_gpu(col, img_shape, kernel_size, stride, pad):
 # =============================================================================
 # Gradient check
 # =============================================================================
-def gradient_check(f, x, eps=0.001, atol=1e-5, rtol=1e-4):
-    y = f(x)
+def gradient_check(f, x, *args, atol=1e-5, rtol=1e-4, **kwargs):
+    """勾配確認を行う
+    誤差逆伝播法と数値微分との結果を比較し、その結果がある誤差以内の場合は True を返す
+    誤差の基準は atol と rtol で指定する
+
+    Parameters
+    ----------
+    f : DeZero function
+        DeZeroの関数やレイヤ
+    x : ndarray or dezero.Variable
+        勾配を求める変数
+    args : 可変長引数
+        f(x, y) のように、入力する変数がx以外にある場合はここで与える
+    atol : float
+        numpy.allclose関数で使用する atol（絶対許容パラメータ）
+    rtol  : float
+        numpy.allclose関数で使用する rtol（相対許容パラメータ）
+    kwargs : キーワード引数
+        f(x, key=y) のように、入力する変数がx以外にある場合はここで与える
+
+    Returns
+    -------
+    res : bool
+    """
+    x = as_variable(x)
+    x.data = x.data.astype(np.float64)
+
+    num_grad = numerical_grad(f, x, *args, **kwargs)
+    y = f(x, *args, **kwargs)
     y.backward()
-    grad_num = numerical_grad(f, x, eps=eps)
-    grad = x.grad if isinstance(x.grad, np.ndarray) else x.grad.data
-    flg = np.allclose(grad, grad_num, atol=atol, rtol=rtol)
-    return flg
+    bp_grad = x.grad.data
+
+    assert bp_grad.shape == num_grad.shape
+    res = array_allclose(num_grad, bp_grad, atol=atol, rtol=rtol)
+
+    if not res:
+        print('')
+        print('========== FAILED (Gradient Check) ==========')
+        print('Numerical Grad')
+        print(' shape: {}'.format(num_grad.shape))
+        val = str(num_grad.flatten()[:10])
+        print(' values: {} ...'.format(val[1:-1]))
+        print('Bacprop Grad')
+        print(' shape: {}'.format(bp_grad.shape))
+        val = str(bp_grad.flatten()[:10])
+        print(' values: {} ...'.format(val[1:-1]))
+    return res
 
 
-def check_backward(func, x_data, y_grad=None, eps=0.001,
-                   atol=1e-5, rtol=1e-4, verbose=True):
-    x_data = _as_tuple(x_data)
-    x_data = tuple([x.astype(np.float64) for x in x_data])
-    if y_grad is not None:
-        y_grad = y_grad.astype(np.float64)
+def numerical_grad(f, x, *args, **kwargs):
+    """数値微分で勾配を求める
 
-    def f(inputs):
-        inputs = _as_tuple(inputs)
-        inputs = [as_variable(x) for x in inputs]
-        y = func(*inputs)
-        return y.data
+    Parameters
+    ----------
+    f : DeZero function
+        DeZeroの関数やレイヤ
+    x : ndarray or dezero.Variable
+        勾配を求める変数
+    args : 可変長引数
+        f(x, y) のように、入力する変数が x 以外にある場合はここで与える
+    kwargs : キーワード引数
+        f(x, key=y) のように、入力する変数が x  以外にある場合はここで与える
 
-    num_grads = numerical_grad(f, x_data, y_grad, eps)
-    inputs = [as_variable(x) for x in x_data]
-    y = func(*inputs)
-    if y_grad is not None:
-        y.grad = Variable(y_grad)
-    y.backward()
-    bp_grads = [x.grad.data for x in inputs]
+    Returns
+    -------
+    grad : ndarray
+    """
+    eps = 1e-4
 
-    results = []
-    for num_grad, bp_grad in zip(num_grads, bp_grads):
-        assert bp_grad.shape == num_grad.shape
-        res = np.allclose(num_grad, bp_grad, atol=atol, rtol=rtol)
-        results.append(res)
-        if not res and verbose:
-            diff = abs(num_grad - bp_grad)
-            print('-------------------------')
-            print('diff', diff)
-            print('diff mean', np.array(diff).mean())
-            # print('num_grad:', num_grad.shape, num_grad)
-            # print('bp_grad:', bp_grad.shape, bp_grad)
+    x = x.data if isinstance(x, Variable) else x
+    xp = cuda.get_array_module(x)
+    grad = xp.zeros_like(x)
 
-    return all(results)
+    it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
+    while not it.finished:
+        idx = it.multi_index
+        tmp_val = x[idx]
 
+        x[idx] = tmp_val + eps
+        fxh1 = f(x, *args, **kwargs).data  # f(x+h)
+        fxh1 = xp.copy(fxh1)
 
-def _as_tuple(x):
-    if isinstance(x, tuple):
-        return x
-    elif isinstance(x, list):
-        return tuple(x)
-    else:
-        return x,
+        x[idx] = tmp_val - eps
+        fxh2 = f(x, *args, **kwargs).data  # f(x-h)
+        fxh2 = xp.copy(fxh2)
 
+        diff = (fxh1 - fxh2).sum()
+        grad[idx] = diff / (2 * eps)
 
-def numerical_grad(f, inputs, grad_output=None, eps=0.001):
-    h = eps
-    inputs = _as_tuple(inputs)
-    grads = [np.zeros_like(x) for x in inputs]
-
-    for x, grad in zip(inputs, grads):
-        it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
-
-        while not it.finished:
-            idx = it.multi_index
-            tmp_val = x[idx]
-
-            x[idx] = tmp_val + h
-            fxh1 = f(*inputs)  # f(x+h)
-            fxh1 = np.copy(fxh1)
-
-            x[idx] = tmp_val - h
-            fxh2 = f(*inputs)  # f(x-h)
-            fxh2 = np.copy(fxh2)
-
-            if grad_output is None:
-                diff = (fxh1 - fxh2).sum()
-            else:
-                diff = ((fxh1 - fxh2) * grad_output).sum()
-
-            grad[idx] = diff / (2 * h)
-
-            x[idx] = tmp_val  #
-            it.iternext()
-
-    return _as_tuple(grads)
+        x[idx] = tmp_val
+        it.iternext()
+    return grad
 
 
+def array_equal(a, b):
+    """ 2つの array が同じ形状で同じ要素をもつ場合は True を返し、それ以外は False を返す
+
+    Parameters
+    ----------
+    a : ndarray (numpy or cupy)
+    b : ndarray (numpy or cupy)
+
+    Returns
+    -------
+    c : bool
+    """
+    a, b = cuda.as_numpy(a), cuda.as_numpy(b)
+    return np.array_equal(a, b)
+
+
+def array_allclose(a, b, atol=1e-5, rtol=1e-4):
+    """2つの array が同じ形状で近い値の要素をもつ場合は True を返し、それ以外は False を返す
+
+    Parameters
+    ----------
+    a : ndarray (numpy or cupy)
+    b : ndarray (numpy or cupy)
+    atol : float
+        numpy.allclose関数で使用する atol（絶対許容パラメータ）
+    rtol  : float
+        numpy.allclose関数で使用する rtol（相対許容パラメータ）
+
+    Returns
+    -------
+
+    """
+    a, b = cuda.as_numpy(a), cuda.as_numpy(b)
+    return np.allclose(a, b, atol=atol, rtol=rtol)
 # =============================================================================
 # download function
 # =============================================================================

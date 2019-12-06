@@ -2,10 +2,11 @@ import unittest
 import numpy as np
 from dezero import Variable
 import dezero.functions as F
-from dezero.utils import check_backward
+from dezero.utils import gradient_check
 
 
 class TestSum(unittest.TestCase):
+
     def test_datatype(self):
         x = Variable(np.random.rand(10))
         y = F.sum(x)
@@ -33,25 +34,26 @@ class TestSum(unittest.TestCase):
     def test_backward1(self):
         x_data = np.random.rand(10)
         f = lambda x: F.sum(x)
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward2(self):
         x_data = np.random.rand(10, 10)
         f = lambda x: F.sum(x, axis=1)
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward3(self):
         x_data = np.random.rand(10, 20, 20)
         f = lambda x: F.sum(x, axis=2)
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward4(self):
         x_data = np.random.rand(10, 20, 20)
         f = lambda x: F.sum(x, axis=None)
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
 
 class TestSumTo(unittest.TestCase):
+
     def test_forward1(self):
         x = Variable(np.random.rand(10))
         y = F.sum_to(x, (1,))
@@ -73,19 +75,19 @@ class TestSumTo(unittest.TestCase):
     def test_backward1(self):
         x_data = np.random.rand(10)
         f = lambda x: F.sum_to(x, (1,))
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward2(self):
         x_data = np.random.rand(10, 10) * 10
         f = lambda x: F.sum_to(x, (10,))
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward3(self):
         x_data = np.random.rand(10, 20, 20) * 100
         f = lambda x: F.sum_to(x, (10,))
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward4(self):
         x_data = np.random.rand(10)
         f = lambda x: F.sum_to(x, (10,)) + 1
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))

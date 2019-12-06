@@ -3,10 +3,11 @@ import numpy as np
 import dezero
 from dezero import Variable
 import dezero.functions as F
-from dezero.utils import check_backward
+from dezero.utils import gradient_check
 
 
 class TestDropout(unittest.TestCase):
+
     def test_forward1(self):
         x = np.random.randn(100, 100)
         y = F.dropout(Variable(x), dropout_ratio=0.0)
@@ -27,7 +28,7 @@ class TestDropout(unittest.TestCase):
             np.random.seed(0)
             return F.dropout(x, 0.5)
 
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward2(self):
         x_data = np.random.randn(10, 20)
@@ -36,7 +37,7 @@ class TestDropout(unittest.TestCase):
             np.random.seed(0)
             return F.dropout(x, 0.99)
 
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))
 
     def test_backward3(self):
         x_data = np.random.randn(10, 10)
@@ -45,4 +46,4 @@ class TestDropout(unittest.TestCase):
             np.random.seed(0)
             return F.dropout(x, 0.0)
 
-        self.assertTrue(check_backward(f, x_data))
+        self.assertTrue(gradient_check(f, x_data))

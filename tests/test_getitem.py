@@ -2,10 +2,11 @@ import unittest
 import numpy as np
 from dezero import Variable
 import dezero.functions as F
-from dezero.utils import check_backward
+from dezero.utils import gradient_check
 
 
 class TestGetitem(unittest.TestCase):
+
     def test_forward1(self):
         x_data = np.arange(12).reshape((2, 2, 3))
         x = Variable(x_data)
@@ -33,13 +34,11 @@ class TestGetitem(unittest.TestCase):
     def test_backward1(self):
         x_data = np.array([[1, 2, 3], [4, 5, 6]])
         slices = 1
-        y_grad = np.ones(x_data[slices].shape)
         f = lambda x: F.get_item(x, slices)
-        check_backward(f, x_data, y_grad=y_grad)
+        gradient_check(f, x_data)
 
     def test_backward2(self):
         x_data = np.arange(12).reshape(4, 3)
         slices = slice(1, 3)
-        y_grad = np.ones(x_data[slices].shape)
         f = lambda x: F.get_item(x, slices)
-        check_backward(f, x_data, y_grad=y_grad)
+        gradient_check(f, x_data)

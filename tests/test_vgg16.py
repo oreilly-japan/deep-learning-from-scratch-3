@@ -4,11 +4,12 @@ import chainer
 import dezero
 from dezero import Variable
 import dezero.functions as F
-from dezero.utils import check_backward
+from dezero.utils import gradient_check
 from dezero.models import VGG16
 
 
 class TestVGG16(unittest.TestCase):
+
     def test_forward1(self):
         x = np.random.randn(1, 3, 224, 224).astype('f')
         _model = chainer.links.VGG16Layers(None)
@@ -33,7 +34,6 @@ class TestVGG16(unittest.TestCase):
             y = model(x)
         res = np.array_equal(y.data, _y.data)
         self.assertTrue(res)
-
 
     """
     def test_backward1(self):

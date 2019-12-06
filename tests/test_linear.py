@@ -3,10 +3,11 @@ import numpy as np
 from dezero import Variable
 import chainer
 import dezero.functions as F
-from dezero.utils import check_backward
+from dezero.utils import gradient_check
 
 
 class TestLinear(unittest.TestCase):
+
     def test_forward1(self):
         x = Variable(np.array([[1, 2, 3], [4, 5, 6]]))
         w = Variable(x.data.T)
@@ -33,7 +34,7 @@ class TestLinear(unittest.TestCase):
         b = layer.b.data
         y = F.linear(x, W, b)
 
-        cy =layer(x)
+        cy = layer(x)
         self.assertTrue(np.array_equal(y.data, cy.data))
 
     def test_backward1(self):
@@ -41,18 +42,18 @@ class TestLinear(unittest.TestCase):
         W = np.random.randn(2, 3)
         b = np.random.randn(3)
         f = lambda x: F.linear(x, W, b)
-        self.assertTrue(check_backward(f, x))
+        self.assertTrue(gradient_check(f, x))
 
     def test_backward1(self):
         x = np.random.randn(3, 2)
         W = np.random.randn(2, 3)
         b = np.random.randn(3)
         f = lambda x: F.linear(x, W, b)
-        self.assertTrue(check_backward(f, x))
+        self.assertTrue(gradient_check(f, x))
 
     def test_backward2(self):
         x = np.random.randn(100, 200)
         W = np.random.randn(200, 300)
         b = None
         f = lambda x: F.linear(x, W, b)
-        self.assertTrue(check_backward(f, x))
+        self.assertTrue(gradient_check(f, x))

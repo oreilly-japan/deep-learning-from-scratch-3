@@ -2,11 +2,12 @@ import unittest
 import numpy as np
 from dezero import Variable
 import dezero.functions as F
-from dezero.utils import check_backward
+from dezero.utils import gradient_check
 import chainer.functions as CF
 
 
 class TestSigmoid(unittest.TestCase):
+
     def test_forward1(self):
         x = np.array([[0, 1, 2], [0, 2, 4]], np.float32)
         y2 = CF.sigmoid(x)
@@ -23,14 +24,14 @@ class TestSigmoid(unittest.TestCase):
 
     def test_backward1(self):
         x_data = np.array([[0, 1, 2], [0, 2, 4]])
-        self.assertTrue(check_backward(F.sigmoid, x_data))
+        self.assertTrue(gradient_check(F.sigmoid, x_data))
 
     def test_backward2(self):
         np.random.seed(0)
         x_data = np.random.rand(10, 10)
-        self.assertTrue(check_backward(F.sigmoid, x_data))
+        self.assertTrue(gradient_check(F.sigmoid, x_data))
 
     def test_backward3(self):
         np.random.seed(0)
         x_data = np.random.rand(10, 10, 10)
-        self.assertTrue(check_backward(F.sigmoid, x_data))
+        self.assertTrue(gradient_check(F.sigmoid, x_data))
