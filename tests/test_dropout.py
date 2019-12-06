@@ -11,7 +11,7 @@ class TestDropout(unittest.TestCase):
     def test_forward1(self):
         x = np.random.randn(100, 100)
         y = F.dropout(Variable(x), dropout_ratio=0.0)
-        res = array_equal(y.data, x.data)
+        res = array_equal(y.data, x)
         self.assertTrue(res)
 
     def test_forward2(self):

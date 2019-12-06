@@ -1,6 +1,6 @@
 import unittest
 import cupy as np  # !! CUPY !!
-# import dezero
+import dezero
 from dezero import Variable
 import dezero.functions as F
 from dezero.utils import gradient_check, array_equal
@@ -11,7 +11,7 @@ class TestDropout(unittest.TestCase):
     def test_forward1(self):
         x = np.random.randn(100, 100)
         y = F.dropout(Variable(x), dropout_ratio=0.0)
-        res = array_equal(y.data, x.data)
+        res = array_equal(y.data, x)
         self.assertTrue(res)
 
     def test_forward2(self):

@@ -29,6 +29,7 @@ class TestLinear(unittest.TestCase):
 
     def test_forward3(self):
         layer = chainer.links.Linear(3, 2)
+        layer.to_gpu()
         x = np.array([[1, 2, 3], [4, 5, 6]]).astype('f')
         W = layer.W.data.T
         b = layer.b.data
