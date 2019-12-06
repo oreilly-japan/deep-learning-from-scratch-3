@@ -397,13 +397,15 @@ def array_equal(a, b):
 
     Parameters
     ----------
-    a : ndarray (numpy or cupy)
-    b : ndarray (numpy or cupy)
+    a : ndarray (numpy or cupy) or Variable
+    b : ndarray (numpy or cupy) or Variable
 
     Returns
     -------
     c : bool
     """
+    a = a.data if isinstance(a, Variable) else a
+    b = b.data if isinstance(b, Variable) else b
     a, b = cuda.as_numpy(a), cuda.as_numpy(b)
     return np.array_equal(a, b)
 
@@ -413,8 +415,8 @@ def array_allclose(a, b, atol=1e-5, rtol=1e-4):
 
     Parameters
     ----------
-    a : ndarray (numpy or cupy)
-    b : ndarray (numpy or cupy)
+    a : ndarray (numpy or cupy) or Variable
+    b : ndarray (numpy or cupy) or Variable
     atol : float
         numpy.allclose関数で使用する atol（絶対許容パラメータ）
     rtol  : float
@@ -424,6 +426,8 @@ def array_allclose(a, b, atol=1e-5, rtol=1e-4):
     -------
 
     """
+    a = a.data if isinstance(a, Variable) else a
+    b = b.data if isinstance(b, Variable) else b
     a, b = cuda.as_numpy(a), cuda.as_numpy(b)
     return np.allclose(a, b, atol=atol, rtol=rtol)
 # =============================================================================

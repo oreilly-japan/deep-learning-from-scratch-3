@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import dezero.layers as L
 import dezero.functions as F
-from dezero.utils import gradient_check
+from dezero.utils import gradient_check, array_equal
 import chainer.functions as CF
 
 
@@ -16,7 +16,7 @@ class TestConv2d_simple(unittest.TestCase):
         b = None
         y = F.conv2d_simple(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_forward2(self):
         n, c, h, w = 1, 5, 15, 15
@@ -26,7 +26,7 @@ class TestConv2d_simple(unittest.TestCase):
         b = None
         y = F.conv2d_simple(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_forward3(self):
         n, c, h, w = 1, 5, 20, 15
@@ -36,7 +36,7 @@ class TestConv2d_simple(unittest.TestCase):
         b = None
         y = F.conv2d_simple(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_forward4(self):
         n, c, h, w = 1, 5, 20, 15
@@ -46,7 +46,7 @@ class TestConv2d_simple(unittest.TestCase):
         b = np.random.randn(o).astype('f')
         y = F.conv2d_simple(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_backward1(self):
         n, c, h, w = 1, 5, 20, 15
@@ -86,7 +86,7 @@ class TestConv2d(unittest.TestCase):
         b = None
         y = F.conv2d(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_forward2(self):
         n, c, h, w = 1, 5, 15, 15
@@ -96,7 +96,7 @@ class TestConv2d(unittest.TestCase):
         b = None
         y = F.conv2d(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_forward3(self):
         n, c, h, w = 1, 5, 20, 15
@@ -106,7 +106,7 @@ class TestConv2d(unittest.TestCase):
         b = None
         y = F.conv2d(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_forward4(self):
         n, c, h, w = 1, 5, 20, 15
@@ -116,7 +116,7 @@ class TestConv2d(unittest.TestCase):
         b = np.random.randn(o).astype('f')
         y = F.conv2d(x, W, b, s, p)
         expected = CF.convolution_2d(x, W, b, s, p)
-        self.assertTrue(np.array_equal(expected.data, y.data))
+        self.assertTrue(array_equal(expected.data, y.data))
 
     def test_backward1(self):
         n, c, h, w = 1, 5, 20, 15
