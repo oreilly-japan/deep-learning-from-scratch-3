@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import cupy as np  # !! CUPY !!
 from dezero import Variable
 import chainer
 import dezero.functions as F

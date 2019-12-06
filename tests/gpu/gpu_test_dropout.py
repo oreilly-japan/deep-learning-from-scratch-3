@@ -1,6 +1,6 @@
 import unittest
-import numpy as np
-import dezero
+import cupy as np  # !! CUPY !!
+# import dezero
 from dezero import Variable
 import dezero.functions as F
 from dezero.utils import gradient_check, array_equal
