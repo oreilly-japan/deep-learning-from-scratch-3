@@ -258,12 +258,7 @@ def _col2im_gpu(col, img_shape, kernel_size, stride, pad):
     sy, sx = pair(stride)
     ph, pw = pair(pad)
     dx, dy = 1, 1
-
     img = cuda.cupy.empty((n, c, h, w), dtype=col.dtype)
-
-    oh = get_conv_outsize(h, kh, sy, ph)
-    ow = get_conv_outsize(w, kw, sx, pw)
-    col = col.reshape(n, oh, ow, c, kh, kw).transpose(0, 3, 4, 5, 1, 2)
 
     cuda.cupy.ElementwiseKernel(
         'raw T col, int32 h, int32 w, int32 out_h, int32 out_w,'
