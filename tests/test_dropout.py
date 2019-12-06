@@ -18,7 +18,7 @@ class TestDropout(unittest.TestCase):
         x = np.random.randn(100, 100)
         with dezero.test_mode():
             y = F.dropout(x)
-        res = array_equal(y.data, x.data)
+        res = array_equal(y.data, x)
         self.assertTrue(res)
 
     def test_backward1(self):
