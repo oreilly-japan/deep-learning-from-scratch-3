@@ -382,14 +382,18 @@ def numerical_grad(f, x, *args, **kwargs):
         tmp_val = x[idx]
 
         x[idx] = tmp_val + eps
-        fxh1 = f(x, *args, **kwargs).data  # f(x+h)
-        fxh1 = xp.copy(fxh1)
+        y1 = f(x, *args, **kwargs)  # f(x+h)
+        if isinstance(y1, Variable):
+            y1 = y1.data
+        y1 = xp.copy(y1)
 
         x[idx] = tmp_val - eps
-        fxh2 = f(x, *args, **kwargs).data  # f(x-h)
-        fxh2 = xp.copy(fxh2)
+        y2 = f(x, *args, **kwargs).data  # f(x-h)
+        if isinstance(y2, Variable):
+            y2 = y2.data
+        y2 = xp.copy(y2)
 
-        diff = (fxh1 - fxh2).sum()
+        diff = (y1 - y2).sum()
         grad[idx] = diff / (2 * eps)
 
         x[idx] = tmp_val
