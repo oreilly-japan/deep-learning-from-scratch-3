@@ -189,7 +189,7 @@ def col2im(col, img_shape, kernel_size, stride, pad, to_matrix=True):
 
     xp = cuda.get_array_module(col)
     if xp != np:
-        img = _col2im_gpu(col, img_shape, kernel_size, stride, pad)
+        img = _col2im_gpu(col, SH, SW, PH, PW, H, W)
     else:
         img = np.zeros((N, C, H + 2 * PH + SH - 1, W + 2 * PW + SW - 1),
                        dtype=col.dtype)
@@ -251,12 +251,8 @@ def _im2col_gpu(img, kernel_size, stride, pad):
     return col
 
 
-def _col2im_gpu(col, img_shape, kernel_size, stride, pad):
+def _col2im_gpu(col, sy, sx, ph, pw, h, w):
     n, c, kh, kw, out_h, out_w = col.shape
-    n, c, h, w = img_shape
-    kh, kw = pair(kernel_size)
-    sy, sx = pair(stride)
-    ph, pw = pair(pad)
     dx, dy = 1, 1
     img = cuda.cupy.empty((n, c, h, w), dtype=col.dtype)
 
