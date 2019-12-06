@@ -341,7 +341,7 @@ def gradient_check(f, x, *args, atol=1e-5, rtol=1e-4, **kwargs):
         print(' shape: {}'.format(num_grad.shape))
         val = str(num_grad.flatten()[:10])
         print(' values: {} ...'.format(val[1:-1]))
-        print('Bacprop Grad')
+        print('Backprop Grad')
         print(' shape: {}'.format(bp_grad.shape))
         val = str(bp_grad.flatten()[:10])
         print(' values: {} ...'.format(val[1:-1]))
@@ -379,19 +379,19 @@ def numerical_grad(f, x, *args, **kwargs):
     it = np.nditer(np_x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         idx = it.multi_index
-        tmp_val = x[idx]
+        tmp_val = x[idx].copy()
 
         x[idx] = tmp_val + eps
         y1 = f(x, *args, **kwargs)  # f(x+h)
         if isinstance(y1, Variable):
             y1 = y1.data
-        y1 = xp.copy(y1)
+        y1 = y1.copy()
 
         x[idx] = tmp_val - eps
-        y2 = f(x, *args, **kwargs).data  # f(x-h)
+        y2 = f(x, *args, **kwargs)  # f(x-h)
         if isinstance(y2, Variable):
             y2 = y2.data
-        y2 = xp.copy(y2)
+        y2 = y2.copy()
 
         diff = (y1 - y2).sum()
         grad[idx] = diff / (2 * eps)
