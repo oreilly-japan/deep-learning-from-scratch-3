@@ -32,7 +32,9 @@ def as_numpy(x):
     if isinstance(x, Variable):
         x = x.data
 
-    if isinstance(x, np.ndarray):
+    if np.isscalar(x):
+        return np.array(x)
+    elif isinstance(x, np.ndarray):
         return x
     return cp.asnumpy(x)
 
