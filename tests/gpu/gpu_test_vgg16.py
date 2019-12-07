@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import cupy as np  # !! CUPY !!
 import chainer
 import dezero
 from dezero.utils import array_allclose
@@ -32,7 +32,6 @@ class TestVGG16(unittest.TestCase):
             y = model(x)
 
         self.assertTrue(array_allclose(y.data, _y.data))
-
 
     def test_forward2(self):
         x = np.random.randn(1, 3, 224, 224).astype('f')

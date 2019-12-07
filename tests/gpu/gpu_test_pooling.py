@@ -1,5 +1,5 @@
 import unittest
-import numpy as np
+import cupy as np  # !! CUPY !!
 import dezero.functions as F
 from dezero.utils import gradient_check, array_allclose
 import chainer.functions as CF
