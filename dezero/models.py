@@ -35,7 +35,7 @@ class MLP(Model):
 class VGG16(Model):
     WEIGHTS_PATH = 'https://github.com/koki0702/dezero-models/releases/download/v0.1/vgg16.npz'
 
-    def __init__(self, weights='imagenet'):
+    def __init__(self, pretrained=False):
         super().__init__()
         self.conv1_1 = L.Conv2d(3, 64, 3, 1, 1)
         self.conv1_2 = L.Conv2d(64, 64, 3, 1, 1)
@@ -54,7 +54,7 @@ class VGG16(Model):
         self.fc7 = L.Linear(4096)
         self.fc8 = L.Linear(1000)
 
-        if weights == 'imagenet':
+        if pretrained:
             weights_path = utils.get_file(VGG16.WEIGHTS_PATH)
             self.load_weights(weights_path)
 
