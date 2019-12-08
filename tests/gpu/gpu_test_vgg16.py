@@ -38,8 +38,8 @@ class TestVGG16(unittest.TestCase):
     def test_forward2(self):
         x = np.random.randn(1, 3, 224, 224).astype('f')
         model = VGG16()
-        y = model(x)
         model.to_gpu()
+        y = model(x)
         self.assertTrue(y.dtype == np.float32)
 
     def test_backward1(self):
@@ -64,7 +64,7 @@ class TestVGG16(unittest.TestCase):
                 if "fc" in l:
                     m1.W.data = m1.W.data.T
         model.to_gpu()
-        
+
         with dezero.test_mode():
             y = model(x)
             y.backward()
