@@ -34,7 +34,6 @@ class TestMSE_simple(unittest.TestCase):
         x1 = np.array([0.0, 1.0, 2.0])
         expected = ((x0 - x1) ** 2).sum() / x0.size
         y = F.mean_squared_error(x0, x1)
-        print(type(x0), type(x1))
         self.assertTrue(array_allclose(y.data, expected))
 
     def test_backward1(self):
