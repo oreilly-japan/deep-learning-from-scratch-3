@@ -11,6 +11,7 @@ class TestVGG16(unittest.TestCase):
     def test_forward1(self):
         x = np.random.randn(1, 3, 224, 224).astype('f')
         _model = chainer.links.VGG16Layers(None)
+        _model.to_gpu()
 
         with chainer.using_config('train', False):
             with chainer.using_config('enable_backprop', False):
@@ -27,6 +28,7 @@ class TestVGG16(unittest.TestCase):
                 m1.b.data = m2.b.data
                 if "fc" in l:
                     m1.W.data = m1.W.data.T
+        model.to_gpu()
 
         with dezero.test_mode():
             y = model(x)
@@ -37,11 +39,13 @@ class TestVGG16(unittest.TestCase):
         x = np.random.randn(1, 3, 224, 224).astype('f')
         model = VGG16()
         y = model(x)
+        model.to_gpu()
         self.assertTrue(y.dtype == np.float32)
 
     def test_backward1(self):
         x = np.random.randn(1, 3, 224, 224).astype('f')
         _model = chainer.links.VGG16Layers(None)
+        _model.to_gpu()
 
         with chainer.using_config('train', False):
             out_layer_name = 'fc8'
@@ -59,7 +63,8 @@ class TestVGG16(unittest.TestCase):
                 m1.b.data = m2.b.data
                 if "fc" in l:
                     m1.W.data = m1.W.data.T
-
+        model.to_gpu()
+        
         with dezero.test_mode():
             y = model(x)
             y.backward()
