@@ -42,7 +42,7 @@ for epoch in range(max_epoch):
     if epoch % 10 == 0:
         print('loss:', loss.data)
 
-# plot
+# Plot
 x = np.array([example[0] for example in train_set])
 t = np.array([example[1] for example in train_set])
 h = 0.001
