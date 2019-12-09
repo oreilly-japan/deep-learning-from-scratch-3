@@ -1,9 +1,19 @@
-from dezero import Model
+import numpy as np
+from dezero import Layer, Variable, Function, Layer
 import dezero.functions as F
 import dezero.layers as L
 from dezero import utils
 
+
+class Model(Layer):
+
+    def plot(self, *inputs, to_file='model.png'):
+        ys = self.__call__(*inputs)
+        utils.plot_dot_graph(ys, verbose=True, to_file=to_file)
+
+
 class Sequential(Model):
+
     def __init__(self, *layers):
         self.layers = []
         for layer in layers:
@@ -16,6 +26,7 @@ class Sequential(Model):
 
 
 class MLP(Model):
+
     def __init__(self, sizes, activation=F.sigmoid):
         super().__init__()
         self.activation = activation
