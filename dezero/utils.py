@@ -9,11 +9,14 @@ from dezero import cuda
 # =============================================================================
 # Visualize for computational graph
 # =============================================================================
-def _dot_var(v):
+def _dot_var(v, verbose=False):
     dot_var = '{} [label="{}", color=orange, style=filled]\n'
-    name = ''
-    if hasattr(v, 'name') and v.name is not None:
-        name = v.name
+
+    name = '' if v.name is None else v.name
+    if verbose and v.data is not None:
+        if v.name is not None:
+            name += ': '
+        name += str(v.shape) + ' ' + str(v.dtype)
 
     return dot_var.format(id(v), name)
 
@@ -32,41 +35,48 @@ def _dot_func(f):
     return ret
 
 
-def get_dot_graph(output):
+def get_dot_graph(outputs, verbose=False):
     """Generates a graphviz DOT text of a computational graph.
 
-    Build a graph of functions and variables backward-reachable from the output.
-    To visualize a graphviz DOT text, you need the dot binary from the graphviz
-    package (www.graphviz.org).
+    Build a graph of functions and variables backward-reachable from the
+    output. To visualize a graphviz DOT text, you need the dot binary from the
+    graphviz package (www.graphviz.org).
 
     Args:
-        output (dezero.Variable): Output variable from which the graph is
-            constructed.
+        outputs (dezero.Variable or list): Output variable from which the graph
+            is constructed.
+        verbose (bool): If True the dot graph contains additional information
+            such as shapes and dtypes.
 
     Returns:
         str: A graphviz DOT text consisting of nodes and edges that are
             backward-reachable from the output
     """
+    txt = ''
     funcs = []
     seen_set = set()
 
-    def add_func(f):
-        if f not in seen_set:
-            funcs.append(f)
-            # funcs.sort(key=lambda x: x.priority)
-            seen_set.add(f)
+    if isinstance(outputs, Variable):
+        outputs = [outputs]
 
-    add_func(output.creator)
-    txt = _dot_var(output)
+    for output in outputs:
+        def add_func(f):
+            if f not in seen_set:
+                funcs.append(f)
+                # funcs.sort(key=lambda x: x.priority)
+                seen_set.add(f)
 
-    while funcs:
-        func = funcs.pop()
-        txt += _dot_func(func)
-        for x in func.inputs:
-            txt += _dot_var(x)
+        add_func(output.creator)
+        txt += _dot_var(output, verbose)
 
-            if x.creator is not None:
-                add_func(x.creator)
+        while funcs:
+            func = funcs.pop()
+            txt += _dot_func(func)
+            for x in func.inputs:
+                txt += _dot_var(x, verbose)
+
+                if x.creator is not None:
+                    add_func(x.creator)
 
     return 'digraph g {\n' + txt + '}'
 
