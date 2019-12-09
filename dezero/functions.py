@@ -194,18 +194,14 @@ class Linear(Function):
     def forward(self, x, W, b):
         y = x.dot(W)
         if b is not None:
-            self.y_shape = y.shape
             y += b
         return y
 
     def backward(self, gy):
         x, W, b = self.inputs
+        gb = None if b.data is None else sum_to(gy, b.shape)
         gx = matmul(gy, W.T)
         gW = matmul(x.T, gy)
-        if b.data is None:
-            gb = None
-        else:
-            gb = sum_to(gy, self.y_shape)
         return gx, gW, gb
 
 
