@@ -81,6 +81,20 @@ def get_dot_graph(outputs, verbose=False):
     return 'digraph g {\n' + txt + '}'
 
 
+def plot_dot_graph(outputs, verbose=False, to_file='graph.png'):
+    dot_graph = get_dot_graph(outputs, verbose)
+
+    tmp_dir = os.path.join(os.path.expanduser('~'), '.dezero/tmp')
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+    graph_path = os.path.join(tmp_dir, 'tmp_graph.dot')
+
+    img_format = os.path.splitext(to_file)[1][1:]  # file extension(e.g. png)
+    with open(graph_path, 'w') as f:
+        f.write(dot_graph)
+    os.system('dot {} -T {} -o {}'.format(graph_path, img_format, to_file))
+
+
 # =============================================================================
 # Utility functions (numpy magic)
 # =============================================================================
