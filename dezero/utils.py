@@ -32,7 +32,21 @@ def _dot_func(f):
     return ret
 
 
-def get_dot_graph(y):
+def get_dot_graph(output):
+    """Generates a graphviz DOT text of a computational graph.
+
+    Build a graph of functions and variables backward-reachable from the output.
+    To visualize a graphviz DOT text, you need the dot binary from the graphviz
+    package (www.graphviz.org).
+
+    Args:
+        output (dezero.Variable): Output variable from which the graph is
+            constructed.
+
+    Returns:
+        str: A graphviz DOT text consisting of nodes and edges that are
+            backward-reachable from the output
+    """
     funcs = []
     seen_set = set()
 
@@ -42,8 +56,8 @@ def get_dot_graph(y):
             # funcs.sort(key=lambda x: x.priority)
             seen_set.add(f)
 
-    add_func(y.creator)
-    txt = _dot_var(y)
+    add_func(output.creator)
+    txt = _dot_var(output)
 
     while funcs:
         func = funcs.pop()
@@ -61,16 +75,14 @@ def get_dot_graph(y):
 # Utility functions (numpy magic)
 # =============================================================================
 def sum_to(x, shape):
-    """x が shape の形状になるように和を求める
+    """Sum elements along axes to output an array of a given shape.
 
-    Parameters
-    ----------
-    x : numpy.ndarray
-    shape : None or int or tuple of ints
+    Args:
+        x (ndarray): Input array.
+        shape:
 
-    Returns
-    -------
-    y : numpy.ndarray
+    Returns:
+        ndarray: Output array of the shape.
     """
     ndim = len(shape)
     lead = x.ndim - ndim
@@ -84,23 +96,17 @@ def sum_to(x, shape):
 
 
 def reshape_sum_backward(gy, x_shape, axis, keepdims):
-    """dezero.functions.sum 関数の逆伝播で伝わる勾配を適切な形状に変換する
+    """Reshape gradient appropriately for dezero.functions.sum's backward.
 
-    Parameters
-    ----------
-    gy : dezero.Variable
-        逆伝播で出力側から伝わる勾配
-    x_shape : tuple
-        順伝播のsum関数で使用した入力変数の形状
-    axis : None or int or tuple of ints
-        順伝播のsum関数の引数で指定した axis
-    keepdims : bool
-        順伝播のsum関数の引数で指定した keepdims
+    Args:
+        gy (dezero.Variable): Gradient variable from the output by backprop.
+        x_shape (tuple): Shape used at sum function's forward.
+        axis (None or int or tuple of ints): Axis used at sum function's
+            forward.
+        keepdims (bool): Keepdims used at sum function's forward.
 
-    Returns
-    -------
-    gy : dezero.Variable
-        形状変換後の勾配
+    Returns:
+        dezero.Variable: Gradient variable which is reshaped appropriately
     """
     ndim = len(x_shape)
     tupled_axis = axis
@@ -160,7 +166,8 @@ def im2col(img, kernel_size, stride, pad, to_matrix=True):
     if xp != np:
         col = _im2col_gpu(img, kernel_size, stride, pad)
     else:
-        img = np.pad(img, ((0, 0), (0, 0), (PH, PH + SH - 1), (PW, PW + SW - 1)),
+        img = np.pad(img,
+                     ((0, 0), (0, 0), (PH, PH + SH - 1), (PW, PW + SW - 1)),
                      mode='constant', constant_values=(0,))
         col = np.ndarray((N, C, KH, KW, OH, OW), dtype=img.dtype)
 
@@ -213,8 +220,8 @@ def pair(x):
 
 
 def _im2col_gpu(img, kernel_size, stride, pad):
-    """
-    based on the code from
+    """im2col function for GPU.
+    This code is ported from Chainer:
     https://github.com/chainer/chainer/blob/v6.4.0/chainer/utils/conv.py
     """
     n, c, h, w = img.shape
@@ -252,6 +259,10 @@ def _im2col_gpu(img, kernel_size, stride, pad):
 
 
 def _col2im_gpu(col, sy, sx, ph, pw, h, w):
+    """col2im function for GPU.
+    This code is ported from Chainer:
+    https://github.com/chainer/chainer/blob/v6.4.0/chainer/utils/conv.py
+    """
     n, c, kh, kw, out_h, out_w = col.shape
     dx, dy = 1, 1
     img = cuda.cupy.empty((n, c, h, w), dtype=col.dtype)
@@ -290,29 +301,27 @@ def _col2im_gpu(col, sy, sx, ph, pw, h, w):
 # =============================================================================
 # Gradient check
 # =============================================================================
-def gradient_check(f, x, *args, atol=1e-5, rtol=1e-4, **kwargs):
-    """勾配確認を行う
-    誤差逆伝播法と数値微分との結果を比較し、その結果がある誤差以内の場合は True を返す
-    誤差の基準は atol と rtol で指定する
+def gradient_check(f, x, *args, rtol=1e-4, atol=1e-5, **kwargs):
+    """Test backward procedure of a given function.
 
-    Parameters
-    ----------
-    f : DeZero function
-        DeZeroの関数やレイヤ
-    x : ndarray or dezero.Variable
-        勾配を求める変数
-    args : 可変長引数
-        f(x, y) のように、入力する変数がx以外にある場合はここで与える
-    atol : float
-        numpy.allclose関数で使用する atol（絶対許容パラメータ）
-    rtol  : float
-        numpy.allclose関数で使用する rtol（相対許容パラメータ）
-    kwargs : キーワード引数
-        f(x, key=y) のように、入力する変数がx以外にある場合はここで与える
+    This automatically checks the backward-process of a given function. For
+    checking the correctness, this function compares gradients by
+    backprop and ones by numerical derivation. If the result is within a
+    tolerance this function return True, otherwise False.
 
-    Returns
-    -------
-    res : bool
+    Args:
+        f (callable): A function which gets `Variable`s and returns `Variable`s.
+        x (`ndarray` or `dezero.Variable`): A traget `Variable` for computing
+            the gradient.
+        *args: If `f` needs variables except `x`, you can specify with this
+            argument.
+        rtol (float): The relative tolerance parameter.
+        atol (float): The absolute tolerance parameter.
+        **kwargs: If `f` needs keyword variables, you can specify with this
+            argument.
+
+    Returns:
+        bool: Return True if the result is within a tolerance, otherwise False.
     """
     x = as_variable(x)
     x.data = x.data.astype(np.float64)
@@ -340,22 +349,19 @@ def gradient_check(f, x, *args, atol=1e-5, rtol=1e-4, **kwargs):
 
 
 def numerical_grad(f, x, *args, **kwargs):
-    """数値微分で勾配を求める
+    """Computes numerical gradient by finite differences.
 
-    Parameters
-    ----------
-    f : DeZero function
-        DeZeroの関数やレイヤ
-    x : ndarray or dezero.Variable
-        勾配を求める変数
-    args : 可変長引数
-        f(x, y) のように、入力する変数が x 以外にある場合はここで与える
-    kwargs : キーワード引数
-        f(x, key=y) のように、入力する変数が x  以外にある場合はここで与える
+    Args:
+        f (callable): A function which gets `Variable`s and returns `Variable`s.
+        x (`ndarray` or `dezero.Variable`): A traget `Variable` for computing
+            the gradient.
+        *args: If `f` needs variables except `x`, you can specify with this
+            argument.
+        **kwargs: If `f` needs keyword variables, you can specify with this
+            argument.
 
-    Returns
-    -------
-    grad : ndarray
+    Returns:
+        `ndarray`:
     """
     eps = 1e-4
 
@@ -393,16 +399,14 @@ def numerical_grad(f, x, *args, **kwargs):
 
 
 def array_equal(a, b):
-    """ 2つの array が同じ形状で同じ要素をもつ場合は True を返し、それ以外は False を返す
+    """True if two arrays have the same shape and elements, False otherwise.
 
-    Parameters
-    ----------
-    a : ndarray (numpy or cupy) or Variable
-    b : ndarray (numpy or cupy) or Variable
+    Args:
+        a, b (numpy.ndarray or cupy.ndarray or dezero.Variable): input arrays
+            to compare
 
-    Returns
-    -------
-    c : bool
+    Returns:
+        bool: True if the two arrays are equal.
     """
     a = a.data if isinstance(a, Variable) else a
     b = b.data if isinstance(b, Variable) else b
@@ -410,26 +414,26 @@ def array_equal(a, b):
     return np.array_equal(a, b)
 
 
-def array_allclose(a, b, atol=1e-5, rtol=1e-4):
-    """2つの array が同じ形状で近い値の要素をもつ場合は True を返し、それ以外は False を返す
+def array_allclose(a, b, rtol=1e-4, atol=1e-5):
+    """Returns True if two arrays(or variables) are element-wise equal within a
+    tolerance.
 
-    Parameters
-    ----------
-    a : ndarray (numpy or cupy) or Variable
-    b : ndarray (numpy or cupy) or Variable
-    atol : float
-        numpy.allclose関数で使用する atol（絶対許容パラメータ）
-    rtol  : float
-        numpy.allclose関数で使用する rtol（相対許容パラメータ）
+    Args:
+        a, b (numpy.ndarray or cupy.ndarray or dezero.Variable): input arrays
+            to compare
+        rtol (float): The relative tolerance parameter.
+        atol (float): The absolute tolerance parameter.
 
-    Returns
-    -------
-
+    Returns:
+        bool: True if the two arrays are equal within the given tolerance,
+            False otherwise.
     """
     a = a.data if isinstance(a, Variable) else a
     b = b.data if isinstance(b, Variable) else b
     a, b = cuda.as_numpy(a), cuda.as_numpy(b)
     return np.allclose(a, b, atol=atol, rtol=rtol)
+
+
 # =============================================================================
 # download function
 # =============================================================================
@@ -444,23 +448,26 @@ def show_progress(block_num, block_size, total_size):
     bar = "#" * i + "." * (30 - i)
     print(bar_template.format(bar, p), end='')
 
+
 cache_dir = os.path.join(os.path.expanduser('~'), '.dezero')
 
-def get_file(url, file_name=None):
-    """ファイルをダウンロードする。
-    すでにダウンロード済みの場合は、そのファイルを使用する。
 
-    Parameters
-    ----------
-    url : str
-        ダウンロード先のURL
-    file_name : str
-        保存するファイル名
+def get_file(url, file_name=None):
+    """Download a file from the `url` if it is not in the cache.
+
+    The file at the `url` is downloaded to the `~/.dezero`.
+
+    Args:
+        url (str): URL of the file.
+        file_name (str): Name of the file. It `None` is specified the original
+            file name is used.
+
+    Returns:
+        str: Absolute path to the saved file.
     """
     if file_name is None:
         file_name = url[url.rfind('/') + 1:]
     file_path = os.path.join(cache_dir, file_name)
-
 
     if not os.path.exists(cache_dir):
         os.mkdir(cache_dir)
