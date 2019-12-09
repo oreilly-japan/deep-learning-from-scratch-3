@@ -18,15 +18,15 @@ class Dataset:
 
 
 class DatasetLoader:
-    def __init__(self, dataset, batch_size, shuffle=True, gpu=False,
-                 preprocess=None):
+    def __init__(self, dataset, batch_size, shuffle=True, preprocess=None,
+                 gpu=False):
         self.dataset = dataset
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.data_size = len(dataset)
         self.max_iter = math.ceil(self.data_size / batch_size)
-        self.gpu = gpu
         self.preprocess = preprocess
+        self.gpu = gpu
 
         self.reset()
 
