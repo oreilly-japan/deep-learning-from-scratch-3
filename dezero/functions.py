@@ -190,7 +190,30 @@ def matmul(x, W):
     return MatMul()(x, W)
 
 
+class Linear(Function):
+    def forward(self, x, W, b):
+        y = x.dot(W)
+        if b is not None:
+            self.y_shape = y.shape
+            y += b
+        return y
+
+    def backward(self, gy):
+        x, W, b = self.inputs
+        gx = matmul(gy, W.T)
+        gW = matmul(x.T, gy)
+        if b.data is None:
+            gb = None
+        else:
+            gb = sum_to(gy, self.y_shape)
+        return gx, gW, gb
+
+
 def linear(x, W, b=None):
+    return Linear()(x, W, b)
+
+
+def linear_simple(x, W, b=None):
     x, W = as_variable(x), as_variable(W)
     t = matmul(x, W)
     if b is None:
