@@ -20,9 +20,9 @@ class Variable:
 
         funcs = [self.creator]
         while funcs:
-            f = funcs.pop()  # 関数を取得
-            x, y = f.input, f.output  # 関数の入出力を取得
-            x.grad = f.backward(y.grad)  # backwardを呼ぶ
+            f = funcs.pop()
+            x, y = f.input, f.output
+            x.grad = f.backward(y.grad)
 
             if x.creator is not None:
                 funcs.append(x.creator)
@@ -39,9 +39,9 @@ class Function:
         x = input.data
         y = self.forward(x)
         output = Variable(as_array(y))
-        output.set_creator(self)  # 親を覚えさせる
+        output.set_creator(self)
         self.input = input
-        self.output = output  # 出力を覚える
+        self.output = output
         return output
 
     def forward(self, x):

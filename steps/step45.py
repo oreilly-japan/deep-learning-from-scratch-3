@@ -9,12 +9,12 @@ x = np.random.rand(100, 1)
 y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
 x, y = Variable(x), Variable(y)
 
-# ハイパーパラメータの設定
+# Hyperparameters
 lr = 0.2
 max_iter = 10000
 hidden_size = 10
 
-# モデルの定義
+# Model definition
 class TwoLayerNet(Model):
     def __init__(self, in_size, hidden_size, out_size):
         super().__init__()

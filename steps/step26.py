@@ -1,5 +1,5 @@
 '''
-You need the dot binary from the graphviz package (www.graphviz.org).
+Need the dot binary from the graphviz package (www.graphviz.org).
 '''
 import numpy as np
 from dezero import Variable

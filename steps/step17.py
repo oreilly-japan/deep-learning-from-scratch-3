@@ -94,5 +94,5 @@ def square(x):
 
 
 for i in range(10):
-    x = Variable(np.random.randn(10000))  # 巨大なデータ
-    y = square(square(square(square(x))))  # 複雑な計算をする
+    x = Variable(np.random.randn(10000))  # big data
+    y = square(square(square(square(x))))

@@ -5,11 +5,11 @@ import dezero.functions as F
 x = np.ones(5)
 print(x)
 
-# 学習時
+# When training
 y = F.dropout(x)
 print(y)
 
-# テスト時
+# When testing (predicting)
 with test_mode():
     y = F.dropout(x)
     print(y)

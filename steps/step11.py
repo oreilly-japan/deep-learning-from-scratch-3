@@ -36,9 +36,9 @@ def as_array(x):
 
 class Function:
     def __call__(self, inputs):
-        xs = [x.data for x in inputs]  # Variableからデータを取り出す
-        ys = self.forward(xs)  # forward()を呼ぶ
-        outputs = [Variable(as_array(y)) for y in ys]  # 結果をVariableで包む
+        xs = [x.data for x in inputs]  # Get data from Variable
+        ys = self.forward(xs)
+        outputs = [Variable(as_array(y)) for y in ys]  # Wrap data
 
         for output in outputs:
             output.set_creator(self)  # 親を覚えさせる

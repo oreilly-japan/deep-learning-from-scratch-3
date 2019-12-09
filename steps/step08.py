@@ -13,9 +13,9 @@ class Variable:
     def backward(self):
         funcs = [self.creator]
         while funcs:
-            f = funcs.pop()  # 関数を取得
-            x, y = f.input, f.output  # 関数の入出力を取得
-            x.grad = f.backward(y.grad)  # backwardを呼ぶ
+            f = funcs.pop()  # 1. Get a function
+            x, y = f.input, f.output  # 2. Get the function's input/output
+            x.grad = f.backward(y.grad)  # 3. Call the function's backward
 
             if x.creator is not None:
                 funcs.append(x.creator)
@@ -26,9 +26,9 @@ class Function:
         x = input.data
         y = self.forward(x)
         output = Variable(y)
-        output.set_creator(self)  # 親を覚えさせる
+        output.set_creator(self)
         self.input = input
-        self.output = output  # 出力を覚える
+        self.output = output
         return output
 
     def forward(self, x):
@@ -65,7 +65,7 @@ a = A(x)
 b = B(a)
 y = C(b)
 
-# 逆伝播
+# backward
 y.grad = np.array(1.0)
 y.backward()
 print(x.grad)  # 3.297442541400256

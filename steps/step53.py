@@ -13,7 +13,6 @@ train_loader = DatasetLoader(train_set, batch_size)
 model = MLP((784, 1000, 10))
 optimizer = optimizers.SGD().setup(model)
 
-# パラーメタの読み込み
 # model.load_weights('my_mlp.npz')
 
 for epoch in range(max_epoch):

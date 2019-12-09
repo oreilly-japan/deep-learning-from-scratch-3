@@ -16,7 +16,6 @@ for i in range(iters):
     x.cleargrad()
     gx.backward(create_graph=True)
 
-# 計算グラフのドット言語を出力
 gx = x.grad
 gx.name = 'gx' + str(iters + 1)
 plot_dot_graph(gx, to_file='tanh.png')

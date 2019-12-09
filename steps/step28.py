@@ -1,6 +1,5 @@
 import numpy as np
-# core_simple を明示的にインポート
-# （dezero/__init__.py の is_simple_core = False でも動作させるため）
+# Import core_simple explicitly
 from dezero.core_simple import Variable
 from dezero.core_simple import setup_variable
 setup_variable()
@@ -31,7 +30,7 @@ for i in range(iters):
     x0.data -= lr * x0.grad
     x1.data -= lr * x1.grad
 
-# 図を描画
+# Plot
 import matplotlib.pyplot as plt
 
 R = 0.01

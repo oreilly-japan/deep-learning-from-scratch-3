@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from dezero import Variable
 import dezero.functions as F
 
-# トイ・データセット
+# Generate toy dataset
 np.random.seed(0)
 x = np.random.rand(100, 1)
 y = 5 + 2 * x + np.random.rand(100, 1)
@@ -34,13 +34,13 @@ for i in range(iters):
     b.cleargrad()
     loss.backward()
 
-    # .data 属性で更新を行う（パラメータの更新時は、計算グラフの作成は不要）
+    # Update .data attribute (No need grads when updating params)
     W.data -= lr * W.grad.data
     b.data -= lr * b.grad.data
     print(loss)
 
 
-# グラフの描画
+# Plot
 plt.scatter(x.data, y.data, s=10)
 plt.xlabel('x')
 plt.ylabel('y')

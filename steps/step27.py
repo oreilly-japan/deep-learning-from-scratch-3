@@ -45,7 +45,6 @@ print('--- approximate sin ---')
 print(y.data)
 print(x.grad)
 
-# 可視化 (dotファイルに保存)
 x.name = 'x'
 y.name = 'y'
 plot_dot_graph(y, to_file='my_sin.png')

@@ -19,8 +19,8 @@ for epoch in range(max_epoch):
 
 
 def preprocess(x):
-    x = x.reshape(1, 28, 28)  # reshape
-    x *= 255.0  # rescaling
+    x = x.reshape(1, 28, 28)  # Reshape
+    x *= 255.0  # Rescaling
     return x
 
 train_loader = DatasetLoader(train, batch_size, preprocess=preprocess)

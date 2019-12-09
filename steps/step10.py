@@ -40,9 +40,9 @@ class Function:
         x = input.data
         y = self.forward(x)
         output = Variable(as_array(y))
-        output.set_creator(self)  # 親を覚えさせる
+        output.set_creator(self)
         self.input = input
-        self.output = output  # 出力を覚える
+        self.output = output
         return output
 
     def forward(self, x):

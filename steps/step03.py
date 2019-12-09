@@ -9,7 +9,7 @@ class Variable:
 class Function:
     def __call__(self, input):
         x = input.data
-        y = self.forward(x)  # 具体的な計算はforward()で行う
+        y = self.forward(x)
         output = Variable(y)
         return output
 

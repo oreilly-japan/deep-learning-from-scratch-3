@@ -11,7 +11,7 @@ train_set, test_set = dezero.datasets.get_spiral()
 x = np.array([example[0] for example in train_set])
 t = np.array([example[1] for example in train_set])
 
-# ハイパーパラメータの設定
+# Hyperparameters
 max_epoch = 300
 batch_size = 30
 hidden_size = 10
@@ -21,10 +21,10 @@ model = MLP((2, hidden_size, 3))
 optimizer = optimizers.SGD(lr).setup(model)
 
 data_size = len(x)
-max_iter = math.ceil(data_size / batch_size)  # 小数点の切り上げ
+max_iter = math.ceil(data_size / batch_size)
 
 for epoch in range(max_epoch):
-    # データのシャッフル
+    # Shuffle data
     idx = np.random.permutation(data_size)
     x = x[idx]
     t = t[idx]
@@ -43,12 +43,12 @@ for epoch in range(max_epoch):
 
         sum_loss += float(loss.data) * len(batch_t)
 
-    # エポックごとに学習経過を出力
+    # Print loss every epoch
     avg_loss = sum_loss / data_size
     print('epoch %d, loss %.2f' % (epoch + 1, avg_loss))
 
 
-# 境界領域のプロット
+# Plot boundary area the model predict
 h = 0.001
 x_min, x_max = x[:, 0].min() - .1, x[:, 0].max() + .1
 y_min, y_max = x[:, 1].min() - .1, x[:, 1].max() + .1
@@ -61,7 +61,7 @@ predict_cls = np.argmax(score.data, axis=1)
 Z = predict_cls.reshape(xx.shape)
 plt.contourf(xx, yy, Z)
 
-# データ点のプロット
+# Plot data points of the dataset
 N, CLS_NUM = 100, 3
 markers = ['o', 'x', '^']
 colors = ['orange', 'blue', 'green']

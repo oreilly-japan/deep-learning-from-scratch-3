@@ -17,11 +17,11 @@ data_size = len(train_set)
 max_iter = math.ceil(data_size / batch_size)
 
 for epoch in range(max_epoch):
-    # shuffle data
+    # Shuffle data
     np.random.shuffle(train_set)
 
     for i in range(max_iter):
-        # create minibatch
+        # Create minibatch
         batch = train_set[i * batch_size:(i + 1) * batch_size]
         x = np.array([example[0] for example in batch])
         t = np.array([example[1] for example in batch])

@@ -1,1 +1,1 @@
-# go to dezero/core.py
+# Look at dezero/core.py

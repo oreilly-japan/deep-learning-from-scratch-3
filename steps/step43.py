@@ -42,7 +42,7 @@ for i in range(iters):
     b2.data -= lr * b2.grad.data
     print(loss)
 
-# グラフの描画
+# Plot
 plt.scatter(x.data, y.data, s=10)
 plt.xlabel('x')
 plt.ylabel('y')

@@ -1,6 +1,5 @@
 import numpy as np
-# core_simple を明示的にインポート
-# （dezero/__init__.py の is_simple_core = False でも動作させるため）
+# Import core_simple explicitly
 from dezero.core_simple import Variable
 from dezero.core_simple import setup_variable
 setup_variable()
