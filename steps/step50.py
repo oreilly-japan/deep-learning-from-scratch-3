@@ -10,11 +10,11 @@ test_loader = DatasetLoader(test, batch_size, shuffle=False)
 
 for epoch in range(max_epoch):
     for x, t in train_loader:
-        print(x.shape, t.shape)  # train data
+        print(x.shape, t.shape)
         break
 
     for x, t in test_loader:
-        print(x.shape, t.shape)  # test data
+        print(x.shape, t.shape)
         break
 
 
