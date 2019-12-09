@@ -1,11 +1,9 @@
 '''
-y=tanh(x)のn階微分
-計算グラフの可視化は、次のコマンドで行えます
-$ python tanh.py | dot -T png -o sample.png
+You need the dot binary from the graphviz package (www.graphviz.org).
 '''
 import numpy as np
 from dezero import Variable
-from dezero.utils import get_dot_graph
+from dezero.utils import plot_dot_graph
 import dezero.functions as F
 
 x = Variable(np.array(1.0))
@@ -23,4 +21,4 @@ for i in range(iters):
 
 gx = x.grad
 gx.name = 'gx' + str(iters + 1)
-print(get_dot_graph(gx))
+plot_dot_graph(gx, to_file='tanh.png')

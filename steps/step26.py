@@ -1,11 +1,9 @@
 '''
-計算グラフの可視化は、次のコマンドで行えます
-$ python step22.py | dot -T png -o sample.png
+You need the dot binary from the graphviz package (www.graphviz.org).
 '''
-
 import numpy as np
 from dezero import Variable
-from dezero.utils import get_dot_graph
+from dezero.utils import plot_dot_graph
 
 
 def goldstein(x0, x1):
@@ -22,4 +20,4 @@ y.backward()
 x0.name = 'x0'
 x1.name = 'x1'
 y.name = 'y'
-print(get_dot_graph(y))
+plot_dot_graph(y)

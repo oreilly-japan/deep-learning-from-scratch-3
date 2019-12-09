@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from dezero import Variable, Function
-from dezero.utils import get_dot_graph
+from dezero.utils import plot_dot_graph
 
 
 class Sin(Function):
@@ -43,11 +43,9 @@ y = my_sin(x)  # , threshold=1e-150)
 y.backward()
 print('--- approximate sin ---')
 print(y.data)
-print(x.grad)  # 0.7071032148228457
+print(x.grad)
 
 # 可視化 (dotファイルに保存)
 x.name = 'x'
 y.name = 'y'
-dot = get_dot_graph(y)
-with open('my_sin.dot', 'w') as o:
-    o.write(dot)
+plot_dot_graph(y, to_file='my_sin.png')
