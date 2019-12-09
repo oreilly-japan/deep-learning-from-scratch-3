@@ -10,9 +10,19 @@ test_loader = DatasetLoader(test, batch_size, shuffle=False)
 
 for epoch in range(max_epoch):
     for x, t in train_loader:
-        print(x, t)  # x, tは訓練データ
+        print(x.shape, t.shape)  # train data
         break
-    # エポックの終わりにテストデータを取り出す
+
     for x, t in test_loader:
-        print(x, t)  # x, tはテストデータ
+        print(x.shape, t.shape)  # test data
         break
+
+
+def preprocess(x):
+    x = x.reshape(1, 28, 28)  # reshape
+    x *= 255.0  # rescaling
+    return x
+
+train_loader = DatasetLoader(train, batch_size, preprocess=preprocess)
+x, t = train_loader.__next__()
+print(x.shape, t.shape)
