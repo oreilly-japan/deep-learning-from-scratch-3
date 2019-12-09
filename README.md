@@ -32,8 +32,6 @@
 |[steps](/steps)|各stepファイル（step01.py ~ step60.py）|
 |[tests](/tests)|DeZeroのユニットテスト|
 
-- 各stepファイルの概要については「[stepファイルの説明](../../wiki/Step%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E8%AA%AC%E6%98%8E)」をご覧ください。
-
 
 ## 必要な外部ライブラリ
 
