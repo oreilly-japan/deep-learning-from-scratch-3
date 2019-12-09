@@ -49,12 +49,12 @@ def as_numpy(x):
 def as_cupy(x):
     """Convert to `cupy.ndarray`.
 
-        Args:
-            x (`numpy.ndarray` or `cupy.ndarray`): Arbitrary object that can be
-                converted to `cupy.ndarray`.
-        Returns:
-            `cupy.ndarray`: Converted array.
-        """
+    Args:
+        x (`numpy.ndarray` or `cupy.ndarray`): Arbitrary object that can be
+            converted to `cupy.ndarray`.
+    Returns:
+        `cupy.ndarray`: Converted array.
+    """
     if isinstance(x, Variable):
         x = x.data
 
