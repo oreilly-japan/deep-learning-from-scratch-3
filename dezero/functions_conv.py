@@ -189,8 +189,7 @@ class Pooling(Function):
         return y
 
     def backward(self, gy):
-        f = Pooling2DGrad(self)
-        return f(gy)
+        return Pooling2DGrad(self)(gy)
 
 
 class Pooling2DGrad(Function):
@@ -199,7 +198,7 @@ class Pooling2DGrad(Function):
         self.kernel_size = mpool2d.kernel_size
         self.stride = mpool2d.stride
         self.pad = mpool2d.pad
-        self.input_shpae = mpool2d.inputs[0].shape
+        self.input_shape = mpool2d.inputs[0].shape
         self.dtype = mpool2d.inputs[0].dtype
         self.indexes = mpool2d.indexes
 
@@ -207,15 +206,15 @@ class Pooling2DGrad(Function):
         xp = cuda.get_array_module(gy)
 
         N, C, OH, OW = gy.shape
-        H, W = self.input_shpae[2:]
+        N, C, H, W = self.input_shape
         KH, KW = pair(self.kernel_size)
 
         gcol = xp.zeros((N * C * OH * OW * KH * KW), dtype=self.dtype)
 
-        indexes = self.indexes.ravel() + xp.arange(
-            0, self.indexes.size * KH * KW, KH * KW)
-
-        gcol[indexes] = gy[0].ravel()
+        indexes = (self.indexes.ravel()
+                   + xp.arange(0, self.indexes.size * KH * KW, KH * KW))
+        
+        gcol[indexes] = gy.ravel()
         gcol = gcol.reshape(N, C, OH, OW, KH, KW)
         gcol = xp.swapaxes(gcol, 2, 4)
         gcol = xp.swapaxes(gcol, 3, 5)
