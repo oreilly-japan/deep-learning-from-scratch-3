@@ -59,6 +59,5 @@ def as_cupy(x):
         x = x.data
 
     if not gpu_enable:
-        msg = "DeZero's GPU mode requires CuPy."
-        raise Exception(msg)
+        raise Exception('CuPy cannot be loaded. Install CuPy!')
     return cp.asarray(x)
