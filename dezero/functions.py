@@ -462,7 +462,7 @@ def dropout(x, dropout_ratio=0.5):
     if dezero.Config.train:
         xp = cuda.get_array_module(x)
         mask = xp.random.rand(*x.shape) > dropout_ratio
-        scale = 1.0 - dropout_ratio
+        scale = xp.array(1.0 - dropout_ratio).astype(x.dtype)
         y = x * mask / scale
         return y
     else:
