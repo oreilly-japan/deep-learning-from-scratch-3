@@ -41,7 +41,7 @@ class TestVGG16(unittest.TestCase):
         self.assertTrue(y.dtype == np.float32)
 
     def test_backward1(self):
-        x = np.random.randn(1, 3, 224, 224).astype('f')
+        x = np.random.randn(2, 3, 224, 224).astype('f')
         _model = chainer.links.VGG16Layers(None)
 
         with chainer.using_config('train', False):
