@@ -1,4 +1,5 @@
 import os
+import subprocess
 import urllib.request
 import numpy as np
 from dezero import as_variable
@@ -89,10 +90,13 @@ def plot_dot_graph(outputs, verbose=False, to_file='graph.png'):
         os.mkdir(tmp_dir)
     graph_path = os.path.join(tmp_dir, 'tmp_graph.dot')
 
-    img_format = os.path.splitext(to_file)[1][1:]  # file extension(e.g. png)
     with open(graph_path, 'w') as f:
         f.write(dot_graph)
-    os.system('dot {} -T {} -o {}'.format(graph_path, img_format, to_file))
+
+    extension = os.path.splitext(to_file)[1][1:]  # extension(e.g. png, pdf)
+    cmd = 'dot {} -T {} -o {}'.format(graph_path, extension, to_file)
+    subprocess.run(cmd, shell=True)
+
 
 
 # =============================================================================
