@@ -36,7 +36,7 @@ def _dot_func(f):
     return ret
 
 
-def get_dot_graph(outputs, verbose=False):
+def get_dot_graph(outputs, verbose=True):
     """Generates a graphviz DOT text of a computational graph.
 
     Build a graph of functions and variables backward-reachable from the
@@ -82,7 +82,7 @@ def get_dot_graph(outputs, verbose=False):
     return 'digraph g {\n' + txt + '}'
 
 
-def plot_dot_graph(outputs, verbose=False, to_file='graph.png'):
+def plot_dot_graph(outputs, verbose=True, to_file='graph.png'):
     dot_graph = get_dot_graph(outputs, verbose)
 
     tmp_dir = os.path.join(os.path.expanduser('~'), '.dezero')
@@ -93,9 +93,16 @@ def plot_dot_graph(outputs, verbose=False, to_file='graph.png'):
     with open(graph_path, 'w') as f:
         f.write(dot_graph)
 
-    extension = os.path.splitext(to_file)[1][1:]  # extension(e.g. png, pdf)
+    extension = os.path.splitext(to_file)[1][1:]  # Extension(e.g. png, pdf)
     cmd = 'dot {} -T {} -o {}'.format(graph_path, extension, to_file)
     subprocess.run(cmd, shell=True)
+
+    # Return the image as a Jupyter Image object, to be displayed in-line.
+    try:
+        from IPython import display
+        return display.Image(filename=to_file)
+    except ImportError:
+        pass
 
 
 

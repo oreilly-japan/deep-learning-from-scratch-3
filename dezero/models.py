@@ -9,7 +9,7 @@ class Model(Layer):
 
     def plot(self, *inputs, to_file='model.png'):
         ys = self.__call__(*inputs)
-        utils.plot_dot_graph(ys, verbose=True, to_file=to_file)
+        return utils.plot_dot_graph(ys, verbose=True, to_file=to_file)
 
 
 class Sequential(Model):
