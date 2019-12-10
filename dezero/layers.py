@@ -100,17 +100,15 @@ class Linear(Layer):
         else:
             self.b = Parameter(np.zeros(out_size, dtype=np.float32), name='b')
 
-    def _init_W(self, x):
-        self.in_size = x.shape[1]
-        xp = cuda.get_array_module(x)
-
-        I, O = self.in_size, self.out_size
-        W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
-        self.W.data = W_data
-
     def __call__(self, x):
         if self.W.data is None:
-            self._init_W(x)
+            self.in_size = x.shape[1]
+            xp = cuda.get_array_module(x)
+
+            I, O = self.in_size, self.out_size
+            W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
+            self.W.data = W_data
+
         y = F.linear(x, self.W, self.b)
         return y
 

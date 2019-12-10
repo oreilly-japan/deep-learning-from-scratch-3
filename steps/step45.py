@@ -16,10 +16,10 @@ hidden_size = 10
 
 # Model definition
 class TwoLayerNet(Model):
-    def __init__(self, in_size, hidden_size, out_size):
+    def __init__(self, hidden_size, out_size):
         super().__init__()
-        self.l1 = L.Linear(in_size, hidden_size)
-        self.l2 = L.Linear(hidden_size, out_size)
+        self.l1 = L.Linear(hidden_size)
+        self.l2 = L.Linear(out_size)
 
     def __call__(self, x):
         y = F.sigmoid(self.l1(x))
@@ -27,7 +27,7 @@ class TwoLayerNet(Model):
         return y
 
 
-model = TwoLayerNet(1, hidden_size, 1)
+model = TwoLayerNet(hidden_size, 1)
 
 for i in range(max_iter):
     y_pred = model(x)

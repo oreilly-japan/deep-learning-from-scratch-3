@@ -10,8 +10,8 @@ y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
 x, y = Variable(x), Variable(y)
 
 I, H, O = 1, 10, 1
-l1 = L.Linear(I, H)
-l2 = L.Linear(H, O)
+l1 = L.Linear(H)  # or L.Linear(I, H)
+l2 = L.Linear(O)  # or L.Linear(H, O)
 
 
 def predict(x):

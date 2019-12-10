@@ -17,7 +17,7 @@ batch_size = 30
 hidden_size = 10
 lr = 1.0
 
-model = MLP((2, hidden_size, 3))
+model = MLP((hidden_size, 3))
 optimizer = optimizers.SGD(lr).setup(model)
 
 data_size = len(x)

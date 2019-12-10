@@ -12,7 +12,7 @@ def softmax1d(x):
     return y / sum_y
 
 
-model = MLP((2, 10, 3))
+model = MLP((10, 3))
 
 x = Variable(np.array([0.2, -0.4]))
 y = model(x)
