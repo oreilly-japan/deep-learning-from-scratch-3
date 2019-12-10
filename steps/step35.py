@@ -18,4 +18,4 @@ for i in range(iters):
 
 gx = x.grad
 gx.name = 'gx' + str(iters + 1)
-plot_dot_graph(gx, to_file='tanh.png')
+plot_dot_graph(gx, verbose=False, to_file='tanh.png')

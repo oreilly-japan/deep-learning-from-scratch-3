@@ -20,4 +20,4 @@ y.backward()
 x0.name = 'x0'
 x1.name = 'x1'
 y.name = 'y'
-plot_dot_graph(y)
+plot_dot_graph(y, verbose=False)
