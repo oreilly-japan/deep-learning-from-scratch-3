@@ -9,7 +9,8 @@ class Optimizer:
 
     def update(self):
         for param in self.target.params():
-            self.update_one(param)
+            if param.grad is not None:
+                self.update_one(param)
 
     def update_one(self, param):
         NotImplementedError()
