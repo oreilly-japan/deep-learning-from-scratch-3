@@ -17,6 +17,25 @@ class Dataset:
         raise NotImplementedError
 
 
+class TupleDataset:
+    """Dataset of tuples from multiple equal-length datasets.
+    """
+    def __init__(self, *datasets):
+        self._datasets = datasets
+        self._length = len(datasets[0])
+
+    def __getitem__(self, index):
+        batches = [dataset[index] for dataset in self._datasets]
+        if isinstance(index, slice):
+            L = len(batches[0])
+            return [tuple([batch[i] for batch in batches]) for i in range(L)]
+        else:
+            return tuple(batches)
+
+    def __len__(self):
+        return self._length
+
+
 class DatasetLoader:
     def __init__(self, dataset, batch_size, shuffle=True, preprocess=None,
                  gpu=False):
@@ -38,15 +57,19 @@ class DatasetLoader:
     def __iter__(self):
         return self
 
+    def _get_batch(self):
+        i = self.iteration % self.max_iter
+        start_idx = i * self.batch_size
+        end_idx = (i + 1) * self.batch_size
+        batch = self.dataset[start_idx:end_idx]
+        return batch
+
     def __next__(self):
         if self.iteration >= self.max_iter:
             self.reset()
             raise StopIteration
 
-        i = self.iteration % self.max_iter
-        start_idx = i * self.batch_size
-        end_idx = (i + 1) * self.batch_size
-        batch = self.dataset[start_idx:end_idx]
+        batch = self._get_batch()
 
         xp = cuda.cupy if self.gpu else np
         if self.preprocess is None:
@@ -67,6 +90,20 @@ class DatasetLoader:
 
     def to_gpu(self):
         self.gpu = True
+
+
+class SequentialDataLoader(DatasetLoader):
+    def __init__(self, dataset, batch_size, preprocess=None, gpu=False):
+        super().__init__(dataset=dataset, batch_size=batch_size, shuffle=False,
+                         preprocess=preprocess, gpu=gpu)
+        self.dataset = np.array(self.dataset)
+
+    def _get_batch(self):
+        jump = self.data_size // self.batch_size
+        offsets = [(i * jump + self.iteration) % self.data_size for i in
+                   range(self.batch_size)]
+        batch = self.dataset[offsets]
+        return batch
 
 
 def preprocess_vgg(image, size=(224, 224), dtype=np.float32):
