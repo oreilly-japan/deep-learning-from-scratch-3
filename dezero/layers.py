@@ -7,7 +7,7 @@ from dezero.utils import pair
 
 
 # =============================================================================
-# Layer / Model
+# Layer (base class)
 # =============================================================================
 class Layer:
     def __init__(self):
@@ -67,12 +67,11 @@ class Layer:
 
 
 # =============================================================================
-# Linear / Conv / EmbedID / RNN / LSTM
+# Linear / Conv2d
 # =============================================================================
 class Linear_simple(Layer):
     def __init__(self, in_size, out_size, nobias=False):
         super().__init__()
-
         I, O = in_size, out_size
         W_data = np.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
         self.W = Parameter(W_data, name='W')
@@ -89,26 +88,30 @@ class Linear_simple(Layer):
 class Linear(Layer):
     def __init__(self, in_size, out_size=None, nobias=False):
         super().__init__()
-
         if out_size is None:
             in_size, out_size = None, in_size
         self.in_size = in_size
         self.out_size = out_size
 
         self.W = Parameter(None, name='W')
+        if self.in_size is not None:
+            self._init_W()
+
         if nobias:
             self.b = None
         else:
             self.b = Parameter(np.zeros(out_size, dtype=np.float32), name='b')
 
+    def _init_W(self, xp=np):
+        I, O = self.in_size, self.out_size
+        W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
+        self.W.data = W_data
+
     def __call__(self, x):
         if self.W.data is None:
             self.in_size = x.shape[1]
             xp = cuda.get_array_module(x)
-
-            I, O = self.in_size, self.out_size
-            W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
-            self.W.data = W_data
+            self._init_W(xp)
 
         y = F.linear(x, self.W, self.b)
         return y
@@ -117,22 +120,17 @@ class Linear(Layer):
 class Conv2d(Layer):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
                  pad=0, nobias=False):
-        """畳込みレイヤ
+        """Two-dimensional convolutional layer.
 
-        Parameters
-        ----------
-        in_channels : int or None
-            入力データのチャンネル数。Noneの場合はforward時のxからin_channelsを取得する
-        out_channels : int
-            出力データのチャンネル数
-        kernel_size : int or (int, int)
-            ：カーネルサイズ
-        stride : int or (int, int)
-            ストライド
-        pad : int or (int, int)
-            パディング
-        nobias : bool
-            バイアスを使用するかどうか
+        Args:
+            in_channels (int or None): Number of channels of input arrays. If
+            `None`, parameter initialization will be deferred until the first
+            forward data pass at which time the size will be determined.
+            out_channels (int): Number of channels of output arrays.
+            kernel_size (int or (int, int)): Size of filters.
+            stride (int or (int, int)): Stride of filter applications.
+            pad (int or (int, int)): Spatial padding width for input arrays.
+            nobias (bool): If `True`, then this function does not use the bias.
         """
         super().__init__()
         self.in_channels = in_channels
@@ -142,16 +140,16 @@ class Conv2d(Layer):
         self.pad = pad
 
         self.W = Parameter(None, name='W')
+        if in_channels is not None:
+            self._init_W()
+
         if nobias:
             self.b = None
         else:
             b_data = np.zeros(out_channels).astype(np.float32)
             self.b = Parameter(b_data, name='b')
 
-    def _init_W(self, x):
-        self.in_channels = x.shape[1]
-        xp = cuda.get_array_module(x)
-
+    def _init_W(self, xp=np):
         C, OC = self.in_channels, self.out_channels
         KH, KW = pair(self.kernel_size)
         W_data = xp.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
@@ -160,28 +158,35 @@ class Conv2d(Layer):
 
     def __call__(self, x):
         if self.W.data is None:
-            self._init_W(x)
+            self.in_channels = x.shape[1]
+            xp = cuda.get_array_module(x)
+            self._init_W(xp)
+
         y = F.conv2d(x, self.W, self.b, self.stride, self.pad)
         return y
 
 
-class EmbedID(Layer):
-
-    def __init__(self, in_size, out_size):
-        super().__init__()
-        self.W = Parameter(np.random.randn(in_size, out_size), name='W')
-
-    def __call__(self, x):
-        y = self.W[x]
-        return y
-
-
+# =============================================================================
+# RNN / LSTM
+# =============================================================================
 class RNN(Layer):
-    def __init__(self, in_size, hidden_size):
+    def __init__(self, in_size, hidden_size=None, nobias=False):
+        """An Elman RNN cell with tanh.
+
+        Args:
+            in_size (int): The number of features in the input. If unspecified
+            or `None`, parameter initialization will be deferred until the
+            first `__call__(x)` at which time the size will be determined.
+            hidden_size (int): The number of features in the hidden state.
+            nobias (bool): If `True`, then this function does not use the bias.
+        """
         super().__init__()
-        I, H = in_size, hidden_size
-        self.x2h = Linear(I, H)
-        self.h2h = Linear(H, H)
+
+        if hidden_size is None:
+            in_size, hidden_size = None, in_size
+
+        self.x2h = Linear(in_size, hidden_size, nobias=nobias)
+        self.h2h = Linear(in_size, hidden_size, nobias=nobias)
         self.h = None
 
     def reset_state(self):
@@ -192,7 +197,6 @@ class RNN(Layer):
             h_new = F.tanh(self.x2h(x))
         else:
             h_new = F.tanh(self.x2h(x) + self.h2h(self.h))
-
         self.h = h_new
         return h_new
 
@@ -236,31 +240,37 @@ class LSTM(Layer):
         return h
 
 
+# =============================================================================
+# EmbedID / BatchNorm
+# =============================================================================
+class EmbedID(Layer):
+    def __init__(self, in_size, out_size):
+        super().__init__()
+        self.W = Parameter(np.random.randn(in_size, out_size), name='W')
+
+    def __call__(self, x):
+        y = self.W[x]
+        return y
+
+
 class BatchNorm(Layer):
     def __init__(self):
         super().__init__()
-        # BatchNorm's avg_mean and avg_var are not trainable but they have to
-        # be saved to a file. So the two values are Parameter object.
-        self._avg_mean = Parameter(None, name='avg_mean')
-        self._avg_var = Parameter(None, name='avg_var')
+        # `.avg_mean` and `.avg_var` are `Parameter` objects, so they will be
+        # saved to a file (using `save_weights()`).
+        # But they don't need grads, so they're just used as `ndarray`.
+        self.avg_mean = Parameter(None, name='avg_mean')
+        self.avg_var = Parameter(None, name='avg_var')
         self.gamma = Parameter(None, name='gamma')
         self.beta = Parameter(None, name='beta')
 
-    @property
-    def avg_mean(self):
-        return self._avg_mean.data
-
-    @property
-    def avg_var(self):
-        return self._avg_var.data
-
-    def _initialize_params(self, x):
+    def _init_params(self, x):
         xp = cuda.get_array_module(x)
         D = x.shape[1]
-        if self._avg_mean.data is None:
-            self._avg_mean.data = xp.zeros(D, dtype=x.dtype)
-        if self._avg_var.data is None:
-            self._avg_var.data = xp.ones(D, dtype=x.dtype)
+        if self.avg_mean.data is None:
+            self.avg_mean.data = xp.zeros(D, dtype=x.dtype)
+        if self.avg_var.data is None:
+            self.avg_var.data = xp.ones(D, dtype=x.dtype)
         if self.gamma.data is None:
             self.gamma.data = xp.ones(D, dtype=x.dtype)
         if self.beta is None:
@@ -268,8 +278,6 @@ class BatchNorm(Layer):
 
     def __call__(self, x):
         if self.avg_mean is None:
-            self._initialize_params(x)
-        return F.batch_nrom(x, self.gamma, self.beta, self.avg_mean,
-                            self.avg_var)
-
-
+            self._init_params(x)
+        return F.batch_nrom(x, self.gamma, self.beta, self.avg_mean.data,
+                            self.avg_var.data)
