@@ -3,10 +3,11 @@ import os.path
 import gzip
 import os
 from dezero.utils import get_file, cache_dir
+from dezero.dataset import TupleDataset
 
 
-def get_spiral(seed=1984):
-    np.random.seed(seed)
+def get_spiral():
+    np.random.seed(seed=1984)
     N = 200  # クラスごとのサンプル数
     DIM = 2  # データの要素数
     CLS_NUM = 3  # クラス数
@@ -25,16 +26,33 @@ def get_spiral(seed=1984):
             x[ix] = np.array([radius * np.sin(theta),
                               radius * np.cos(theta)]).flatten()
             t[ix] = j
-
-    # shuffle
+    # Shuffle
     indices = np.random.permutation(N*CLS_NUM)
     x = x[indices]
     t = t[indices]
 
-    # tupled dataset
+    # Convert to tupled dataset.
     train_size = TRAIN_SIZE*CLS_NUM
-    train_set = [(x, t) for x, t in zip(x[:train_size], t[:train_size])]
-    test_set = [(x, t) for x, t in zip(x[:train_size], t[train_size:])]
+    train_set = TupleDataset(x[:train_size], t[:train_size])
+    test_set = TupleDataset(x[train_size:], t[train_size:])
+    return train_set, test_set
+
+# sin Dataset
+def get_sin():
+    N = 1000
+    x = np.linspace(0, 2 * np.pi, N)
+    noise_range = (-0.05, 0.05)
+    noise = np.random.uniform(noise_range[0], noise_range[1], size=x.shape)
+    y = np.sin(x) + noise
+    y = y.astype(np.float32)
+    xs = y[:-1][:, np.newaxis]
+    ts = y[1:][:, np.newaxis]
+    train_set = TupleDataset(xs, ts)
+
+    y_test = np.cos(x) + noise
+    xs_test = y_test[:-1][:, np.newaxis]
+    ts_test = y_test[1:][:, np.newaxis]
+    test_set = TupleDataset(xs_test, ts_test)
     return train_set, test_set
 
 
