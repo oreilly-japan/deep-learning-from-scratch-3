@@ -101,7 +101,7 @@ def plot_dot_graph(outputs, verbose=True, to_file='graph.png'):
     try:
         from IPython import display
         return display.Image(filename=to_file)
-    except ImportError:
+    except:
         pass
 
 
