@@ -16,7 +16,8 @@ class Sequential(Model):
 
     def __init__(self, *layers):
         self.layers = []
-        for layer in layers:
+        for i, layer in enumerate(layers):
+            setattr(self, 'l' + str(i), layer)
             self.layers.append(layer)
 
     def __call__(self, x):
