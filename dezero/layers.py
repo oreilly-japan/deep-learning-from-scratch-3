@@ -202,14 +202,17 @@ class RNN(Layer):
 
 
 class LSTM(Layer):
-    def __init__(self, in_size, hidden_size):
+    def __init__(self, in_size, hidden_size=None, nobias=False):
         super().__init__()
 
+        if hidden_size is None:
+            in_size, hidden_size = None, in_size
+
         I, H = in_size, hidden_size
-        self.x2f = Linear(I, H)
-        self.x2i = Linear(I, H)
-        self.x2o = Linear(I, H)
-        self.x2u = Linear(I, H)
+        self.x2f = Linear(I, H, nobias=nobias)
+        self.x2i = Linear(I, H, nobias=nobias)
+        self.x2o = Linear(I, H, nobias=nobias)
+        self.x2u = Linear(I, H, nobias=nobias)
         self.h2f = Linear(H, H, nobias=True)
         self.h2i = Linear(H, H, nobias=True)
         self.h2o = Linear(H, H, nobias=True)
