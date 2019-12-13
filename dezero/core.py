@@ -238,7 +238,7 @@ class Mul(Function):
         x0, x1 = self.inputs
         gx0 = gy * x1
         gx1 = gy * x0
-        if x0.shape != x1.shape:  # for broadcaset
+        if x0.shape != x1.shape:  # for broadcast
             gx0 = dezero.functions.sum_to(gx0, x0.shape)
             gx1 = dezero.functions.sum_to(gx1, x1.shape)
         return gx0, gx1
@@ -270,7 +270,7 @@ class Sub(Function):
     def backward(self, gy):
         gx0 = gy
         gx1 = -gy
-        if self.x0_shape != self.x1_shape:  # for broadcaset
+        if self.x0_shape != self.x1_shape:  # for broadcast
             gx0 = dezero.functions.sum_to(gx0, self.x0_shape)
             gx1 = dezero.functions.sum_to(gx1, self.x1_shape)
         return gx0, gx1
@@ -295,7 +295,7 @@ class Div(Function):
         x0, x1 = self.inputs
         gx0 = gy / x1
         gx1 = gy * (-x0 / x1 ** 2)
-        if x0.shape != x1.shape:  # for broadcaset
+        if x0.shape != x1.shape:  # for broadcast
             gx0 = dezero.functions.sum_to(gx0, x0.shape)
             gx1 = dezero.functions.sum_to(gx1, x1.shape)
         return gx0, gx1
