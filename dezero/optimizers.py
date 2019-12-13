@@ -1,13 +1,23 @@
 import math
-from dezero import cuda
+from dezero import cuda, Parameter
 
 
+# =============================================================================
+# Optimizer (base class)
+# =============================================================================
 class Optimizer:
+    def __init__(self):
+        self.target = None
+        self.hooks = []
+
     def setup(self, link):
         self.target = link
         return self
 
     def update(self):
+        for f in self.hooks:
+            f([p for p in self.target.params()])
+
         for param in self.target.params():
             if param.grad is not None:
                 self.update_one(param)
@@ -15,9 +25,60 @@ class Optimizer:
     def update_one(self, param):
         NotImplementedError()
 
+    def add_hook(self, f):
+        self.hooks.append(f)
 
+
+# =============================================================================
+# Hook functions
+# =============================================================================
+class WeightDecay:
+    def __init__(self, rate):
+        self.rate = rate
+
+    def __call__(self, params):
+        for param in params:
+            param.grad.data += self.rate * param.data
+
+
+class ClipGrad:
+    def __init__(self, max_norm):
+        self.max_norm = max_norm
+
+    def __call__(self, params):
+        total_norm = 0
+        for param in params:
+            total_norm += (param.grad.data ** 2).sum()
+        total_norm = math.sqrt(float(total_norm))
+
+        rate = self.max_norm / (total_norm + 1e-6)
+        if rate < 1:
+            for param in params:
+                param.grad.data *= rate
+
+
+class FreezeParam:
+    def __init__(self, *layers):
+        self.freeze_params = []
+        for l in layers:
+            if isinstance(l, Parameter):
+                self.freeze_params.append(l)
+            else:
+                for p in l.params():
+                    self.freeze_params.append(p)
+
+    def __call__(self, params):
+        for p in self.freeze_params:
+            p.grad.data = None
+
+
+
+# =============================================================================
+# SGD / MomentumSGD / AdaGrad / AdaDelta / Adam
+# =============================================================================
 class SGD(Optimizer):
     def __init__(self, lr=0.01):
+        super().__init__()
         self.lr = lr
 
     def update_one(self, param):
@@ -26,6 +87,7 @@ class SGD(Optimizer):
 
 class MomentumSGD(Optimizer):
     def __init__(self, lr=0.01, momentum=0.9):
+        super().__init__()
         self.lr = lr
         self.momentum = momentum
         self.vs = {}
@@ -44,6 +106,7 @@ class MomentumSGD(Optimizer):
 
 class AdaGrad(Optimizer):
     def __init__(self, lr=0.001, eps=1e-8):
+        super().__init__()
         self.lr = lr
         self.eps = eps
         self.hs = {}
@@ -66,6 +129,7 @@ class AdaGrad(Optimizer):
 
 class AdaDelta(Optimizer):
     def __init__(self, rho=0.95, eps=1e-6):
+        super().__init__()
         self.rho = rho
         self.eps = eps
         self.msg = {}
@@ -94,6 +158,7 @@ class AdaDelta(Optimizer):
 
 class Adam(Optimizer):
     def __init__(self, alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+        super().__init__()
         self.t = 0
         self.alpha = alpha
         self.beta1 = beta1
