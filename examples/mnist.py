@@ -12,8 +12,9 @@ train_set, test_set = dezero.datasets.get_mnist()
 train_loader = DatasetLoader(train_set, batch_size)
 test_loader = DatasetLoader(test_set, batch_size, shuffle=False)
 
-model = MLP((784, hidden_size, hidden_size, 10), activation=F.relu)
+model = MLP((hidden_size, hidden_size, 10), activation=F.relu)
 optimizer = dezero.optimizers.Adam().setup(model)
+optimizer.add_hook(dezero.optimizers.WeightDecay(1e-4))  # Weight decay
 
 for epoch in range(max_epoch):
     sum_loss, sum_acc = 0, 0
