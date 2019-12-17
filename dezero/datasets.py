@@ -6,45 +6,40 @@ from dezero.utils import get_file, cache_dir
 from dezero.dataset import TupleDataset
 
 
-def get_spiral():
+def get_spiral(num_class=3, num_data=100, dtype=np.float32):
     np.random.seed(seed=1984)
-    N = 200  # クラスごとのサンプル数
-    DIM = 2  # データの要素数
-    CLS_NUM = 3  # クラス数
-    TRAIN_SIZE = 100  # 訓練データのサイズ
+    input_dim = 2
+    data_size = 2 * num_class * num_data  # double for train/test
+    x = np.zeros((data_size, input_dim), dtype=dtype)
+    t = np.zeros(data_size, dtype=np.int)
 
-    x = np.zeros((N * CLS_NUM, DIM))
-    t = np.zeros((N * CLS_NUM), dtype=np.int)
-
-    for j in range(CLS_NUM):
-        for i in range(N):
-            rate = i / N
+    for j in range(num_class):
+        for i in range(num_data):
+            rate = i / num_data
             radius = 1.0 * rate
             theta = j * 4.0 + 4.0 * rate + np.random.randn() * 0.2
-
-            ix = N * j + i
+            ix = num_data * j + i
             x[ix] = np.array([radius * np.sin(theta),
                               radius * np.cos(theta)]).flatten()
             t[ix] = j
     # Shuffle
-    indices = np.random.permutation(N*CLS_NUM)
+    indices = np.random.permutation(num_data*num_class)
     x = x[indices]
     t = t[indices]
 
     # Convert to tupled dataset.
-    train_size = TRAIN_SIZE*CLS_NUM
+    train_size = num_data*num_class
     train_set = TupleDataset(x[:train_size], t[:train_size])
     test_set = TupleDataset(x[train_size:], t[train_size:])
     return train_set, test_set
 
-# sin Dataset
-def get_sin():
-    N = 1000
-    x = np.linspace(0, 2 * np.pi, N)
+
+def get_sin(num_data=1000, dtype=np.float64):
+    x = np.linspace(0, 2 * np.pi, num_data)
     noise_range = (-0.05, 0.05)
     noise = np.random.uniform(noise_range[0], noise_range[1], size=x.shape)
     y = np.sin(x) + noise
-    y = y.astype(np.float32)
+    y = y.astype(dtype)
     xs = y[:-1][:, np.newaxis]
     ts = y[1:][:, np.newaxis]
     train_set = TupleDataset(xs, ts)
@@ -54,6 +49,40 @@ def get_sin():
     ts_test = y_test[1:][:, np.newaxis]
     test_set = TupleDataset(xs_test, ts_test)
     return train_set, test_set
+
+
+def get_mnist(ndim=1, scale=1.0, dtype=np.float32):
+    m = MNIST()
+    return m.get_mnist(ndim, scale, dtype)
+
+
+def get_imagenet_labels():
+    url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/raw/238f720ff059c1f82f368259d1ca4ffa5dd8f9f5/imagenet1000_clsidx_to_labels.txt'
+    path = get_file(url)
+    with open(path, 'r') as f:
+        labels = eval(f.read())
+    return labels
+
+
+def get_shakespear():
+    url = 'https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt'
+    file_name = 'shakespear.txt'
+    path = get_file(url, file_name)
+
+    with open(path, 'r') as f:
+        data = f.read()
+    chars = list(data)
+
+    char_to_id = {}
+    id_to_char = {}
+    for word in data:
+        if word not in char_to_id:
+            new_id = len(char_to_id)
+            char_to_id[word] = new_id
+            id_to_char[new_id] = word
+
+    indices = np.array([char_to_id[c] for c in chars])
+    return indices, char_to_id, id_to_char
 
 
 class MNIST:
@@ -126,37 +155,3 @@ class MNIST:
         train = [(x_train[i], t_train[i]) for i in range(len(t_train))]
         test = [(x_test[i], t_test[i]) for i in range(len(t_test))]
         return train, test
-
-
-def get_mnist(ndim=1, scale=1.0, dtype=np.float32):
-    m = MNIST()
-    return m.get_mnist(ndim, scale, dtype)
-
-
-def get_imagenet_labels():
-    url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/raw/238f720ff059c1f82f368259d1ca4ffa5dd8f9f5/imagenet1000_clsidx_to_labels.txt'
-    path = get_file(url)
-    with open(path, 'r') as f:
-        labels = eval(f.read())
-    return labels
-
-
-def get_shakespear():
-    url = 'https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt'
-    file_name = 'shakespear.txt'
-    path = get_file(url, file_name)
-
-    with open(path, 'r') as f:
-        data = f.read()
-    chars = list(data)
-
-    char_to_id = {}
-    id_to_char = {}
-    for word in data:
-        if word not in char_to_id:
-            new_id = len(char_to_id)
-            char_to_id[word] = new_id
-            id_to_char[new_id] = word
-
-    indices = np.array([char_to_id[c] for c in chars])
-    return indices, char_to_id, id_to_char
