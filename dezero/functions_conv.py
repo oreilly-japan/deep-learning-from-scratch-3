@@ -1,17 +1,8 @@
 import numpy as np
-from dezero import cuda, utils
+from dezero import cuda
 from dezero.core import Function, as_variable
-from dezero.utils import pair
+from dezero.utils import pair, get_conv_outsize, get_deconv_outsize
 from dezero.functions import linear
-
-
-
-def get_deconv_outsize(size, k, s, p):
-    return s * (size - 1) + k - 2 * p
-
-
-def get_conv_outsize(input_size, kernel_size, stride, pad):
-    return (input_size + pad * 2 - kernel_size) // stride + 1
 
 
 # =============================================================================
