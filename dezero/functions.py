@@ -607,6 +607,7 @@ from dezero.functions_conv import im2col
 from dezero.functions_conv import col2im
 from dezero.functions_conv import pooling_simple
 from dezero.functions_conv import pooling
+from dezero.functions_conv import average_pooling
 from dezero.core import add
 from dezero.core import sub
 from dezero.core import rsub
