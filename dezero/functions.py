@@ -493,10 +493,14 @@ class BatchNorm(Function):
             var = x.var(axis=0)
             inv_std = 1 / xp.sqrt(var + self.eps)
             xc = (x - mean) * inv_std
+
+            m = x.size // gamma.size
+            s = m - 1. if m - 1. > 1. else 1.
+            adjust = m / s  # unbiased estimation
             self.avg_mean *= self.decay
             self.avg_mean += (1 - self.decay) * mean
             self.avg_var *= self.decay
-            self.avg_var += (1 - self.decay) * var
+            self.avg_var += (1 - self.decay) * adjust * var
             self.inv_std = inv_std
         else:
             inv_std = 1 / xp.sqrt(self.avg_var + self.eps)
