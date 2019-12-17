@@ -38,14 +38,12 @@ class TupleDataset:
 
 
 class DatasetLoader:
-    def __init__(self, dataset, batch_size, shuffle=True, preprocess=None,
-                 gpu=False):
+    def __init__(self, dataset, batch_size, shuffle=True, gpu=False):
         self.dataset = dataset
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.data_size = len(dataset)
         self.max_iter = math.ceil(self.data_size / batch_size)
-        self.preprocess = preprocess
         self.gpu = gpu
 
         self.reset()
@@ -73,10 +71,7 @@ class DatasetLoader:
         batch = self._get_batch()
 
         xp = cuda.cupy if self.gpu else np
-        if self.preprocess is None:
-            x = xp.array([example[0] for example in batch])
-        else:
-            x = xp.array([self.preprocess(example[0]) for example in batch])
+        x = xp.array([example[0] for example in batch])
         t = xp.array([example[1] for example in batch])
 
         self.iteration += 1
@@ -94,9 +89,9 @@ class DatasetLoader:
 
 
 class SeqDataLoader(DatasetLoader):
-    def __init__(self, dataset, batch_size, preprocess=None, gpu=False):
+    def __init__(self, dataset, batch_size, gpu=False):
         super().__init__(dataset=dataset, batch_size=batch_size, shuffle=False,
-                         preprocess=preprocess, gpu=gpu)
+                         gpu=gpu)
 
     def _get_batch(self):
         jump = self.data_size // self.batch_size
