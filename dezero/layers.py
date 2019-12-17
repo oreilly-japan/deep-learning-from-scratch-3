@@ -70,15 +70,15 @@ class Layer:
 # Linear / Conv2d
 # =============================================================================
 class Linear_simple(Layer):
-    def __init__(self, in_size, out_size, nobias=False):
+    def __init__(self, in_size, out_size, nobias=False, dtype=np.float32):
         super().__init__()
         I, O = in_size, out_size
-        W_data = np.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
+        W_data = np.random.randn(I, O).astype(dtype) * np.sqrt(1 / I)
         self.W = Parameter(W_data, name='W')
         if nobias:
             self.b = None
         else:
-            self.b = Parameter(np.zeros(O, dtype=np.float32), name='b')
+            self.b = Parameter(np.zeros(O, dtype=dtype), name='b')
 
     def __call__(self, x):
         y = F.linear(x, self.W, self.b)
@@ -86,12 +86,13 @@ class Linear_simple(Layer):
 
 
 class Linear(Layer):
-    def __init__(self, in_size, out_size=None, nobias=False):
+    def __init__(self, in_size, out_size=None, nobias=False, dtype=np.float32):
         super().__init__()
         if out_size is None:
             in_size, out_size = None, in_size
         self.in_size = in_size
         self.out_size = out_size
+        self.dtype = dtype
 
         self.W = Parameter(None, name='W')
         if self.in_size is not None:
@@ -100,11 +101,11 @@ class Linear(Layer):
         if nobias:
             self.b = None
         else:
-            self.b = Parameter(np.zeros(out_size, dtype=np.float32), name='b')
+            self.b = Parameter(np.zeros(out_size, dtype=dtype), name='b')
 
     def _init_W(self, xp=np):
         I, O = self.in_size, self.out_size
-        W_data = xp.random.randn(I, O).astype(np.float32) * np.sqrt(1 / I)
+        W_data = xp.random.randn(I, O).astype(self.dtype) * np.sqrt(1 / I)
         self.W.data = W_data
 
     def __call__(self, x):
@@ -119,7 +120,7 @@ class Linear(Layer):
 
 class Conv2d(Layer):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
-                 pad=0, nobias=False):
+                 pad=0, nobias=False, dtype=np.float32):
         """Two-dimensional convolutional layer.
 
         Args:
@@ -138,6 +139,7 @@ class Conv2d(Layer):
         self.kernel_size = kernel_size
         self.stride = stride
         self.pad = pad
+        self.dtype = dtype
 
         self.W = Parameter(None, name='W')
         if in_channels is not None:
@@ -146,13 +148,12 @@ class Conv2d(Layer):
         if nobias:
             self.b = None
         else:
-            b_data = np.zeros(out_channels).astype(np.float32)
-            self.b = Parameter(b_data, name='b')
+            self.b = Parameter(np.zeros(out_channels, dtype=dtype), name='b')
 
     def _init_W(self, xp=np):
         C, OC = self.in_channels, self.out_channels
         KH, KW = pair(self.kernel_size)
-        W_data = xp.random.randn(OC, C, KH, KW).astype(np.float32) * np.sqrt(
+        W_data = xp.random.randn(OC, C, KH, KW).astype(self.dtype) * np.sqrt(
             1 / C * KH * KW)
         self.W.data = W_data
 
@@ -170,23 +171,22 @@ class Conv2d(Layer):
 # RNN / LSTM
 # =============================================================================
 class RNN(Layer):
-    def __init__(self, in_size, hidden_size=None, nobias=False):
-        """An Elman RNN cell with tanh.
+    def __init__(self, in_size, hidden_size=None):
+        """An Elman RNN with tanh.
 
         Args:
             in_size (int): The number of features in the input. If unspecified
             or `None`, parameter initialization will be deferred until the
             first `__call__(x)` at which time the size will be determined.
             hidden_size (int): The number of features in the hidden state.
-            nobias (bool): If `True`, then this function does not use the bias.
         """
         super().__init__()
 
         if hidden_size is None:
             in_size, hidden_size = None, in_size
 
-        self.x2h = Linear(in_size, hidden_size, nobias=nobias)
-        self.h2h = Linear(in_size, hidden_size, nobias=nobias)
+        self.x2h = Linear(in_size, hidden_size)
+        self.h2h = Linear(in_size, hidden_size, nobias=True)
         self.h = None
 
     def reset_state(self):
@@ -202,17 +202,17 @@ class RNN(Layer):
 
 
 class LSTM(Layer):
-    def __init__(self, in_size, hidden_size=None, nobias=False):
+    def __init__(self, in_size, hidden_size=None):
         super().__init__()
 
         if hidden_size is None:
             in_size, hidden_size = None, in_size
 
         I, H = in_size, hidden_size
-        self.x2f = Linear(I, H, nobias=nobias)
-        self.x2i = Linear(I, H, nobias=nobias)
-        self.x2o = Linear(I, H, nobias=nobias)
-        self.x2u = Linear(I, H, nobias=nobias)
+        self.x2f = Linear(I, H)
+        self.x2i = Linear(I, H)
+        self.x2o = Linear(I, H)
+        self.x2u = Linear(I, H)
         self.h2f = Linear(H, H, nobias=True)
         self.h2i = Linear(H, H, nobias=True)
         self.h2o = Linear(H, H, nobias=True)
@@ -226,17 +226,21 @@ class LSTM(Layer):
 
     def __call__(self, x):
         if self.h is None:
-            N, D = x.shape
-            H, H = self.h2f.W.shape
-            self.h = np.zeros((N, H), np.float32)
-            self.c = np.zeros((N, H), np.float32)
+            f = F.sigmoid(self.x2f(x))
+            i = F.sigmoid(self.x2i(x))
+            o = F.sigmoid(self.x2o(x))
+            u = F.tanh(self.x2u(x))
+        else:
+            f = F.sigmoid(self.x2f(x) + self.h2f(self.h))
+            i = F.sigmoid(self.x2i(x) + self.h2i(self.h))
+            o = F.sigmoid(self.x2o(x) + self.h2o(self.h))
+            u = F.tanh(self.x2u(x) + self.h2u(self.h))
 
-        f = F.sigmoid(self.x2f(x) + self.h2f(self.h))
-        i = F.sigmoid(self.x2i(x) + self.h2i(self.h))
-        o = F.sigmoid(self.x2o(x) + self.h2o(self.h))
-        u = F.tanh(self.x2u(x) + self.h2u(self.h))
+        if self.c is None:
+            c = (i * u)
+        else:
+            c = (f * self.c) + (i * u)
 
-        c = (f * self.c) + (i * u)
         h = o * F.tanh(c)
 
         self.h, self.c = h, c
