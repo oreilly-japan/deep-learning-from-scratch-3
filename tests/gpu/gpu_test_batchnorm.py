@@ -142,14 +142,22 @@ class TestBatchNormLayer(unittest.TestCase):
     def test_forward1(self):
         N, C = 8, 3
         x, gamma, beta, mean, var = get_params(N, C)
-        cy = chainer.links.BatchNormalization(3)(x)
-        y = dezero.layers.BatchNorm()(x)
+        ly = chainer.links.BatchNormalization(3)
+        l = dezero.layers.BatchNorm()
+        ly.to_gpu()
+        l.to_gpu()
+        cy = ly(x)
+        y = l(x)
+
         self.assertTrue(array_allclose(y.data, cy.data))
 
     def test_forward2(self):
         N, C = 8, 3
         cl = chainer.links.BatchNormalization(C)
         l = dezero.layers.BatchNorm()
+        cl.to_gpu()
+        l.to_gpu()
+
         for i in range(10):
             x, gamma, beta, mean, var = get_params(N, C)
             cy = cl(x)
