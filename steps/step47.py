@@ -15,7 +15,7 @@ def softmax1d(x):
 
 model = MLP((10, 3))
 
-x = Variable(np.array([0.2, -0.4]))
+x = Variable(np.array([[0.2, -0.4]]))
 y = model(x)
 p = softmax1d(y)
 print(y)
