@@ -96,13 +96,22 @@ class VGG16(Model):
         return x
 
 
-class ResNet152(Model):
-    WEIGHTS_PATH = 'https://github.com/koki0702/dezero-models/releases/download/v0.1/resnet152.npz'
+class ResNet(Model):
+    WEIGHTS_PATH = 'https://github.com/koki0702/dezero-models/releases/download/v0.1/resnet{}.npz'
 
-    def __init__(self, pretrained=False):
+    def __init__(self, n_layers=152, pretrained=False):
         super().__init__()
 
-        block = [3, 8, 36, 3]
+        if n_layers == 50:
+            block = [3, 4, 6, 3]
+        elif n_layers == 101:
+            block = [3, 4, 23, 3]
+        elif n_layers == 152:
+            block = [3, 8, 36, 3]
+        else:
+            raise ValueError('The n_layers argument should be either 50, 101,'
+                             ' or 152, but {} was given.'.format(n_layers))
+
         self.conv1 = L.Conv2d(3, 64, 7, 2, 3)
         self.bn1 = L.BatchNorm()
         self.res2 = BuildingBlock(block[0], 64, 64, 256, 1)
@@ -112,7 +121,7 @@ class ResNet152(Model):
         self.fc6 = L.Linear(1000)
 
         if pretrained:
-            weights_path = utils.get_file(ResNet152.WEIGHTS_PATH)
+            weights_path = utils.get_file(ResNet.WEIGHTS_PATH.format(n_layers))
             self.load_weights(weights_path)
 
     def __call__(self, x):
@@ -125,6 +134,21 @@ class ResNet152(Model):
         x = _global_average_pooling_2d(x)
         x = self.fc6(x)
         return x
+
+
+class ResNet152(ResNet):
+    def __init__(self, pretrained=False):
+        super().__init__(152, pretrained)
+
+
+class ResNet101(ResNet):
+    def __init__(self, pretrained=False):
+        super().__init__(101, pretrained)
+
+
+class ResNet50(ResNet):
+    def __init__(self, pretrained=False):
+        super().__init__(50, pretrained)
 
 
 def _global_average_pooling_2d(x):
