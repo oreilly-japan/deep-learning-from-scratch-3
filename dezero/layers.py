@@ -18,6 +18,9 @@ class Layer:
             self._params.add(name)
         super().__setattr__(name, value)
 
+    def __call__(self, *args, **kwargs):
+        return self.forward(*args, **kwargs)
+
     def params(self):
         for name in self._params:
             obj = self.__dict__[name]
