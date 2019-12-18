@@ -49,18 +49,17 @@
 ## 実行方法
 
 本書で説明するPythonファイルは、主に[steps](/steps)ファルダにあります。
-実行するためには、本リポジトリの一番上の階層からPythonコマンドを実行します。
-
+実行するためには、下記のとおりPythonコマンドを実行します。
 
 ```
-# 👍(Good)
 $ python steps/step01.py
-$ python steps/step31.py
+$ python steps/step02.py
 
-# ❌(NG)
 $ cd steps
 $ python step31.py
 ```
+
+上のように、どのディレクトリからでも実行することができます。
 
 ## デモ
 
