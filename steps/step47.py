@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 np.random.seed(0)
 from dezero import Variable, as_variable

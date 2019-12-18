@@ -1,3 +1,4 @@
+import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from dezero.datasets import get_mnist
 from dezero.dataset import DatasetLoader
 
