@@ -15,8 +15,9 @@ model = MLP((1000, 10))
 optimizer = optimizers.SGD().setup(model)
 
 # GPU mode
-train_loader.to_gpu()
-model.to_gpu()
+if dezero.cuda.gpu_enable:
+    train_loader.to_gpu()
+    model.to_gpu()
 
 for epoch in range(max_epoch):
     start = time.time()

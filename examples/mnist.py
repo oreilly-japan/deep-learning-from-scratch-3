@@ -16,6 +16,11 @@ model = MLP((hidden_size, hidden_size, 10), activation=F.relu)
 optimizer = dezero.optimizers.Adam().setup(model)
 optimizer.add_hook(dezero.optimizers.WeightDecay(1e-4))  # Weight decay
 
+if dezero.cuda.gpu_enable:
+    train_loader.to_gpu()
+    test_loader.to_gpu()
+    model.to_gpu()
+
 for epoch in range(max_epoch):
     sum_loss, sum_acc = 0, 0
 
