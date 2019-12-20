@@ -95,6 +95,17 @@ class VGG16(Model):
         x = self.fc8(x)
         return x
 
+    @staticmethod
+    def preprocess(image, size=(224, 224), dtype=np.float32):
+        image = image.convert('RGB')
+        if size:
+            image = image.resize(size)
+        image = np.asarray(image, dtype=dtype)
+        image = image[:, :, ::-1]
+        image -= np.array([103.939, 116.779, 123.68], dtype=dtype)
+        image = image.transpose((2, 0, 1))
+        return image
+
 
 class ResNet(Model):
     WEIGHTS_PATH = 'https://github.com/koki0702/dezero-models/releases/download/v0.1/resnet{}.npz'
