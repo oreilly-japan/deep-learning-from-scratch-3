@@ -25,15 +25,17 @@ else:
     from dezero.core import Config
     from dezero.layers import Layer
     from dezero.models import Model
+    from dezero.data import Dataset
 
     import dezero.datasets
-    import dezero.dataset
+    import dezero.data
     import dezero.optimizers
     import dezero.functions
     import dezero.functions_conv
     import dezero.layers
     import dezero.utils
     import dezero.cuda
+    import dezero.transforms
 
 setup_variable()
 __version__ = '0.0.12'
