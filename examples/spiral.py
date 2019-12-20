@@ -5,7 +5,7 @@ from dezero import optimizers
 from dezero import Model
 import dezero.functions as F
 import dezero.layers as L
-from dezero.dataset import DatasetLoader
+from dezero.data import DataLoader
 
 
 max_epoch = 300
@@ -14,7 +14,7 @@ hidden_size = 10
 lr = 1.0
 
 train_set, test_set = dezero.datasets.get_spiral()
-train_loader = DatasetLoader(train_set, batch_size)
+train_loader = DataLoader(train_set, batch_size)
 
 
 class TwoLayerNet(Model):
