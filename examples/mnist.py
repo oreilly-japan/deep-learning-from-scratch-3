@@ -1,6 +1,6 @@
 import dezero
 import dezero.functions as F
-from dezero.dataset import DatasetLoader
+from dezero.data import DataLoader
 from dezero.models import MLP
 
 
@@ -9,8 +9,8 @@ batch_size = 100
 hidden_size = 1000
 
 train_set, test_set = dezero.datasets.get_mnist()
-train_loader = DatasetLoader(train_set, batch_size)
-test_loader = DatasetLoader(test_set, batch_size, shuffle=False)
+train_loader = DataLoader(train_set, batch_size)
+test_loader = DataLoader(test_set, batch_size, shuffle=False)
 
 model = MLP((hidden_size, hidden_size, 10), activation=F.relu)
 optimizer = dezero.optimizers.Adam().setup(model)
