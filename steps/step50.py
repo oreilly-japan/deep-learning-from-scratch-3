@@ -1,13 +1,14 @@
 import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from dezero.datasets import get_mnist
-from dezero.dataset import DatasetLoader
+from dezero.datasets import MNIST
+from dezero.data import DataLoader
 
 batch_size = 10
 max_epoch = 1
 
-train, test = get_mnist()
-train_loader = DatasetLoader(train, batch_size)
-test_loader = DatasetLoader(test, batch_size, shuffle=False)
+train_set = MNIST(train=True)
+test_set = MNIST(train=False)
+train_loader = DataLoader(train_set, batch_size)
+test_loader = DataLoader(test_set, batch_size, shuffle=False)
 
 for epoch in range(max_epoch):
     for x, t in train_loader:

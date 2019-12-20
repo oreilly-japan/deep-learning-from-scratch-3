@@ -8,7 +8,7 @@ import dezero.functions as F
 from dezero.models import MLP
 
 
-train_set, test_set = dezero.datasets.get_spiral()
+train_set = dezero.datasets.Spiral(train=True)
 x = np.array([example[0] for example in train_set])
 t = np.array([example[1] for example in train_set])
 
@@ -25,16 +25,14 @@ data_size = len(x)
 max_iter = math.ceil(data_size / batch_size)
 
 for epoch in range(max_epoch):
-    # Shuffle data
-    idx = np.random.permutation(data_size)
-    x = x[idx]
-    t = t[idx]
-
+    # Shuffle index for data
+    index = np.random.permutation(data_size)
     sum_loss = 0
 
     for i in range(max_iter):
-        batch_x = x[i * batch_size:(i + 1) * batch_size]
-        batch_t = t[i * batch_size:(i + 1) * batch_size]
+        batch_index = index[i * batch_size:(i + 1) * batch_size]
+        batch_x = x[batch_index]
+        batch_t = t[batch_index]
 
         y = model(batch_x)
         loss = F.softmax_cross_entropy(y, batch_t)

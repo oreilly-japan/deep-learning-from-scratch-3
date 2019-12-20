@@ -3,14 +3,14 @@ import time
 import dezero
 import dezero.functions as F
 from dezero import optimizers
-from dezero.dataset import DatasetLoader
+from dezero.data import DataLoader
 from dezero.models import MLP
 
 max_epoch = 3
 batch_size = 100
 
-train_set, test_set = dezero.datasets.get_mnist()
-train_loader = DatasetLoader(train_set, batch_size)
+train_set = dezero.datasets.MNIST(train=True)
+train_loader = DataLoader(train_set, batch_size)
 model = MLP((1000, 10))
 optimizer = optimizers.SGD().setup(model)
 

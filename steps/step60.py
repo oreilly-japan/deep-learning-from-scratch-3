@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import dezero
 from dezero import Model
-from dezero.dataset import SeqDataLoader
+from dezero.data import SeqDataLoader
 import dezero.functions as F
 import dezero.layers as L
 
@@ -13,7 +13,7 @@ batch_size = 30
 hidden_size = 100
 bptt_length = 30
 
-train_set, test_set = dezero.datasets.get_sin()
+train_set = dezero.datasets.SinCurve(train=True)
 dataloader = SeqDataLoader(train_set, batch_size=batch_size)
 seqlen = len(train_set)
 

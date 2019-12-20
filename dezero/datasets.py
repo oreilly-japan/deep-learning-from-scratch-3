@@ -1,67 +1,118 @@
-import numpy as np
-import os.path
 import gzip
-import os
-from dezero.utils import get_file, cache_dir
-from dezero.dataset import TupleDataset
+import numpy as np
+import matplotlib.pyplot as plt
+from dezero.utils import get_file
+from dezero.data import Dataset, TupleDataset
+from dezero.transforms import Compose, Flatten, ToFloat, Normalize
 
 
-def get_spiral(num_class=3, num_data=100, dtype=np.float32):
-    np.random.seed(seed=1984)
-    input_dim = 2
-    data_size = 2 * num_class * num_data  # double for train/test
-    x = np.zeros((data_size, input_dim), dtype=dtype)
-    t = np.zeros(data_size, dtype=np.int)
+class Spiral(Dataset):
 
-    for j in range(num_class):
-        for i in range(num_data):
-            rate = i / num_data
-            radius = 1.0 * rate
-            theta = j * 4.0 + 4.0 * rate + np.random.randn() * 0.2
-            ix = num_data * j + i
-            x[ix] = np.array([radius * np.sin(theta),
-                              radius * np.cos(theta)]).flatten()
-            t[ix] = j
-    # Shuffle
-    indices = np.random.permutation(num_data*num_class)
-    x = x[indices]
-    t = t[indices]
+    def prepare(self):
+        seed = 1984 if self.train else 2020
+        np.random.seed(seed=seed)
 
-    # Convert to tupled dataset.
-    train_size = num_data*num_class
-    train_set = TupleDataset(x[:train_size], t[:train_size])
-    test_set = TupleDataset(x[train_size:], t[train_size:])
-    return train_set, test_set
+        num_data, num_class, input_dim = 100, 3, 2
+        data_size = num_class * num_data
+        x = np.zeros((data_size, input_dim), dtype=np.float32)
+        t = np.zeros(data_size, dtype=np.int)
 
-
-def get_sin(num_data=1000, dtype=np.float64):
-    x = np.linspace(0, 2 * np.pi, num_data)
-    noise_range = (-0.05, 0.05)
-    noise = np.random.uniform(noise_range[0], noise_range[1], size=x.shape)
-    y = np.sin(x) + noise
-    y = y.astype(dtype)
-    xs = y[:-1][:, np.newaxis]
-    ts = y[1:][:, np.newaxis]
-    train_set = TupleDataset(xs, ts)
-
-    y_test = np.cos(x) + noise
-    xs_test = y_test[:-1][:, np.newaxis]
-    ts_test = y_test[1:][:, np.newaxis]
-    test_set = TupleDataset(xs_test, ts_test)
-    return train_set, test_set
+        for j in range(num_class):
+            for i in range(num_data):
+                rate = i / num_data
+                radius = 1.0 * rate
+                theta = j * 4.0 + 4.0 * rate + np.random.randn() * 0.2
+                ix = num_data * j + i
+                x[ix] = np.array([radius * np.sin(theta),
+                                  radius * np.cos(theta)]).flatten()
+                t[ix] = j
+        # Shuffle
+        indices = np.random.permutation(num_data * num_class)
+        x = x[indices]
+        t = t[indices]
+        self.data, self.label = x, t
 
 
-def get_mnist(ndim=1, scale=1.0, dtype=np.float32):
-    m = MNIST()
-    return m.get_mnist(ndim, scale, dtype)
+class MNIST(Dataset):
+
+    def __init__(self, train=True,
+                 transforms=Compose([Flatten(), ToFloat(),
+                                     Normalize(0., 255.)]),
+                 target_transforms=None):
+        super().__init__(train, transforms, target_transforms)
+
+    def prepare(self):
+        url = 'http://yann.lecun.com/exdb/mnist/'
+        train_files = {'target': 'train-images-idx3-ubyte.gz',
+                       'label': 'train-labels-idx1-ubyte.gz'}
+        test_files = {'target': 't10k-images-idx3-ubyte.gz',
+                      'label': 't10k-labels-idx1-ubyte.gz'}
+
+        files = train_files if self.train else test_files
+        data_path = get_file(url + files['target'])
+        label_path = get_file(url + files['label'])
+
+        self.data = self._load_data(data_path)
+        self.label = self._load_label(label_path)
+
+    def _load_label(self, filepath):
+        with gzip.open(filepath, 'rb') as f:
+            labels = np.frombuffer(f.read(), np.uint8, offset=8)
+        return labels
+
+    def _load_data(self, filepath):
+        with gzip.open(filepath, 'rb') as f:
+            data = np.frombuffer(f.read(), np.uint8, offset=16)
+        data = data.reshape(-1, 1, 28, 28)
+        return data
+
+    def show(self, row=10, col=10):
+        H, W = 28, 28
+        img = np.zeros((H * row, W * col))
+        for r in range(row):
+            for c in range(col):
+                img[r * H:(r + 1) * H, c * W:(c + 1) * W] = self.data[
+                    np.random.randint(0, len(self.data) - 1)].reshape(H, W)
+        plt.imshow(img, cmap='gray', interpolation='nearest')
+        plt.axis('off')
+        plt.show()
+
+    @staticmethod
+    def labels():
+        return {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7',
+                8: '8', 9: '9'}
 
 
-def get_imagenet_labels():
-    url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/raw/238f720ff059c1f82f368259d1ca4ffa5dd8f9f5/imagenet1000_clsidx_to_labels.txt'
-    path = get_file(url)
-    with open(path, 'r') as f:
-        labels = eval(f.read())
-    return labels
+class SinCurve(Dataset):
+
+    def prepare(self):
+        num_data = 1000
+        dtype = np.float64
+
+        x = np.linspace(0, 2 * np.pi, num_data)
+        noise_range = (-0.05, 0.05)
+        noise = np.random.uniform(noise_range[0], noise_range[1], size=x.shape)
+        if self.train:
+            y = np.sin(x) + noise
+        else:
+            y = np.cos(x)
+        y = y.astype(dtype)
+        self.data = y[:-1][:, np.newaxis]
+        self.label = y[1:][:, np.newaxis]
+
+
+class ImageNet(Dataset):
+
+    def __init__(self):
+        NotImplemented
+
+    @staticmethod
+    def labels():
+        url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/raw/238f720ff059c1f82f368259d1ca4ffa5dd8f9f5/imagenet1000_clsidx_to_labels.txt'
+        path = get_file(url)
+        with open(path, 'r') as f:
+            labels = eval(f.read())
+        return labels
 
 
 def get_shakespear():
@@ -83,75 +134,3 @@ def get_shakespear():
 
     indices = np.array([char_to_id[c] for c in chars])
     return indices, char_to_id, id_to_char
-
-
-class MNIST:
-    url_base = 'http://yann.lecun.com/exdb/mnist/'
-    key_file = {
-        'train_img': 'train-images-idx3-ubyte.gz',
-        'train_label': 'train-labels-idx1-ubyte.gz',
-        'test_img': 't10k-images-idx3-ubyte.gz',
-        'test_label': 't10k-labels-idx1-ubyte.gz'
-    }
-    train_num = 60000
-    test_num = 10000
-    img_dim = (1, 28, 28)
-    img_size = 784
-    save_path = os.path.join(cache_dir, "mnist.npz")
-
-    def download_mnist(self):
-        for v in MNIST.key_file.values():
-            get_file(MNIST.url_base + v)
-
-    def _load_label(self, file_name):
-        file_path = os.path.join(cache_dir, file_name)
-
-        with gzip.open(file_path, 'rb') as f:
-            labels = np.frombuffer(f.read(), np.uint8, offset=8)
-
-        return labels
-
-    def _load_img(self, file_name):
-        file_path = os.path.join(cache_dir, file_name)
-
-        with gzip.open(file_path, 'rb') as f:
-            data = np.frombuffer(f.read(), np.uint8, offset=16)
-        data = data.reshape(-1, MNIST.img_size)
-
-        return data
-
-    def _convert_numpy(self):
-        key_file = MNIST.key_file
-        x0 = self._load_img(key_file['train_img'])
-        t0 = self._load_label(key_file['train_label'])
-        x1 = self._load_img(key_file['test_img'])
-        t1 = self._load_label(key_file['test_label'])
-        return x0, t0, x1, t1
-
-    def init_mnist(self):
-        self.download_mnist()
-        x0, t0, x1, t1 = self._convert_numpy()
-        np.savez_compressed(MNIST.save_path, x0=x0, t0=t0, x1=x1, t1=t1)
-        return x0, t0, x1, t1
-
-    def preprocess(self, x, ndim, scale, dtype):
-        _shape = {1: (-1, 784), 2: (-1, 28, 28), 3: (-1, 1, 28, 28)}
-
-        x = x.astype(dtype)
-        x /= (255.0 / scale)
-        x = x.reshape(*_shape[ndim])
-        return x
-
-    def get_mnist(self, ndim=1, scale=1.0, dtype=np.float32):
-        if not os.path.exists(MNIST.save_path):
-            self.init_mnist()
-
-        D = np.load(MNIST.save_path)
-        x_train, t_train, x_test, t_test = D['x0'], D['t0'], D['x1'], D['t1']
-
-        x_train = self.preprocess(x_train, ndim, scale, dtype)
-        x_test = self.preprocess(x_test, ndim, scale, dtype)
-
-        train = [(x_train[i], t_train[i]) for i in range(len(t_train))]
-        test = [(x_test[i], t_test[i]) for i in range(len(t_test))]
-        return train, test

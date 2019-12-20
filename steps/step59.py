@@ -7,12 +7,11 @@ import dezero.functions as F
 import dezero.layers as L
 
 # Hyperparameters
-max_epoch = 20
+max_epoch = 30
 hidden_size = 100
 bptt_length = 30
 
-
-train_set, test_set = dezero.datasets.get_sin()
+train_set = dezero.datasets.SinCurve(train=True)
 seqlen = len(train_set)
 
 
