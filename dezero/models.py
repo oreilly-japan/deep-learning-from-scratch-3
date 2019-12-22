@@ -5,6 +5,10 @@ import dezero.layers as L
 from dezero import utils
 
 
+
+# =============================================================================
+# Model / Sequential / MLP
+# =============================================================================
 class Model(Layer):
 
     def plot(self, *inputs, to_file='model.png'):
@@ -44,6 +48,9 @@ class MLP(Model):
         return self.layers[-1](x)
 
 
+# =============================================================================
+# VGG
+# =============================================================================
 class VGG16(Model):
     WEIGHTS_PATH = 'https://github.com/koki0702/dezero-models/releases/download/v0.1/vgg16.npz'
 
@@ -107,6 +114,9 @@ class VGG16(Model):
         return image
 
 
+# =============================================================================
+# ResNet
+# =============================================================================
 class ResNet(Model):
     WEIGHTS_PATH = 'https://github.com/koki0702/dezero-models/releases/download/v0.1/resnet{}.npz'
 
