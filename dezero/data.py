@@ -1,11 +1,9 @@
-from operator import itemgetter
 import math
 pil_available = True
 try:
     from PIL import Image
 except:
     pil_available = False
-import random
 import numpy as np
 from dezero import cuda
 
@@ -25,7 +23,6 @@ class Dataset:
 
         self.data = None
         self.label = None
-
         self.prepare()
 
     def __getitem__(self, index):
@@ -41,25 +38,6 @@ class Dataset:
 
     def prepare(self):
         pass
-
-
-class TupleDataset:
-    """Dataset of tuples from multiple equal-length datasets.
-    """
-    def __init__(self, *datasets):
-        self._datasets = datasets
-        self._length = len(datasets[0])
-
-    def __getitem__(self, index):
-        batches = [dataset[index] for dataset in self._datasets]
-        if isinstance(index, slice):
-            L = len(batches[0])
-            return [tuple([batch[i] for batch in batches]) for i in range(L)]
-        else:
-            return tuple(batches)
-
-    def __len__(self):
-        return self._length
 
 
 # =============================================================================
