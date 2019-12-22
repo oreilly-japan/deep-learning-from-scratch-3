@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import dezero
 import dezero.functions as F
@@ -59,7 +60,12 @@ class Layer:
         self._flatten_params(params_dict)
         array_dict = {key: param.data for key, param in params_dict.items()
                       if param is not None}
-        np.savez_compressed(path, **array_dict)
+        try:
+            np.savez_compressed(path, **array_dict)
+        except (Exception, KeyboardInterrupt) as e:
+            if os.path.exists(path):
+                os.remove(path)
+            raise
 
     def load_weights(self, path):
         npz = np.load(path)
