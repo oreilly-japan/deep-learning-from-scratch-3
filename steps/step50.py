@@ -1,6 +1,6 @@
 import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from dezero.datasets import MNIST
-from dezero.data import DataLoader
+from dezero import DataLoader
 
 batch_size = 10
 max_epoch = 1

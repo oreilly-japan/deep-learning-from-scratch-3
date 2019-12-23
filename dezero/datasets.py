@@ -5,8 +5,36 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from dezero.utils import get_file, cache_dir
-from dezero.data import Dataset
 from dezero.transforms import Compose, Flatten, ToFloat, Normalize
+
+
+class Dataset:
+    def __init__(self, train=True, transforms=None, target_transforms=None):
+        self.train = train
+        self.transforms = transforms
+        self.target_transforms = target_transforms
+        if self.transforms is None:
+            self.transforms = lambda x: x
+        if self.target_transforms is None:
+            self.target_transforms = lambda x: x
+
+        self.data = None
+        self.label = None
+        self.prepare()
+
+    def __getitem__(self, index):
+        assert np.isscalar(index)
+        if self.label is None:
+            return self.transforms(self.data[index]), None
+        else:
+            return self.transforms(self.data[index]),\
+                   self.target_transforms(self.label[index])
+
+    def __len__(self):
+        return len(self.data)
+
+    def prepare(self):
+        pass
 
 
 # =============================================================================
@@ -206,7 +234,7 @@ class CIFAR100(CIFAR10):
 
 
 
-    # =============================================================================
+# =============================================================================
 # Big datasets
 # =============================================================================
 class ImageNet(Dataset):

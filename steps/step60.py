@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import dezero
 from dezero import Model
-from dezero.data import SeqDataLoader
+from dezero import SeqDataLoader
 import dezero.functions as F
 import dezero.layers as L
 

@@ -5,7 +5,7 @@ from dezero import optimizers
 from dezero import Model
 import dezero.functions as F
 import dezero.layers as L
-from dezero.data import DataLoader
+from dezero import DataLoader
 
 
 max_epoch = 300

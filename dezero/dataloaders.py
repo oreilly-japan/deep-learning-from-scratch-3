@@ -8,41 +8,6 @@ import numpy as np
 from dezero import cuda
 
 
-# =============================================================================
-# Dataset
-# =============================================================================
-class Dataset:
-    def __init__(self, train=True, transforms=None, target_transforms=None):
-        self.train = train
-        self.transforms = transforms
-        self.target_transforms = target_transforms
-        if self.transforms is None:
-            self.transforms = lambda x: x
-        if self.target_transforms is None:
-            self.target_transforms = lambda x: x
-
-        self.data = None
-        self.label = None
-        self.prepare()
-
-    def __getitem__(self, index):
-        assert np.isscalar(index)
-        if self.label is None:
-            return self.transforms(self.data[index]), None
-        else:
-            return self.transforms(self.data[index]),\
-                   self.target_transforms(self.label[index])
-
-    def __len__(self):
-        return len(self.data)
-
-    def prepare(self):
-        pass
-
-
-# =============================================================================
-# DataLoader
-# =============================================================================
 class DataLoader:
     def __init__(self, dataset, batch_size, shuffle=True, gpu=False):
         self.dataset = dataset

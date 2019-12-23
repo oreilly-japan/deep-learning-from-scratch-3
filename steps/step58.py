@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 import dezero
 from dezero.models import VGG16
-import dezero.transforms as transforms
+
 
 url = 'https://github.com/oreilly-japan/deep-learning-from-scratch-3/raw/images/zebra.jpg'
 img_path = dezero.utils.get_file(url)

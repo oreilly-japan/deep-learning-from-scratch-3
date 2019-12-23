@@ -2,7 +2,7 @@ import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import dezero
 import dezero.functions as F
 from dezero import optimizers
-from dezero.data import DataLoader
+from dezero import DataLoader
 from dezero.models import MLP
 
 
