@@ -8,10 +8,7 @@ import dezero.functions as F
 from dezero.models import MLP
 
 
-train_set = dezero.datasets.Spiral(train=True)
-x = np.array([example[0] for example in train_set])
-t = np.array([example[1] for example in train_set])
-
+x, t = dezero.datasets.get_spiral(train=True)
 # Hyperparameters
 max_epoch = 300
 batch_size = 30
