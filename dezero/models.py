@@ -10,14 +10,12 @@ from dezero import utils
 # Model / Sequential / MLP
 # =============================================================================
 class Model(Layer):
-
     def plot(self, *inputs, to_file='model.png'):
         ys = self.__call__(*inputs)
         return utils.plot_dot_graph(ys, verbose=True, to_file=to_file)
 
 
 class Sequential(Model):
-
     def __init__(self, *layers):
         self.layers = []
         for i, layer in enumerate(layers):
@@ -31,7 +29,6 @@ class Sequential(Model):
 
 
 class MLP(Model):
-
     def __init__(self, fc_output_sizes, activation=F.sigmoid):
         super().__init__()
         self.activation = activation
@@ -56,19 +53,19 @@ class VGG16(Model):
 
     def __init__(self, pretrained=False):
         super().__init__()
-        self.conv1_1 = L.Conv2d(3, 64, 3, 1, 1)
-        self.conv1_2 = L.Conv2d(64, 64, 3, 1, 1)
-        self.conv2_1 = L.Conv2d(64, 128, 3, 1, 1)
-        self.conv2_2 = L.Conv2d(128, 128, 3, 1, 1)
-        self.conv3_1 = L.Conv2d(128, 256, 3, 1, 1)
-        self.conv3_2 = L.Conv2d(256, 256, 3, 1, 1)
-        self.conv3_3 = L.Conv2d(256, 256, 3, 1, 1)
-        self.conv4_1 = L.Conv2d(256, 512, 3, 1, 1)
-        self.conv4_2 = L.Conv2d(512, 512, 3, 1, 1)
-        self.conv4_3 = L.Conv2d(512, 512, 3, 1, 1)
-        self.conv5_1 = L.Conv2d(512, 512, 3, 1, 1)
-        self.conv5_2 = L.Conv2d(512, 512, 3, 1, 1)
-        self.conv5_3 = L.Conv2d(512, 512, 3, 1, 1)
+        self.conv1_1 = L.Conv2d(64, kernel_size=3, stride=1, pad=1)
+        self.conv1_2 = L.Conv2d(64, kernel_size=3, stride=1, pad=1)
+        self.conv2_1 = L.Conv2d(128, kernel_size=3, stride=1, pad=1)
+        self.conv2_2 = L.Conv2d(128, kernel_size=3, stride=1, pad=1)
+        self.conv3_1 = L.Conv2d(256, kernel_size=3, stride=1, pad=1)
+        self.conv3_2 = L.Conv2d(256, kernel_size=3, stride=1, pad=1)
+        self.conv3_3 = L.Conv2d(256, kernel_size=3, stride=1, pad=1)
+        self.conv4_1 = L.Conv2d(512, kernel_size=3, stride=1, pad=1)
+        self.conv4_2 = L.Conv2d(512, kernel_size=3, stride=1, pad=1)
+        self.conv4_3 = L.Conv2d(512, kernel_size=3, stride=1, pad=1)
+        self.conv5_1 = L.Conv2d(512, kernel_size=3, stride=1, pad=1)
+        self.conv5_2 = L.Conv2d(512, kernel_size=3, stride=1, pad=1)
+        self.conv5_3 = L.Conv2d(512, kernel_size=3, stride=1, pad=1)
         self.fc6 = L.Linear(4096)
         self.fc7 = L.Linear(4096)
         self.fc8 = L.Linear(1000)
