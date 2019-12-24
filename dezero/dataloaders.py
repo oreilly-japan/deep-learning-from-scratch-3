@@ -21,7 +21,6 @@ class DataLoader:
 
     def reset(self):
         self.iteration = 0
-
         if self.shuffle:
             self.index = np.random.permutation(len(self.dataset))
         else:
@@ -30,18 +29,15 @@ class DataLoader:
     def __iter__(self):
         return self
 
-    def _get_batch(self):
-        i, batch_size = self.iteration, self.batch_size
-        batch_index = self.index[i * batch_size:(i + 1) * batch_size]
-        batch = [self.dataset[i] for i in batch_index]
-        return batch
-
     def __next__(self):
         if self.iteration >= self.max_iter:
             self.reset()
             raise StopIteration
 
-        batch = self._get_batch()
+        i, batch_size = self.iteration, self.batch_size
+        batch_index = self.index[i * batch_size:(i + 1) * batch_size]
+        batch = [self.dataset[i] for i in batch_index]
+
         xp = cuda.cupy if self.gpu else np
         x = xp.array([example[0] for example in batch])
         t = xp.array([example[1] for example in batch])
@@ -64,9 +60,19 @@ class SeqDataLoader(DataLoader):
         super().__init__(dataset=dataset, batch_size=batch_size, shuffle=False,
                          gpu=gpu)
 
-    def _get_batch(self):
+    def __next__(self):
+        if self.iteration >= self.max_iter:
+            self.reset()
+            raise StopIteration
+
         jump = self.data_size // self.batch_size
         batch_index = [(i * jump + self.iteration) % self.data_size for i in
-                   range(self.batch_size)]
+                       range(self.batch_size)]
         batch = [self.dataset[i] for i in batch_index]
-        return batch
+
+        xp = cuda.cupy if self.gpu else np
+        x = xp.array([example[0] for example in batch])
+        t = xp.array([example[1] for example in batch])
+
+        self.iteration += 1
+        return x, t
