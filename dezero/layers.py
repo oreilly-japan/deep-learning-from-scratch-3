@@ -78,27 +78,9 @@ class Layer:
 # =============================================================================
 # Linear / Conv2d
 # =============================================================================
-class Linear_simple(Layer):
-    def __init__(self, in_size, out_size, nobias=False, dtype=np.float32):
-        super().__init__()
-        I, O = in_size, out_size
-        W_data = np.random.randn(I, O).astype(dtype) * np.sqrt(1 / I)
-        self.W = Parameter(W_data, name='W')
-        if nobias:
-            self.b = None
-        else:
-            self.b = Parameter(np.zeros(O, dtype=dtype), name='b')
-
-    def __call__(self, x):
-        y = F.linear(x, self.W, self.b)
-        return y
-
-
 class Linear(Layer):
-    def __init__(self, in_size, out_size=None, nobias=False, dtype=np.float32):
+    def __init__(self, out_size, nobias=False, dtype=np.float32, in_size=None):
         super().__init__()
-        if out_size is None:
-            in_size, out_size = None, in_size
         self.in_size = in_size
         self.out_size = out_size
         self.dtype = dtype
@@ -128,19 +110,19 @@ class Linear(Layer):
 
 
 class Conv2d(Layer):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
-                 pad=0, nobias=False, dtype=np.float32):
+    def __init__(self, out_channels, kernel_size, stride=1,
+                 pad=0, nobias=False, dtype=np.float32, in_channels=None):
         """Two-dimensional convolutional layer.
 
         Args:
-            in_channels (int or None): Number of channels of input arrays. If
-            `None`, parameter initialization will be deferred until the first
-            forward data pass at which time the size will be determined.
             out_channels (int): Number of channels of output arrays.
             kernel_size (int or (int, int)): Size of filters.
             stride (int or (int, int)): Stride of filter applications.
             pad (int or (int, int)): Spatial padding width for input arrays.
             nobias (bool): If `True`, then this function does not use the bias.
+            in_channels (int or None): Number of channels of input arrays. If
+            `None`, parameter initialization will be deferred until the first
+            forward data pass at which time the size will be determined.
         """
         super().__init__()
         self.in_channels = in_channels
