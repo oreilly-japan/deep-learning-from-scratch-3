@@ -27,12 +27,12 @@ class Exp(Function):
         return np.exp(x)
 
 
-f = Square()
-g = Exp()
-h = Square()
+A = Square()
+B = Exp()
+C = Square()
 
 x = Variable(np.array(0.5))
-y = f(x)
-z = g(y)
-a = h(z)
-print(a.data)
+a = A(x)
+b = B(a)
+y = C(b)
+print(y.data)
