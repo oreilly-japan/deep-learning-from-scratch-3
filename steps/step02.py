@@ -25,5 +25,5 @@ class Square(Function):
 x = Variable(np.array(10))
 f = Square()
 y = f(x)
-print(y)
+print(type(y))
 print(y.data)  # 100
