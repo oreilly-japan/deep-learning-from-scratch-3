@@ -112,6 +112,10 @@ def expand_dims(x, axis):
     return reshape(x, tuple(shape))
 
 
+def flatten(x):
+    """Flattens the input. Does not affect the batch size."""
+    return reshape(x, (x.shape[0], -1))
+
 class Sum(Function):
     def __init__(self, axis, keepdims):
         self.axis = axis
@@ -451,6 +455,16 @@ class SoftmaxCrossEntropy(Function):
 
 def softmax_cross_entropy(x, t):
     return SoftmaxCrossEntropy()(x, t)
+
+
+def sigmoid_cross_entropy(x, t):
+    x, t = as_variable(x), as_variable(t)
+    N = x.shape[0]
+    p = sigmoid(x)
+    p = clip(p, 1e-15, 1.0)
+    tlog_p = t * log(p) + (1 - t) * log(1 - p)
+    y = -1 * sum(tlog_p) / N
+    return y
 
 
 # =============================================================================
