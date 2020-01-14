@@ -15,12 +15,13 @@ class Optimizer:
         return self
 
     def update(self):
-        for f in self.hooks:
-            f([p for p in self.target.params()])
+        params = [p for p in self.target.params() if p.grad is not None]
 
-        for param in self.target.params():
-            if param.grad is not None:
-                self.update_one(param)
+        for f in self.hooks:
+            f(params)
+
+        for param in params:
+            self.update_one(param)
 
     def update_one(self, param):
         NotImplementedError()
@@ -69,7 +70,7 @@ class FreezeParam:
 
     def __call__(self, params):
         for p in self.freeze_params:
-            p.grad.data = None
+            p.grad = None
 
 
 
