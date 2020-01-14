@@ -14,7 +14,8 @@ train_loader = DataLoader(train_set, batch_size)
 model = MLP((1000, 10))
 optimizer = optimizers.SGD().setup(model)
 
-# model.load_weights('my_mlp.npz')
+if os.path.exists('my_mlp.npz'):
+    model.load_weights('my_mlp.npz')
 
 for epoch in range(max_epoch):
     sum_loss = 0
