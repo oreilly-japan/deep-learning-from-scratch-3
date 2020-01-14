@@ -11,9 +11,8 @@ class TestWeightDecay(unittest.TestCase):
         rate = 0.4
         x = np.random.rand(10, 2)
         t = np.zeros((10)).astype(int)
-        layer = dezero.layers.Linear(2, 3, nobias=True)
+        layer = dezero.layers.Linear(in_size=2, out_size=3, nobias=True)
         layer.W.data = np.ones_like(layer.W.data)
-
         optimizer = dezero.optimizers.SGD().setup(layer)
         optimizer.add_hook(dezero.optimizers.WeightDecay(rate=rate))
 
