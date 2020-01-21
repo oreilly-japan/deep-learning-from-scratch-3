@@ -168,10 +168,10 @@ a = Variable(np.array(3.0))
 b = Variable(np.array(2.0))
 c = Variable(np.array(1.0))
 
-# y = add(mul(x0, x1), x2)
+# y = add(mul(a, b), c)
 y = a * b + c
 y.backward()
 
-print(y)  # variable(7.)
-print(a.grad)  # 2.0
-print(b.grad)  # 3.0
+print(y)
+print(a.grad)
+print(b.grad)

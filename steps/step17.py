@@ -95,4 +95,4 @@ def square(x):
 
 for i in range(10):
     x = Variable(np.random.randn(10000))  # big data
-    y = square(square(square(square(x))))
+    y = square(square(square(x)))

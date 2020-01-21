@@ -118,9 +118,9 @@ funcs.sort(key=lambda x: x.priority)
 print([f.priority for f in funcs])  # [0, 1, 2, 2, 4]
 
 x = Variable(np.array(2.0))
-t = square(x)
-y = add(square(t), square(t))
+a = square(x)
+y = add(square(a), square(a))
 y.backward()
 
-print(y.data)  # 36.0
+print(y.data)  # 32.0
 print(x.grad)  # 64.0
