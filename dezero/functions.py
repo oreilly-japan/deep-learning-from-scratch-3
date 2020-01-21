@@ -458,8 +458,10 @@ def softmax_cross_entropy(x, t):
 
 
 def sigmoid_cross_entropy(x, t):
+    if x.ndim != t.ndim:
+        t = t.reshape(*x.shape)
     x, t = as_variable(x), as_variable(t)
-    N = x.shape[0]
+    N = len(x)
     p = sigmoid(x)
     p = clip(p, 1e-15, 1.0)
     tlog_p = t * log(p) + (1 - t) * log(1 - p)
