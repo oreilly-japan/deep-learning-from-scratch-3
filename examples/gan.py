@@ -1,5 +1,3 @@
-# WIP
-
 import numpy as np
 import matplotlib.pyplot as plt
 import dezero
@@ -10,123 +8,126 @@ from dezero.models import Sequential
 from dezero.optimizers import Adam
 
 
-C, H, W = 512, 3, 3
-G = Sequential(
-    L.Linear(C*H*W),
-    F.Reshape((-1, C, H, W)),
+use_gpu = dezero.cuda.gpu_enable
+max_epoch = 5
+batch_size = 128
+hidden_size = 62
+
+fc_channel, fc_height, fc_width = 128, 7, 7
+
+gen = Sequential(
+    L.Linear(1024),
     L.BatchNorm(),
-    F.ReLU(),
-    L.Deconv2d(C // 2, kernel_size=2, stride=2, pad=1),
+    F.relu,
+    L.Linear(fc_channel * fc_height * fc_width),
     L.BatchNorm(),
-    F.ReLU(),
-    L.Deconv2d(C // 4, kernel_size=2, stride=2, pad=1),
+    F.relu,
+    lambda x: F.reshape(x, (-1, fc_channel, fc_height, fc_width)),
+    L.Deconv2d(fc_channel // 2, kernel_size=4, stride=2, pad=1),
     L.BatchNorm(),
-    F.ReLU(),
-    L.Deconv2d(C // 8, kernel_size=2, stride=2, pad=1),
-    L.BatchNorm(),
-    F.ReLU(),
-    L.Deconv2d(1, kernel_size=3, stride=3, pad=1),
-    F.Sigmoid()
+    F.relu,
+    L.Deconv2d(1, kernel_size=4, stride=2, pad=1),
+    F.sigmoid
 )
 
-D = Sequential(
-    L.Conv2d(64, kernel_size=3, stride=3, pad=1),
-    F.LeakyReLU(0.1),
-    L.Conv2d(128, kernel_size=2, stride=2, pad=1),
+dis = Sequential(
+    L.Conv2d(64, kernel_size=4, stride=2, pad=1),
+    F.leaky_relu,
+    L.Conv2d(128, kernel_size=4, stride=2, pad=1),
     L.BatchNorm(),
-    F.LeakyReLU(0.1),
-    L.Conv2d(256, kernel_size=2, stride=2, pad=1),
-    L.BatchNorm(),
-    F.LeakyReLU(0.1),
-    L.Conv2d(512, kernel_size=2, stride=2, pad=1),
-    L.BatchNorm(),
-    F.LeakyReLU(0.1),
+    F.leaky_relu,
     F.flatten,
-    L.Linear(1)
+    L.Linear(1024),
+    L.BatchNorm(),
+    F.leaky_relu,
+    L.Linear(1),
+    F.sigmoid
 )
 
-D.layers[0].W.name = 'conv1_W'
-D.layers[0].b.name = 'conv1_b'
 
-def init_weight(D, G, hidden_size):
-    # dummy data
+def init_weight(dis, gen, hidden_size):
+    # Input dummy data to initialize weights
     batch_size = 1
     z = np.random.rand(batch_size, hidden_size)
-    fake_images = G(z)
-    D(fake_images)
+    fake_images = gen(z)
+    dis(fake_images)
 
-    for l in D.layers + G.layers:
+    for l in dis.layers + gen.layers:
         classname = l.__class__.__name__
-        if 'conv' in classname.lower():
+        if classname.lower() in ('conv2d', 'linear', 'deconv2d'):
             l.W.data = 0.02 * np.random.randn(*l.W.data.shape)
 
+init_weight(dis, gen, hidden_size)
 
-max_epoch = 100
-batch_size = 100
-hidden_size = 1000
+opt_g = Adam(alpha=0.0002, beta1=0.5).setup(gen)
+opt_d = Adam(alpha=0.0002, beta1=0.5).setup(dis)
 
-init_weight(D, G, hidden_size)
-
-train_set = dezero.datasets.MNIST(train=True,
-                                  transforms=dezero.transforms.AsType('f'))
+transforms = lambda x: (x / 255.0).astype(np.float32)
+train_set = dezero.datasets.MNIST(train=True, transforms=transforms)
 train_loader = DataLoader(train_set, batch_size)
 
-label_real = np.ones(batch_size).astype(np.int)
-label_fake = np.zeros(batch_size).astype(np.int)
-
-if dezero.cuda.gpu_enable:
-    G.to_gpu()
-    D.to_gpu()
+if use_gpu:
+    gen.to_gpu()
+    dis.to_gpu()
     train_loader.to_gpu()
-    label_real = dezero.cuda.as_cupy(label_real)
-    label_fake = dezero.cuda.as_cupy(label_fake)
+    xp = dezero.cuda.cupy
+else:
+    xp = np
 
-opt_g = Adam(alpha=0.0002, beta1=0.5).setup(G)
-opt_g.add_hook(dezero.optimizers.WeightDecay(0.0001))
-opt_d = Adam(alpha=0.0002, beta1=0.5).setup(D)
-opt_d.add_hook(dezero.optimizers.WeightDecay(0.0001))
+label_real = xp.ones(batch_size).astype(np.int)
+label_fake = xp.zeros(batch_size).astype(np.int)
+test_z = xp.random.randn(25, hidden_size).astype(np.float32)
 
 
-test_z = np.random.randn(25, hidden_size).astype(np.float32)
+def generate_image():
+    with dezero.test_mode():
+        fake_images = gen(test_z)
 
-def generate_image(epoch=0):
-    fake_images = G(test_z)
-    fig = plt.figure()
+    img = dezero.cuda.as_numpy(fake_images.data)
+    plt.figure()
     for i in range(0, 25):
         ax = plt.subplot(5, 5, i+1)
         ax.axis('off')
-        plt.imshow(fake_images.data[i][0], 'gray')
-    plt.savefig('gan_{}.png'.format(epoch))
-
-generate_image()
+        plt.imshow(img[i][0], 'gray')
+    plt.show()
+    #plt.savefig('gan_{}.png'.format(idx))
 
 for epoch in range(max_epoch):
+    avg_loss_d = 0
+    avg_loss_g = 0
+    cnt = 0
+
     for x, t in train_loader:
-        # real
-        y_real = D(x)
+        cnt += 1
+        if len(t) != batch_size:
+            continue
 
-        # fake
-        z = np.random.randn(batch_size, hidden_size).astype(np.float32)
-        x_fake = G(z)
-        y_fake = D(x_fake)
-        d_loss = F.sigmoid_cross_entropy(y_real, label_real) + \
-               F.sigmoid_cross_entropy(y_fake, label_fake)
-
-        G.cleargrads()
-        D.cleargrads()
-        d_loss.backward()
+        # (1) Update discriminator
+        z = xp.random.randn(batch_size, hidden_size).astype(np.float32)
+        fake = gen(z)
+        y_real = dis(x)
+        y_fake = dis(fake.data)
+        loss_d = F.binary_cross_entropy(y_real, label_real) + \
+                 F.binary_cross_entropy(y_fake, label_fake)
+        gen.cleargrads()
+        dis.cleargrads()
+        loss_d.backward()
         opt_d.update()
 
-        # train for Generator
-        z = np.random.randn(batch_size, hidden_size).astype(np.float32)
-        x_fake = G(z)
-        y_fake = D(x_fake)
-        g_loss = F.sigmoid_cross_entropy(y_fake, label_real)
-
-        G.cleargrads()
-        D.cleargrads()
-        g_loss.backward()
+        # (2) Update generator
+        y_fake = dis(fake)
+        loss_g = F.binary_cross_entropy(y_fake, label_real)
+        gen.cleargrads()
+        dis.cleargrads()
+        loss_g.backward()
         opt_g.update()
 
-        print(g_loss, d_loss)
-    generate_image(epoch)
+        # Print loss & visualize generator
+        avg_loss_g += loss_g.data
+        avg_loss_d += loss_d.data
+        interval = 100 if use_gpu else 5
+        if cnt % interval == 0:
+            epoch_detail = epoch + cnt / train_loader.max_iter
+            print('epoch: {:.2f}, loss_g: {:.4f}, loss_d: {:.4f}'.format(
+                epoch_detail, float(avg_loss_g/cnt), float(avg_loss_d/cnt)))
+            generate_image(cnt)
