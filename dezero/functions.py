@@ -469,6 +469,16 @@ def sigmoid_cross_entropy(x, t):
     return y
 
 
+def binary_cross_entropy(p, t):
+    if p.ndim != t.ndim:
+        t = t.reshape(*p.shape)
+    N = len(t)
+    p = clip(p, 1e-15, 1.0)
+    tlog_p = t * log(p) + (1 - t) * log(1 - p)
+    loss = -1 * sum(tlog_p) / N
+    return loss
+
+
 # =============================================================================
 # utility function
 # =============================================================================
