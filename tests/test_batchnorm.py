@@ -100,6 +100,33 @@ class TestBatchNorm(unittest.TestCase):
         y = F.batch_nrom(x, gamma, beta, mean, var)
         self.assertTrue(array_allclose(y.data, cy.data))
 
+    def test_forward5(self):
+        N, C = 20, 10
+        cl = chainer.links.BatchNormalization(C)
+        l = dezero.layers.BatchNorm()
+
+        for i in range(10):
+            x = np.random.randn(N, C).astype('f')
+            cy = cl(x)
+            y = l(x)
+            self.assertTrue(array_allclose(y.data, cy.data))
+        self.assertTrue(array_allclose(cl.avg_mean.data, l.avg_mean.data))
+        self.assertTrue(array_allclose(cl.avg_var.data, l.avg_var.data))
+
+    def test_forward6(self):
+        N, C, H, W = 20, 10, 5, 5
+        cl = chainer.links.BatchNormalization(C)
+        l = dezero.layers.BatchNorm()
+
+        for i in range(10):
+            x = np.random.randn(N, C, H, W).astype('f')
+            cy = cl(x)
+            y = l(x)
+            self.assertTrue(array_allclose(y.data, cy.data))
+        self.assertTrue(array_allclose(cl.avg_mean.data, l.avg_mean.data))
+        self.assertTrue(array_allclose(cl.avg_var.data, l.avg_var.data))
+
+
     def test_backward1(self):
         N, C = 8, 3
         x, gamma, beta, mean, var = get_params(N, C, dtype=np.float64)
