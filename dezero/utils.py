@@ -64,7 +64,7 @@ def get_dot_graph(outputs, verbose=True):
         def add_func(f):
             if f not in seen_set:
                 funcs.append(f)
-                # funcs.sort(key=lambda x: x.priority)
+                # funcs.sort(key=lambda x: x.generation)
                 seen_set.add(f)
 
         add_func(output.creator)

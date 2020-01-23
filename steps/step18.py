@@ -30,11 +30,11 @@ class Variable:
         self.data = data
         self.grad = None
         self.creator = None
-        self.priority = 0
+        self.generation = 0
 
     def set_creator(self, func):
         self.creator = func
-        self.priority = func.priority + 1
+        self.generation = func.generation + 1
 
     def cleargrad(self):
         self.grad = None
@@ -50,7 +50,7 @@ class Variable:
             if f not in seen_set:
                 funcs.append(f)
                 seen_set.add(f)
-                funcs.sort(key=lambda x: x.priority)
+                funcs.sort(key=lambda x: x.generation)
 
         add_func(self.creator)
 
@@ -90,7 +90,7 @@ class Function:
         outputs = [Variable(as_array(y)) for y in ys]
 
         if Config.enable_backprop:
-            self.priority = max([x.priority for x in inputs])
+            self.generation = max([x.generation for x in inputs])
             for output in outputs:
                 output.set_creator(self)
             self.inputs = inputs

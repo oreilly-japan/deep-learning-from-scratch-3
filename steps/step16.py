@@ -10,11 +10,11 @@ class Variable:
         self.data = data
         self.grad = None
         self.creator = None
-        self.priority = 0
+        self.generation = 0
 
     def set_creator(self, func):
         self.creator = func
-        self.priority = func.priority + 1
+        self.generation = func.generation + 1
 
     def cleargrad(self):
         self.grad = None
@@ -30,7 +30,7 @@ class Variable:
             if f not in seen_set:
                 funcs.append(f)
                 seen_set.add(f)
-                funcs.sort(key=lambda x: x.priority)
+                funcs.sort(key=lambda x: x.generation)
 
         add_func(self.creator)
 
@@ -65,7 +65,7 @@ class Function:
             ys = (ys,)
         outputs = [Variable(as_array(y)) for y in ys]
 
-        self.priority = max([x.priority for x in inputs])
+        self.generation = max([x.generation for x in inputs])
         for output in outputs:
             output.set_creator(self)
         self.inputs = inputs
@@ -105,17 +105,17 @@ def add(x0, x1):
     return Add()(x0, x1)
 
 
-prioritys = [2, 0, 1, 4, 2]
+generations = [2, 0, 1, 4, 2]
 funcs = []
-for r in prioritys:
+for r in generations:
     f = Function()
-    f.priority = r
+    f.generation = r
     funcs.append(f)
 
-print([f.priority for f in funcs])  # [2, 0, 1, 4, 2]
+print([f.generation for f in funcs])  # [2, 0, 1, 4, 2]
 
-funcs.sort(key=lambda x: x.priority)
-print([f.priority for f in funcs])  # [0, 1, 2, 2, 4]
+funcs.sort(key=lambda x: x.generation)
+print([f.generation for f in funcs])  # [0, 1, 2, 2, 4]
 
 x = Variable(np.array(2.0))
 a = square(x)
