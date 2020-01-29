@@ -105,18 +105,6 @@ def add(x0, x1):
     return Add()(x0, x1)
 
 
-generations = [2, 0, 1, 4, 2]
-funcs = []
-for r in generations:
-    f = Function()
-    f.generation = r
-    funcs.append(f)
-
-print([f.generation for f in funcs])  # [2, 0, 1, 4, 2]
-
-funcs.sort(key=lambda x: x.generation)
-print([f.generation for f in funcs])  # [0, 1, 2, 2, 4]
-
 x = Variable(np.array(2.0))
 a = square(x)
 y = add(square(a), square(a))

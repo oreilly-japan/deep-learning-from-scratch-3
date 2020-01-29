@@ -16,7 +16,7 @@ for i in range(3):
     x.cleargrad()
     gx.backward(create_graph=True)
 
-labels = ["y=sin(x)", "y'", '2nd', '3rd']
+labels = ["y=sin(x)", "y'", "y''", "y'''"]
 for i, v in enumerate(logs):
     plt.plot(x.data, logs[i], label=labels[i])
 plt.legend(loc='lower right')

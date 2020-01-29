@@ -52,7 +52,6 @@ x = Variable(np.array(0.5))
 a = A(x)
 b = B(a)
 y = C(b)
-print(y.data)
 
 y.grad = np.array(1.0)
 b.grad = C.backward(y.grad)

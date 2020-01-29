@@ -15,9 +15,8 @@ def gx2(x):
     return 12 * x ** 2 - 4
 
 
-logs = []
 x = Variable(np.array(2.0))
-iters = 200
+iters = 10
 
 for i in range(iters):
     print(i, x)
@@ -26,4 +25,4 @@ for i in range(iters):
     x.cleargrad()
     y.backward()
 
-    x.data -= 0.01 * x.grad
+    x.data -= x.grad / gx2(x.data)

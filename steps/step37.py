@@ -3,8 +3,8 @@ import numpy as np
 from dezero import Variable
 import dezero.functions as F
 
-x = Variable(np.array([[0, 1, 2], [3, 4, 5]]))
-c = Variable(np.array([[0, 10, 20], [30, 40, 50]]))
+x = Variable(np.array([[1, 2, 3], [4, 5, 6]]))
+c = Variable(np.array([[10, 20, 30], [40, 50, 60]]))
 t = x + c
 y = F.sum(t)
 

@@ -82,4 +82,7 @@ y = square(exp(square(x)))
 y.backward()
 print(x.grad)  # 3.297442541400256
 
+
+x = Variable(np.array(1.0))  # OK
+x = Variable(None)  # OK
 x = Variable(1.0)  # NG

@@ -259,21 +259,16 @@ Variable.__pow__ = pow
 
 x = Variable(np.array(2.0))
 y = -x
-y.backward()
 print(y)  # variable(-2.0)
-print(x.grad)  # -1.0
 
-x = Variable(np.array(2.0))
-y = 2.0 - x
-y.backward()
-print(y)  # variable(0.0)
+y1 = 2.0 - x
+y2 = x - 1.0
+print(y1)  # variable(0.0)
+print(y2)  # variable(1.0)
 
-x = Variable(np.array(2.0))
 y = 3.0 / x
-y.backward()
 print(y)  # variable(1.5)
 
-x = Variable(np.array(3.0))
 y = x ** 3
 y.backward()
-print(y)  # variable(27)
+print(y)  # variable(8.0)

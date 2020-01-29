@@ -10,8 +10,8 @@ class Optimizer:
         self.target = None
         self.hooks = []
 
-    def setup(self, link):
-        self.target = link
+    def setup(self, target):
+        self.target = target
         return self
 
     def update(self):

@@ -79,21 +79,13 @@ def add(x0, x1):
     return Add()(x0, x1)
 
 
-x0 = Variable(np.array(1.0))
-x1 = Variable(np.array(1.0))
-t = add(x0, x1)
-y = add(x0, t)
-y.backward()
-
-print(y.grad, t.grad)  # None None
-print(x0.grad, x1.grad)  # 2.0 1.0
-
 x = Variable(np.array(3.0))
 y = add(x, x)
 y.backward()
-print(x.grad)  # 2
+print(x.grad)  # 2.0
 
-x.cleargrad()
+
+x = Variable(np.array(3.0))  # or x.cleargrad()
 y = add(add(x, x), x)
 y.backward()
-print(x.grad)  # 3
+print(x.grad)  # 3.0

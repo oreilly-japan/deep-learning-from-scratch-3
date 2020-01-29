@@ -42,7 +42,8 @@ def cos(x):
 class Tanh(Function):
     def forward(self, x):
         xp = cuda.get_array_module(x)
-        return xp.tanh(x)
+        y = xp.tanh(x)
+        return y
 
     def backward(self, gy):
         y = self.outputs[0]()  # weakref
@@ -57,7 +58,8 @@ def tanh(x):
 class Exp(Function):
     def forward(self, x):
         xp = cuda.get_array_module(x)
-        return xp.exp(x)
+        y = xp.exp(x)
+        return y
 
     def backward(self, gy):
         y = self.outputs[0]()  # weakref
@@ -72,7 +74,8 @@ def exp(x):
 class Log(Function):
     def forward(self, x):
         xp = cuda.get_array_module(x)
-        return xp.log(x)
+        y = xp.log(x)
+        return y
 
     def backward(self, gy):
         x, = self.inputs
@@ -93,7 +96,8 @@ class Reshape(Function):
 
     def forward(self, x):
         self.x_shape = x.shape
-        return x.reshape(self.shape)
+        y = x.reshape(self.shape)
+        return y
 
     def backward(self, gy):
         return reshape(gy, self.x_shape)
@@ -251,11 +255,13 @@ class GetItem(Function):
         self.slices = slices
 
     def forward(self, x):
-        return x[self.slices]
+        y = x[self.slices]
+        return y
 
     def backward(self, gy):
         x, = self.inputs
-        return GetItemGrad(self.slices, x.shape)(gy)
+        f = GetItemGrad(self.slices, x.shape)
+        return f(gy)
 
 
 class GetItemGrad(Function):
@@ -398,7 +404,8 @@ def leaky_relu(x, slope=0.2):
 def mean_squared_error_simple(x0, x1):
     x0, x1 = as_variable(x0), as_variable(x1)
     diff = x0 - x1
-    return sum(diff ** 2) / diff.size
+    y = sum(diff ** 2) / diff.size
+    return y
 
 
 class MeanSquaredError(Function):
@@ -475,8 +482,8 @@ def binary_cross_entropy(p, t):
     N = len(t)
     p = clip(p, 1e-15, 1.0)
     tlog_p = t * log(p) + (1 - t) * log(1 - p)
-    loss = -1 * sum(tlog_p) / N
-    return loss
+    y = -1 * sum(tlog_p) / N
+    return y
 
 
 # =============================================================================
@@ -595,7 +602,8 @@ class Max(Function):
         self.keepdims = keepdims
 
     def forward(self, x):
-        return x.max(axis=self.axis, keepdims=self.keepdims)
+        y = x.max(axis=self.axis, keepdims=self.keepdims)
+        return y
 
     def backward(self, gy):
         x = self.inputs[0]
@@ -611,7 +619,8 @@ class Max(Function):
 
 class Min(Max):
     def forward(self, x):
-        return x.min(axis=self.axis, keepdims=self.keepdims)
+        y = x.min(axis=self.axis, keepdims=self.keepdims)
+        return y
 
 
 def max(x, axis=None, keepdims=False):

@@ -36,7 +36,7 @@ def _dot_func(f):
     return ret
 
 
-def get_dot_graph(outputs, verbose=True):
+def get_dot_graph(output, verbose=True):
     """Generates a graphviz DOT text of a computational graph.
 
     Build a graph of functions and variables backward-reachable from the
@@ -44,8 +44,8 @@ def get_dot_graph(outputs, verbose=True):
     graphviz package (www.graphviz.org).
 
     Args:
-        outputs (dezero.Variable or list): Output variable from which the graph
-            is constructed.
+        output (dezero.Variable): Output variable from which the graph is
+            constructed.
         verbose (bool): If True the dot graph contains additional information
             such as shapes and dtypes.
 
@@ -57,33 +57,29 @@ def get_dot_graph(outputs, verbose=True):
     funcs = []
     seen_set = set()
 
-    if isinstance(outputs, Variable):
-        outputs = [outputs]
+    def add_func(f):
+        if f not in seen_set:
+            funcs.append(f)
+            # funcs.sort(key=lambda x: x.generation)
+            seen_set.add(f)
 
-    for output in outputs:
-        def add_func(f):
-            if f not in seen_set:
-                funcs.append(f)
-                # funcs.sort(key=lambda x: x.generation)
-                seen_set.add(f)
+    add_func(output.creator)
+    txt += _dot_var(output, verbose)
 
-        add_func(output.creator)
-        txt += _dot_var(output, verbose)
+    while funcs:
+        func = funcs.pop()
+        txt += _dot_func(func)
+        for x in func.inputs:
+            txt += _dot_var(x, verbose)
 
-        while funcs:
-            func = funcs.pop()
-            txt += _dot_func(func)
-            for x in func.inputs:
-                txt += _dot_var(x, verbose)
-
-                if x.creator is not None:
-                    add_func(x.creator)
+            if x.creator is not None:
+                add_func(x.creator)
 
     return 'digraph g {\n' + txt + '}'
 
 
-def plot_dot_graph(outputs, verbose=True, to_file='graph.png'):
-    dot_graph = get_dot_graph(outputs, verbose)
+def plot_dot_graph(output, verbose=True, to_file='graph.png'):
+    dot_graph = get_dot_graph(output, verbose)
 
     tmp_dir = os.path.join(os.path.expanduser('~'), '.dezero')
     if not os.path.exists(tmp_dir):
