@@ -62,8 +62,8 @@ init_weight(dis, gen, hidden_size)
 opt_g = Adam(alpha=0.0002, beta1=0.5).setup(gen)
 opt_d = Adam(alpha=0.0002, beta1=0.5).setup(dis)
 
-transforms = lambda x: (x / 255.0).astype(np.float32)
-train_set = dezero.datasets.MNIST(train=True, transforms=transforms)
+transform = lambda x: (x / 255.0).astype(np.float32)
+train_set = dezero.datasets.MNIST(train=True, transform=transform)
 train_loader = DataLoader(train_set, batch_size)
 
 if use_gpu:

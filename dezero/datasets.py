@@ -9,14 +9,14 @@ from dezero.transforms import Compose, Flatten, ToFloat, Normalize
 
 
 class Dataset:
-    def __init__(self, train=True, transforms=None, target_transforms=None):
+    def __init__(self, train=True, transform=None, target_transform=None):
         self.train = train
-        self.transforms = transforms
-        self.target_transforms = target_transforms
-        if self.transforms is None:
-            self.transforms = lambda x: x
-        if self.target_transforms is None:
-            self.target_transforms = lambda x: x
+        self.transform = transform
+        self.target_transform = target_transform
+        if self.transform is None:
+            self.transform = lambda x: x
+        if self.target_transform is None:
+            self.target_transform = lambda x: x
 
         self.data = None
         self.label = None
@@ -25,10 +25,10 @@ class Dataset:
     def __getitem__(self, index):
         assert np.isscalar(index)
         if self.label is None:
-            return self.transforms(self.data[index]), None
+            return self.transform(self.data[index]), None
         else:
-            return self.transforms(self.data[index]),\
-                   self.target_transforms(self.label[index])
+            return self.transform(self.data[index]),\
+                   self.target_transform(self.label[index])
 
     def __len__(self):
         return len(self.data)
@@ -76,10 +76,10 @@ class Spiral(Dataset):
 class MNIST(Dataset):
 
     def __init__(self, train=True,
-                 transforms=Compose([Flatten(), ToFloat(),
+                 transform=Compose([Flatten(), ToFloat(),
                                      Normalize(0., 255.)]),
-                 target_transforms=None):
-        super().__init__(train, transforms, target_transforms)
+                 target_transform=None):
+        super().__init__(train, transform, target_transform)
 
     def prepare(self):
         url = 'http://yann.lecun.com/exdb/mnist/'
@@ -125,9 +125,9 @@ class MNIST(Dataset):
 class CIFAR10(Dataset):
 
     def __init__(self, train=True,
-                 transforms=Compose([ToFloat(), Normalize(mean=0.5, std=0.5)]),
-                 target_transforms=None):
-        super().__init__(train, transforms, target_transforms)
+                 transform=Compose([ToFloat(), Normalize(mean=0.5, std=0.5)]),
+                 target_transform=None):
+        super().__init__(train, transform, target_transform)
 
     def prepare(self):
         url='https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz'
@@ -185,12 +185,12 @@ class CIFAR10(Dataset):
 class CIFAR100(CIFAR10):
 
     def __init__(self, train=True,
-                 transforms=Compose([ToFloat(), Normalize(mean=0.5, std=0.5)]),
-                 target_transforms=None,
+                 transform=Compose([ToFloat(), Normalize(mean=0.5, std=0.5)]),
+                 target_transform=None,
                  label_type='fine'):
         assert label_type in ['fine', 'coarse']
         self.label_type = label_type
-        super().__init__(train, transforms, target_transforms)
+        super().__init__(train, transform, target_transform)
 
     def prepare(self):
         url = 'https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz'
