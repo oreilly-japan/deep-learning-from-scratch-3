@@ -21,7 +21,7 @@ def predict(x):
 
 def mean_squared_error(x0, x1):
     diff = x0 - x1
-    return F.sum(diff ** 2) / diff.size
+    return F.sum(diff ** 2) / len(diff)
 
 
 lr = 0.1
