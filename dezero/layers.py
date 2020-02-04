@@ -21,6 +21,9 @@ class Layer:
     def __call__(self, *args, **kwargs):
         return self.forward(*args, **kwargs)
 
+    def forward(self, *args, **kwargs):
+        return self.__call__(*args, **kwargs)
+
     def params(self):
         for name in self._params:
             obj = self.__dict__[name]
@@ -98,7 +101,7 @@ class Linear(Layer):
         W_data = xp.random.randn(I, O).astype(self.dtype) * np.sqrt(1 / I)
         self.W.data = W_data
 
-    def __call__(self, x):
+    def forward(self, x):
         if self.W.data is None:
             self.in_size = x.shape[1]
             xp = cuda.get_array_module(x)
@@ -210,22 +213,19 @@ class Deconv2d(Layer):
 # RNN / LSTM
 # =============================================================================
 class RNN(Layer):
-    def __init__(self, in_size, hidden_size=None):
+    def __init__(self, hidden_size, in_size=None):
         """An Elman RNN with tanh.
 
         Args:
+            hidden_size (int): The number of features in the hidden state.
             in_size (int): The number of features in the input. If unspecified
             or `None`, parameter initialization will be deferred until the
             first `__call__(x)` at which time the size will be determined.
-            hidden_size (int): The number of features in the hidden state.
+
         """
         super().__init__()
-
-        if hidden_size is None:
-            in_size, hidden_size = None, in_size
-
-        self.x2h = Linear(in_size, hidden_size)
-        self.h2h = Linear(in_size, hidden_size, nobias=True)
+        self.x2h = Linear(hidden_size, in_size=in_size)
+        self.h2h = Linear(hidden_size, in_size=in_size, nobias=True)
         self.h = None
 
     def reset_state(self):
@@ -241,22 +241,18 @@ class RNN(Layer):
 
 
 class LSTM(Layer):
-    def __init__(self, in_size, hidden_size=None):
+    def __init__(self, hidden_size, in_size=None):
         super().__init__()
 
-        if hidden_size is None:
-            in_size, hidden_size = None, in_size
-
-        I, H = in_size, hidden_size
-        self.x2f = Linear(I, H)
-        self.x2i = Linear(I, H)
-        self.x2o = Linear(I, H)
-        self.x2u = Linear(I, H)
-        self.h2f = Linear(H, H, nobias=True)
-        self.h2i = Linear(H, H, nobias=True)
-        self.h2o = Linear(H, H, nobias=True)
-        self.h2u = Linear(H, H, nobias=True)
-
+        H, I = hidden_size, in_size
+        self.x2f = Linear(H, in_size=I)
+        self.x2i = Linear(H, in_size=I)
+        self.x2o = Linear(H, in_size=I)
+        self.x2u = Linear(H, in_size=I)
+        self.h2f = Linear(H, in_size=H, nobias=True)
+        self.h2i = Linear(H, in_size=H, nobias=True)
+        self.h2o = Linear(H, in_size=H, nobias=True)
+        self.h2u = Linear(H, in_size=H, nobias=True)
         self.reset_state()
 
     def reset_state(self):
@@ -276,14 +272,14 @@ class LSTM(Layer):
             u = F.tanh(self.x2u(x) + self.h2u(self.h))
 
         if self.c is None:
-            c = (i * u)
+            c_new = (i * u)
         else:
-            c = (f * self.c) + (i * u)
+            c_new = (f * self.c) + (i * u)
 
-        h = o * F.tanh(c)
+        h_new = o * F.tanh(c_new)
 
-        self.h, self.c = h, c
-        return h
+        self.h, self.c = h_new, c_new
+        return h_new
 
 
 # =============================================================================
