@@ -24,7 +24,7 @@ class Optimizer:
             self.update_one(param)
 
     def update_one(self, param):
-        NotImplementedError()
+        raise NotImplementedError()
 
     def add_hook(self, f):
         self.hooks.append(f)
