@@ -8,13 +8,13 @@ import dezero.functions as F
 from dezero.models import MLP
 
 
-x, t = dezero.datasets.get_spiral(train=True)
 # Hyperparameters
 max_epoch = 300
 batch_size = 30
 hidden_size = 10
 lr = 1.0
 
+x, t = dezero.datasets.get_spiral(train=True)
 model = MLP((hidden_size, 3))
 optimizer = optimizers.SGD(lr).setup(model)
 

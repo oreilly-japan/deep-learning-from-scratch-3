@@ -7,7 +7,7 @@ import dezero.functions as F
 import dezero.layers as L
 
 # Hyperparameters
-max_epoch = 30
+max_epoch = 100
 hidden_size = 100
 bptt_length = 30
 
@@ -39,7 +39,7 @@ for epoch in range(max_epoch):
     loss, count = 0, 0
 
     for x, t in train_set:
-        x = x[:, np.newaxis]  # Add axis for batch.
+        x = x.reshape(1, 1)
         y = model(x)
         loss += F.mean_squared_error(y, t)
         count += 1

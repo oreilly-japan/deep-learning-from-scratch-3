@@ -16,6 +16,7 @@ model = VGG16(pretrained=True)
 with dezero.test_mode():
     y = model(x)
 predict_id = np.argmax(y.data)
+
 model.plot(x, to_file='vgg.pdf')
 labels = dezero.datasets.ImageNet.labels()
 print(labels[predict_id])
