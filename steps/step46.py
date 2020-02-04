@@ -26,4 +26,5 @@ for i in range(max_iter):
     loss.backward()
 
     optimizer.update()
-    print(loss)
+    if i % 1000 == 0:
+        print(loss)

@@ -41,7 +41,8 @@ for i in range(iters):
     b1.data -= lr * b1.grad.data
     W2.data -= lr * W2.grad.data
     b2.data -= lr * b2.grad.data
-    print(loss)
+    if i % 1000 == 0:
+        print(loss)
 
 # Plot
 plt.scatter(x.data, y.data, s=10)

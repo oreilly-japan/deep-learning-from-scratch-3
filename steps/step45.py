@@ -39,4 +39,5 @@ for i in range(max_iter):
 
     for p in model.params():
         p.data -= lr * p.grad.data
-    print(loss)
+    if i % 1000 == 0:
+        print(loss)

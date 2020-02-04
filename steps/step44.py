@@ -10,9 +10,8 @@ x = np.random.rand(100, 1)
 y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
 x, y = Variable(x), Variable(y)
 
-I, H, O = 1, 10, 1
-l1 = L.Linear(H)  # or L.Linear(I, H)
-l2 = L.Linear(O)  # or L.Linear(H, O)
+l1 = L.Linear(10)
+l2 = L.Linear(1)
 
 
 def predict(x):
@@ -36,5 +35,5 @@ for i in range(iters):
     for l in [l1, l2]:
         for p in l.params():
             p.data -= lr * p.grad.data
-
-    print(loss)
+    if i % 1000 == 0:
+        print(loss)
