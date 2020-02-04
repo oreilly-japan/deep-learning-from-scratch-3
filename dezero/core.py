@@ -32,12 +32,11 @@ def test_mode():
 # =============================================================================
 # Variable / Function
 # =============================================================================
-array_types = (np.ndarray)
 try:
     import cupy
     array_types = (np.ndarray, cupy.ndarray)
 except ImportError:
-    pass
+    array_types = (np.ndarray)
 
 
 class Variable:
