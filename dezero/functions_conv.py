@@ -67,12 +67,11 @@ class Conv2d(Function):
 
     def backward(self, gy):
         x, W, b = self.inputs
-
         # ==== gx ====
-        gx = deconv2d(gy, W, b=None, stride=self.stride, pad=self.pad)
+        gx = deconv2d(gy, W, b=None, stride=self.stride, pad=self.pad,
+                      outsize=(x.shape[2], x.shape[3]))
         # ==== gW ====
-        f = Conv2DGradW(self)
-        gW = f(x, gy)
+        gW = Conv2DGradW(self)(x, gy)
         # ==== gb ====
         gb = None
         if b.data is not None:
