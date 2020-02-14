@@ -224,8 +224,7 @@ def linear_simple(x, W, b=None):
         return t
 
     y = t + b
-    # matmul関数の逆伝播では出力データは不要、かつadd関数の逆伝播では入力データは不要
-    t.data = None  # t のデータ（ndarray）を消去
+    t.data = None  # Release t.data (ndarray) for memory efficiency
     return y
 
 
@@ -300,7 +299,8 @@ def sigmoid_simple(x):
 class Sigmoid(Function):
     def forward(self, x):
         xp = cuda.get_array_module(x)
-        y = 1 / (1 + xp.exp(-x))
+        # y = 1 / (1 + xp.exp(-x))
+        y = xp.tanh(x * 0.5) * 0.5 + 0.5
         return y
 
     def backward(self, gy):
@@ -431,7 +431,7 @@ def softmax_cross_entropy_simple(x, t):
     x, t = as_variable(x), as_variable(t)
     N = x.shape[0]
     p = softmax(x)
-    p = clip(p, 1e-15, 1.0)  # log(0)を防ぐために、p の値を 1e-15 以上とする
+    p = clip(p, 1e-15, 1.0)  # To avoid log(0)
     log_p = log(p)
     tlog_p = log_p[np.arange(N), t.data]
     y = -1 * sum(tlog_p) / N
@@ -480,7 +480,7 @@ def binary_cross_entropy(p, t):
     if p.ndim != t.ndim:
         t = t.reshape(*p.shape)
     N = len(t)
-    p = clip(p, 1e-15, 1.0)
+    p = clip(p, 1e-15, 0.999)
     tlog_p = t * log(p) + (1 - t) * log(1 - p)
     y = -1 * sum(tlog_p) / N
     return y
@@ -491,7 +491,7 @@ def binary_cross_entropy(p, t):
 # =============================================================================
 def accuracy(y, t):
     """
-    [WAR] この関数は微分可能ではありません
+    [WAR] This function is not differentiable.
     """
     y, t = as_variable(y), as_variable(t)
 
@@ -652,7 +652,7 @@ def clip(x, x_min, x_max):
     return Clip(x_min, x_max)(x)
 
 # =============================================================================
-# conv2d / col2im / im2col / basic_math（他ファイルの関数をfunciontsへインポート）
+# conv2d / col2im / im2col / basic_math
 # =============================================================================
 from dezero.functions_conv import conv2d
 from dezero.functions_conv import deconv2d
