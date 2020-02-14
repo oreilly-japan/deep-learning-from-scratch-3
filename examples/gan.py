@@ -130,4 +130,4 @@ for epoch in range(max_epoch):
             epoch_detail = epoch + cnt / train_loader.max_iter
             print('epoch: {:.2f}, loss_g: {:.4f}, loss_d: {:.4f}'.format(
                 epoch_detail, float(avg_loss_g/cnt), float(avg_loss_d/cnt)))
-            generate_image(cnt)
+            generate_image()
