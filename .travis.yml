@@ -3,6 +3,7 @@ python:
   - 3.6
 install:
   - pip install numpy
+  - pip install matplotlib
   - pip install chainer
   - pip install Pillow
 script:
