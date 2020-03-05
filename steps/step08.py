@@ -40,20 +40,24 @@ class Function:
 
 class Square(Function):
     def forward(self, x):
-        return x ** 2
+        y = x ** 2
+        return y
 
     def backward(self, gy):
         x = self.input.data
-        return 2 * x * gy
+        gx = 2 * x * gy
+        return gx
 
 
 class Exp(Function):
     def forward(self, x):
-        return np.exp(x)
+        y = np.exp(x)
+        return y
 
     def backward(self, gy):
         x = self.input.data
-        return np.exp(x) * gy
+        gx = np.exp(x) * gy
+        return gx
 
 
 A = Square()
