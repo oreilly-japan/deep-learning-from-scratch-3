@@ -22,12 +22,13 @@ def no_grad():
 
 
 class Variable:
-    def __init__(self, data):
+    def __init__(self, data, name=None):
         if data is not None:
             if not isinstance(data, np.ndarray):
                 raise TypeError('{} is not supported'.format(type(data)))
 
         self.data = data
+        self.name = name
         self.grad = None
         self.creator = None
         self.generation = 0
@@ -47,10 +48,6 @@ class Variable:
     @property
     def dtype(self):
         return self.data.dtype
-
-    @property
-    def array(self):
-        return self.data
 
     def __len__(self):
         return len(self.data)
