@@ -49,10 +49,6 @@ class Variable:
     def dtype(self):
         return self.data.dtype
 
-    @property
-    def array(self):
-        return self.data
-
     def __len__(self):
         return len(self.data)
 
@@ -137,11 +133,13 @@ class Function:
 
 class Square(Function):
     def forward(self, x):
-        return x ** 2
+        y = x ** 2
+        return y
 
     def backward(self, gy):
         x = self.inputs[0].data
-        return 2 * x * gy
+        gx = 2 * x * gy
+        return gx
 
 
 def square(x):
