@@ -41,7 +41,7 @@ class Function:
         outputs = [Variable(as_array(y)) for y in ys]  # Wrap data
 
         for output in outputs:
-            output.set_creator(self)  # 親を覚えさせる
+            output.set_creator(self)
         self.inputs = inputs
         self.outputs = outputs
         return outputs
