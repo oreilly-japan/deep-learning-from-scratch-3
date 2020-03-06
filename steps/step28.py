@@ -1,9 +1,9 @@
 import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
-# Import core_simple explicitly
-from dezero.core_simple import Variable
-from dezero.core_simple import setup_variable
-setup_variable()
+import dezero
+if not dezero.is_simple_core:
+    raise RuntimeError('Modify dezero/__init__.py: is_simple_core = True')
+from dezero import Variable
 
 
 def rosenbrock(x0, x1):
@@ -13,8 +13,8 @@ def rosenbrock(x0, x1):
 
 x0 = Variable(np.array(0.0))
 x1 = Variable(np.array(2.0))
-iters = 1000
 lr = 0.001
+iters = 1000
 
 for i in range(iters):
     print(x0, x1)
