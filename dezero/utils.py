@@ -385,7 +385,7 @@ def pair(x):
     if isinstance(x, int):
         return (x, x)
     elif isinstance(x, tuple):
-        assert len(x) is 2
+        assert len(x) == 2
         return x
     else:
         raise ValueError

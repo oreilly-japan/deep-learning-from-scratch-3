@@ -31,7 +31,7 @@ class Convert:
         self.mode = mode
 
     def __call__(self, img):
-        if self.mode is 'BGR':
+        if self.mode == 'BGR':
             img = img.convert('RGB')
             r, g, b = img.split()
             img = Image.merge('RGB', (b, g, r))
