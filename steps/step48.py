@@ -1,4 +1,6 @@
-import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import os, sys;
+if '__file__' in globals():
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import math
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,7 +8,6 @@ import dezero
 from dezero import optimizers
 import dezero.functions as F
 from dezero.models import MLP
-
 
 # Hyperparameters
 max_epoch = 300
@@ -42,7 +43,6 @@ for epoch in range(max_epoch):
     # Print loss every epoch
     avg_loss = sum_loss / data_size
     print('epoch %d, loss %.2f' % (epoch + 1, avg_loss))
-
 
 # Plot boundary area the model predict
 h = 0.001

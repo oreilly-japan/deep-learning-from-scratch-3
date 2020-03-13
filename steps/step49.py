@@ -1,4 +1,6 @@
-import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import os, sys;
+if '__file__' in globals():
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import math
 import numpy as np
 import dezero

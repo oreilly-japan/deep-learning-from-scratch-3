@@ -1,6 +1,7 @@
-import os, sys; sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import os, sys;
+if '__file__' in globals():
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
-from dezero import Variable
 from dezero import optimizers
 import dezero.functions as F
 from dezero.models import MLP
