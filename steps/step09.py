@@ -84,7 +84,7 @@ def exp(x):
 x = Variable(np.array(0.5))
 y = square(exp(square(x)))
 y.backward()
-print(x.grad)  # 3.297442541400256
+print(x.grad)
 
 
 x = Variable(np.array(1.0))  # OK

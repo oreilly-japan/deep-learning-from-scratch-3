@@ -169,6 +169,6 @@ c = Variable(np.array(1.0))
 y = a * b + c
 y.backward()
 
-print(y)  # variable(7.0)
-print(a.grad)  # 2.0
-print(b.grad)  # 3.0
+print(y)
+print(a.grad)
+print(b.grad)

@@ -26,4 +26,4 @@ x = Variable(np.array(10))
 f = Square()
 y = f(x)
 print(type(y))
-print(y.data)  # 100
+print(y.data)

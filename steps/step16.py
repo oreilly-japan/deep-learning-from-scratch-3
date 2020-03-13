@@ -112,5 +112,5 @@ a = square(x)
 y = add(square(a), square(a))
 y.backward()
 
-print(y.data)  # 32.0
-print(x.grad)  # 64.0
+print(y.data)
+print(x.grad)

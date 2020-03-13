@@ -40,7 +40,7 @@ def numerical_diff(f, x, eps=1e-4):
 f = Square()
 x = Variable(np.array(2.0))
 dy = numerical_diff(f, x)
-print(dy)  # 4.000000000004
+print(dy)
 
 
 def f(x):
@@ -52,4 +52,4 @@ def f(x):
 
 x = Variable(np.array(0.5))
 dy = numerical_diff(f, x)
-print(dy)  # 3.2974426293330694
+print(dy)

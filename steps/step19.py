@@ -162,8 +162,6 @@ def add(x0, x1):
 x = Variable(np.array([[1, 2, 3], [4, 5, 6]]))
 x.name = 'x'
 
-print(x.name)  # x
-print(x.shape)  # (2, 3)
+print(x.name)
+print(x.shape)
 print(x)
-# variable([[1 2 3]
-#           [4 5 6]])

@@ -82,10 +82,10 @@ def add(x0, x1):
 x = Variable(np.array(3.0))
 y = add(x, x)
 y.backward()
-print(x.grad)  # 2.0
+print(x.grad)
 
 
 x = Variable(np.array(3.0))  # or x.cleargrad()
 y = add(add(x, x), x)
 y.backward()
-print(x.grad)  # 3.0
+print(x.grad)

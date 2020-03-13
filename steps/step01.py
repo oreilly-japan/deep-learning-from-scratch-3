@@ -8,7 +8,7 @@ class Variable:
 
 data = np.array(1.0)
 x = Variable(data)
-print(x.data)  # 1.0
+print(x.data)
 
 x.data = np.array(2.0)
-print(x.data)  # 2.0
+print(x.data)
