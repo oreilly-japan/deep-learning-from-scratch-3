@@ -262,3 +262,14 @@ class BottleneckB(Layer):
         h = F.relu(self.bn2(self.conv2(h)))
         h = self.bn3(self.conv3(h))
         return F.relu(h + x)
+
+
+# =============================================================================
+# SqueezeNet
+# =============================================================================
+class SqueezeNet(Model):
+    def __init__(self, pretrained=False):
+        pass
+
+    def __call__(self, x):
+        pass
