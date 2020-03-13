@@ -38,7 +38,7 @@ for i in range(iters):
     # Update .data attribute (No need grads when updating params)
     W.data -= lr * W.grad.data
     b.data -= lr * b.grad.data
-    print(loss)
+    print(W, b, loss)
 
 
 # Plot
