@@ -6,7 +6,8 @@ from dezero import optimizers
 from dezero import DataLoader
 from dezero.models import MLP
 
-max_epoch = 3
+
+max_epoch = 5
 batch_size = 100
 
 train_set = dezero.datasets.MNIST(train=True)
