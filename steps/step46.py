@@ -9,7 +9,6 @@ from dezero.models import MLP
 np.random.seed(0)
 x = np.random.rand(100, 1)
 y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
-x, y = Variable(x), Variable(y)
 
 lr = 0.2
 max_iter = 10000

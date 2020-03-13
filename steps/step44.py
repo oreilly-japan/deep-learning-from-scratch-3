@@ -8,7 +8,6 @@ import dezero.layers as L
 np.random.seed(0)
 x = np.random.rand(100, 1)
 y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
-x, y = Variable(x), Variable(y)
 
 l1 = L.Linear(10)
 l2 = L.Linear(1)

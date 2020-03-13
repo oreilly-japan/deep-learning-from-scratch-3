@@ -8,7 +8,6 @@ import dezero.functions as F
 np.random.seed(0)
 x = np.random.rand(100, 1)
 y = np.sin(2 * np.pi * x) + np.random.rand(100, 1)
-x, y = Variable(x), Variable(y)
 
 I, H, O = 1, 10, 1
 W1 = Variable(0.01 * np.random.randn(I, H))
