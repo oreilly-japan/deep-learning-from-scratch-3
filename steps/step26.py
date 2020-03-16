@@ -1,8 +1,8 @@
 '''
 Need the dot binary from the graphviz package (www.graphviz.org).
 '''
-import os, sys;
 if '__file__' in globals():
+    import os, sys
     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 from dezero import Variable
