@@ -53,17 +53,19 @@ for epoch in range(max_epoch):
             optimizer.update()
 
     avg_loss = float(loss.data) / count
-    print('| epoch %d | loss %f' % (epoch + 1,avg_loss))
+    print('| epoch %d | loss %f' % (epoch + 1, avg_loss))
 
 # Plot
 xs = np.cos(np.linspace(0, 4 * np.pi, 1000))
 model.reset_state()
 pred_list = []
+
 with dezero.no_grad():
     for x in xs:
         x = np.array(x).reshape(1, 1)
         y = model(x)
         pred_list.append(float(y.data))
+
 plt.plot(np.arange(len(xs)), xs, label='y=cos(x)')
 plt.plot(np.arange(len(xs)), pred_list, label='predict')
 plt.xlabel('x')

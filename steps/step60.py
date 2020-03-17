@@ -58,11 +58,13 @@ for epoch in range(max_epoch):
 xs = np.cos(np.linspace(0, 4 * np.pi, 1000))
 model.reset_state()
 pred_list = []
+
 with dezero.no_grad():
     for x in xs:
         x = np.array(x).reshape(1, 1)
         y = model(x)
         pred_list.append(float(y.data))
+
 plt.plot(np.arange(len(xs)), xs, label='y=cos(x)')
 plt.plot(np.arange(len(xs)), pred_list, label='predict')
 plt.xlabel('x')
