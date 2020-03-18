@@ -23,7 +23,7 @@ class TwoLayerNet(Model):
         self.l1 = L.Linear(hidden_size)
         self.l2 = L.Linear(out_size)
 
-    def __call__(self, x):
+    def forward(self, x):
         y = F.sigmoid(self.l1(x))
         y = self.l2(y)
         return y

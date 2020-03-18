@@ -236,7 +236,7 @@ def numerical_grad(f, x, *args, **kwargs):
 
     Args:
         f (callable): A function which gets `Variable`s and returns `Variable`s.
-        x (`ndarray` or `dezero.Variable`): A traget `Variable` for computing
+        x (`ndarray` or `dezero.Variable`): A target `Variable` for computing
             the gradient.
         *args: If `f` needs variables except `x`, you can specify with this
             argument.
@@ -244,7 +244,7 @@ def numerical_grad(f, x, *args, **kwargs):
             argument.
 
     Returns:
-        `ndarray`:
+        `ndarray`: Gradient.
     """
     eps = 1e-4
 

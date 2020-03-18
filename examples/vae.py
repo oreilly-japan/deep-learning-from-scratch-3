@@ -27,7 +27,7 @@ class Encoder(Model):
         self.linear2 = L.Linear(latent_size)
         self.linear3 = L.Linear(latent_size)
 
-    def __call__(self, x):
+    def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
@@ -53,7 +53,7 @@ class Decoder(Model):
         self.deconv = L.Deconv2d(32, kernel_size=4, stride=2, pad=1)
         self.conv = L.Conv2d(1, kernel_size=3, stride=1, pad=1)
 
-    def __call__(self, x):
+    def forward(self, x):
         x = F.relu(self.linear(x))
         x = F.reshape(x, (-1,) + self.to_shape)  # reshape to (-1, C, H, W)
         x = F.relu(self.deconv(x))
@@ -68,7 +68,7 @@ class VAE(Model):
         self.encoder = Encoder(latent_size)
         self.decoder = Decoder()
 
-    def __call__(self, x, C=1.0, k=1):
+    def forward(self, x, C=1.0, k=1):
         """Call loss function of VAE.
         The loss value is equal to ELBO (Evidence Lower Bound)
         multiplied by -1.

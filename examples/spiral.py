@@ -25,7 +25,7 @@ class TwoLayerNet(Model):
         self.l2 = L.Linear(out_size)
         self.bn1 = L.BatchNorm()
 
-    def __call__(self, x):
+    def forward(self, x):
         y = F.sigmoid(self.bn1(self.l1(x)))
         y = self.l2(y)
         return y

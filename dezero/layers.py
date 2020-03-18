@@ -1,4 +1,5 @@
 import os
+import weakref
 import numpy as np
 import dezero.functions as F
 from dezero import cuda
@@ -18,11 +19,16 @@ class Layer:
             self._params.add(name)
         super().__setattr__(name, value)
 
-    def __call__(self, *args, **kwargs):
-        return self.forward(*args, **kwargs)
+    def __call__(self, *inputs):
+        outputs = self.forward(*inputs)
+        if not isinstance(outputs, tuple):
+            outputs = (outputs,)
+        self.inputs = [weakref.ref(x) for x in inputs]
+        self.outputs = [weakref.ref(y) for y in outputs]
+        return outputs if len(outputs) > 1 else outputs[0]
 
-    def forward(self, *args, **kwargs):
-        return self.__call__(*args, **kwargs)
+    def forward(self, inputs):
+        raise NotImplementedError()
 
     def params(self):
         for name in self._params:
@@ -101,7 +107,7 @@ class Linear(Layer):
         W_data = xp.random.randn(I, O).astype(self.dtype) * np.sqrt(1 / I)
         self.W.data = W_data
 
-    def __call__(self, x):
+    def forward(self, x):
         if self.W.data is None:
             self.in_size = x.shape[1]
             xp = cuda.get_array_module(x)
@@ -150,7 +156,7 @@ class Conv2d(Layer):
         W_data = xp.random.randn(OC, C, KH, KW).astype(self.dtype) * scale
         self.W.data = W_data
 
-    def __call__(self, x):
+    def forward(self, x):
         if self.W.data is None:
             self.in_channels = x.shape[1]
             xp = cuda.get_array_module(x)
@@ -199,7 +205,7 @@ class Deconv2d(Layer):
         W_data = xp.random.randn(C, OC, KH, KW).astype(self.dtype) * scale
         self.W.data = W_data
 
-    def __call__(self, x):
+    def forward(self, x):
         if self.W.data is None:
             self.in_channels = x.shape[1]
             xp = cuda.get_array_module(x)
@@ -231,7 +237,7 @@ class RNN(Layer):
     def reset_state(self):
         self.h = None
 
-    def __call__(self, x):
+    def forward(self, x):
         if self.h is None:
             h_new = F.tanh(self.x2h(x))
         else:
@@ -259,7 +265,7 @@ class LSTM(Layer):
         self.h = None
         self.c = None
 
-    def __call__(self, x):
+    def forward(self, x):
         if self.h is None:
             f = F.sigmoid(self.x2f(x))
             i = F.sigmoid(self.x2i(x))

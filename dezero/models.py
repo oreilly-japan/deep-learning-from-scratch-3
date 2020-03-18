@@ -11,7 +11,7 @@ from dezero import utils
 # =============================================================================
 class Model(Layer):
     def plot(self, *inputs, to_file='model.png'):
-        y = self.__call__(*inputs)
+        y = self.forward(*inputs)
         return utils.plot_dot_graph(y, verbose=True, to_file=to_file)
 
 
@@ -23,7 +23,7 @@ class Sequential(Model):
             setattr(self, 'l' + str(i), layer)
             self.layers.append(layer)
 
-    def __call__(self, x):
+    def forward(self, x):
         for layer in self.layers:
             x = layer(x)
         return x
@@ -40,7 +40,7 @@ class MLP(Model):
             setattr(self, 'l' + str(i), layer)
             self.layers.append(layer)
 
-    def __call__(self, x):
+    def forward(self, x):
         for l in self.layers[:-1]:
             x = self.activation(l(x))
         return self.layers[-1](x)
@@ -75,7 +75,7 @@ class VGG16(Model):
             weights_path = utils.get_file(VGG16.WEIGHTS_PATH)
             self.load_weights(weights_path)
 
-    def __call__(self, x):
+    def forward(self, x):
         x = F.relu(self.conv1_1(x))
         x = F.relu(self.conv1_2(x))
         x = F.pooling(x, 2, 2)
@@ -143,7 +143,7 @@ class ResNet(Model):
             weights_path = utils.get_file(ResNet.WEIGHTS_PATH.format(n_layers))
             self.load_weights(weights_path)
 
-    def __call__(self, x):
+    def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.pooling(x, kernel_size=3, stride=2)
         x = self.res2(x)
@@ -271,5 +271,5 @@ class SqueezeNet(Model):
     def __init__(self, pretrained=False):
         pass
 
-    def __call__(self, x):
+    def forward(self, x):
         pass
