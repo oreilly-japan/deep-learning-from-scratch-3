@@ -5,7 +5,7 @@ from dezero.core import Function, Variable, as_variable, as_array
 
 
 # =============================================================================
-# sin / cos / tanh / exp / log
+# Basic functions: sin / cos / tanh / exp / log
 # =============================================================================
 class Sin(Function):
     def forward(self, x):
@@ -88,7 +88,7 @@ def log(x):
 
 
 # =============================================================================
-# Tensor operations: sum / repeat / reshape / sum_to / broadcast_to / get_item
+# Tensor operations: reshape / transpose / get_item / expand_dims / flatten
 # =============================================================================
 class Reshape(Function):
     def __init__(self, shape):
@@ -109,6 +109,65 @@ def reshape(x, shape):
     return Reshape(shape)(x)
 
 
+class Transpose(Function):
+    def __init__(self, axes=None):
+        self.axes = axes
+
+    def forward(self, x):
+        y = x.transpose(self.axes)
+        return y
+
+    def backward(self, gy):
+        if self.axes is None:
+            return transpose(gy)
+
+        axes_len = len(self.axes)
+        inv_axes = tuple(np.argsort([ax % axes_len for ax in self.axes]))
+        return transpose(gy, inv_axes)
+
+
+def transpose(x, axes=None):
+    return Transpose(axes)(x)
+
+
+class GetItem(Function):
+    def __init__(self, slices):
+        self.slices = slices
+
+    def forward(self, x):
+        y = x[self.slices]
+        return y
+
+    def backward(self, gy):
+        x, = self.inputs
+        f = GetItemGrad(self.slices, x.shape)
+        return f(gy)
+
+
+class GetItemGrad(Function):
+    def __init__(self, slices, in_shape):
+        self.slices = slices
+        self.in_shape = in_shape
+
+    def forward(self, gy):
+        xp = dezero.cuda.get_array_module(gy)
+        gx = xp.zeros(self.in_shape, dtype=gy.dtype)
+
+        if xp is np:
+            np.add.at(gx, self.slices, gy)
+        else:
+            xp.scatter_add(gx, self.slices, gy)
+        return gx
+
+    def backward(self, ggx):
+        return get_item(ggx, self.slices)
+
+
+def get_item(x, slices):
+    f = GetItem(slices)
+    return f(x)
+
+
 def expand_dims(x, axis):
     x = as_variable(x)
     shape = list(x.shape)
@@ -120,6 +179,10 @@ def flatten(x):
     """Flattens the input. Does not affect the batch size."""
     return reshape(x, (x.shape[0], -1))
 
+
+# =============================================================================
+# sum / sum_to / broadcast_to / average / matmul / linear
+# =============================================================================
 class Sum(Function):
     def __init__(self, axis, keepdims):
         self.axis = axis
@@ -228,67 +291,8 @@ def linear_simple(x, W, b=None):
     return y
 
 
-class Transpose(Function):
-    def __init__(self, axes=None):
-        self.axes = axes
-
-    def forward(self, x):
-        y = x.transpose(self.axes)
-        return y
-
-    def backward(self, gy):
-        if self.axes is None:
-            return transpose(gy)
-
-        axes_len = len(self.axes)
-        inv_axes = tuple(np.argsort([ax % axes_len for ax in self.axes]))
-        return transpose(gy, inv_axes)
-
-
-def transpose(x, axes=None):
-    return Transpose(axes)(x)
-
-
-class GetItem(Function):
-    def __init__(self, slices):
-        self.slices = slices
-
-    def forward(self, x):
-        y = x[self.slices]
-        return y
-
-    def backward(self, gy):
-        x, = self.inputs
-        f = GetItemGrad(self.slices, x.shape)
-        return f(gy)
-
-
-class GetItemGrad(Function):
-    def __init__(self, slices, in_shape):
-        self.slices = slices
-        self.in_shape = in_shape
-
-    def forward(self, gy):
-        xp = dezero.cuda.get_array_module(gy)
-        gx = xp.zeros(self.in_shape, dtype=gy.dtype)
-
-        if xp is np:
-            np.add.at(gx, self.slices, gy)
-        else:
-            xp.scatter_add(gx, self.slices, gy)
-        return gx
-
-    def backward(self, ggx):
-        return get_item(ggx, self.slices)
-
-
-def get_item(x, slices):
-    f = GetItem(slices)
-    return f(x)
-
-
 # =============================================================================
-# activation function
+# activation function: sigmoid / relu / softmax / log_softmax / leaky_relu
 # =============================================================================
 def sigmoid_simple(x):
     x = as_variable(x)
@@ -398,8 +402,10 @@ class LeakyReLU(Function):
 
 def leaky_relu(x, slope=0.2):
     return LeakyReLU(slope)(x)
+
+
 # =============================================================================
-# loss function
+# loss function: mean_squared_error / softmax_cross_entropy / sigmoid_cross_entropy / binary_cross_entropy
 # =============================================================================
 def mean_squared_error_simple(x0, x1):
     x0, x1 = as_variable(x0), as_variable(x1)
@@ -487,7 +493,7 @@ def binary_cross_entropy(p, t):
 
 
 # =============================================================================
-# utility function
+# accuracy / dropout / batch_norm / embed_id
 # =============================================================================
 def accuracy(y, t):
     """
@@ -499,13 +505,6 @@ def accuracy(y, t):
     result = (pred == t.data)
     acc = result.mean()
     return Variable(as_array(acc))
-
-
-# =============================================================================
-# embed_id / dropout / batch_norm
-# =============================================================================
-def embed_id(x, W):
-    return W[x]
 
 
 def dropout(x, dropout_ratio=0.5):
@@ -591,6 +590,10 @@ class BatchNorm(Function):
 
 def batch_nrom(x, gamma, beta, mean, var, decay=0.9, eps=2e-5):
     return BatchNorm(mean, var, decay, eps)(x, gamma, beta)
+
+
+def embed_id(x, W):
+    return W[x]
 
 
 # =============================================================================
