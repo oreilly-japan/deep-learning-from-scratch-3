@@ -94,12 +94,13 @@ class Variable:
             self.grad = Variable(xp.ones_like(self.data))
 
         funcs = []
-        seen_set = set()
+        seen_funcs = set()
+        seen_vars = set()
 
         def add_func(f):
-            if f not in seen_set:
+            if f not in seen_funcs:
                 funcs.append(f)
-                seen_set.add(f)
+                seen_funcs.add(f)
                 funcs.sort(key=lambda x: x.generation)
 
         add_func(self.creator)
@@ -113,11 +114,11 @@ class Variable:
                     gxs = (gxs,)
 
                 for x, gx in zip(f.inputs, gxs):
-                    if x.grad is None:
+                    if x.grad is None or x not in seen_vars:
                         x.grad = gx
                     else:
                         x.grad = x.grad + gx
-
+                    seen_vars.add(x)
                     if x.creator is not None:
                         add_func(x.creator)
 
