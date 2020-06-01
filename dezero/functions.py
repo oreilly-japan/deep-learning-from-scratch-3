@@ -290,7 +290,6 @@ def linear(x, W, b=None):
 
 
 def linear_simple(x, W, b=None):
-    x, W = as_variable(x), as_variable(W)
     t = matmul(x, W)
     if b is None:
         return t
