@@ -24,7 +24,7 @@ class Compose:
 
 
 # =============================================================================
-# Transfroms for PIL Image
+# Transforms for PIL Image
 # =============================================================================
 class Convert:
     def __init__(self, mode='RGB'):
@@ -104,7 +104,7 @@ class RandomHorizontalFlip:
 
 
 # =============================================================================
-# Transfroms for NumPy ndarray
+# Transforms for NumPy ndarray
 # =============================================================================
 class Normalize:
     """Normalize a NumPy array with mean and standard deviation.
