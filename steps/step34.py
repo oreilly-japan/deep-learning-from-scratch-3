@@ -10,10 +10,10 @@ x = Variable(np.linspace(-7, 7, 200))
 y = F.sin(x)
 y.backward(create_graph=True)
 
-logs = [y.data.flatten()]
+logs = [y.data]
 
 for i in range(3):
-    logs.append(x.grad.data.flatten())
+    logs.append(x.grad.data)
     gx = x.grad
     x.cleargrad()
     gx.backward(create_graph=True)
