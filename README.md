@@ -1,11 +1,11 @@
-<p align="center">
-<img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/images/deep-learning-from-scratch-3.png" width="200px">
+<p>
+<a href="https://www.amazon.co.jp/dp/4873119065/ref=cm_sw_r_tw_dp_U_x_KiA1Eb39SW14Q"><img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/images/deep-learning-from-scratch-3.png" height="250"></a>
 </p>
 
-
-## フレームワーク編
+## 本書の概要
 
 本書では「DeZero」というディープラーニングのフレームワークを作ります。DeZeroは本書オリジナルのフレームワークです。最小限のコードで、フレームワークのモダンな機能を実現します。本書では、この小さな——それでいて十分にパワフルな——フレームワークを、全部で60のステップで完成させます。それによって、PyTorch、TensorFlow、Chainerなどの現代のフレームワークに通じる深い知識を養います。
+
 
 <p>
 <img src="https://raw.githubusercontent.com/oreilly-japan/deep-learning-from-scratch-3/images/dezero_logo.png" width="400px" </p>
@@ -22,6 +22,13 @@
 		alt="Build Status"
 		src="https://travis-ci.org/oreilly-japan/deep-learning-from-scratch-3.svg?branch=master"></a>
 </p>
+
+## News
+<a href="https://koki0702.github.io/dezero-book/"><img src="https://raw.githubusercontent.com/koki0702/koki0702.github.io/master/dezero-book/images/summary_ja.png" height="150px"></a>
+
+【試し読み】本書の一部をオンラインで公開しています。
+https://koki0702.github.io/dezero-book/
+
 
 ## ファイル構成
 
