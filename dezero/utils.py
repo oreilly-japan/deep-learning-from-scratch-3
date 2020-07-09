@@ -143,7 +143,7 @@ def reshape_sum_backward(gy, x_shape, axis, keepdims):
     tupled_axis = axis
     if axis is None:
         tupled_axis = None
-    elif not hasattr(axis, 'len'):
+    elif not isinstance(axis, tuple):
         tupled_axis = (axis,)
 
     if not (ndim == 0 or tupled_axis is None or keepdims):
