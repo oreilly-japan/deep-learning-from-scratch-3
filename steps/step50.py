@@ -18,7 +18,7 @@ test_set = dezero.datasets.Spiral(train=False)
 train_loader = DataLoader(train_set, batch_size)
 test_loader = DataLoader(test_set, batch_size, shuffle=False)
 
-model = MLP((hidden_size, 10))
+model = MLP((hidden_size, 3))
 optimizer = optimizers.SGD(lr).setup(model)
 
 for epoch in range(max_epoch):
