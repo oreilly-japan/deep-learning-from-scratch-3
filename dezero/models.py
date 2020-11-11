@@ -131,7 +131,7 @@ class ResNet(Model):
             raise ValueError('The n_layers argument should be either 50, 101,'
                              ' or 152, but {} was given.'.format(n_layers))
 
-        self.conv1 = L.Conv2d(3, 64, 7, 2, 3)
+        self.conv1 = L.Conv2d(64, 7, 2, 3)
         self.bn1 = L.BatchNorm()
         self.res2 = BuildingBlock(block[0], 64, 64, 256, 1)
         self.res3 = BuildingBlock(block[1], 256, 128, 512, 2)
@@ -220,15 +220,15 @@ class BottleneckA(Layer):
         # In Facebook ResNet, stride=2 is on 3x3 convolution.
         stride_1x1, stride_3x3 = (1, stride) if downsample_fb else (stride, 1)
        
-        self.conv1 = L.Conv2d(in_channels, mid_channels, 1, stride_1x1, 0,
+        self.conv1 = L.Conv2d(mid_channels, 1, stride_1x1, 0,
                               nobias=True)
         self.bn1 = L.BatchNorm()
-        self.conv2 = L.Conv2d(mid_channels, mid_channels, 3, stride_3x3, 1,
+        self.conv2 = L.Conv2d(mid_channels, 3, stride_3x3, 1,
                               nobias=True)
         self.bn2 = L.BatchNorm()
-        self.conv3 = L.Conv2d(mid_channels, out_channels, 1, 1, 0, nobias=True)
+        self.conv3 = L.Conv2d(out_channels, 1, 1, 0, nobias=True)
         self.bn3 = L.BatchNorm()
-        self.conv4 = L.Conv2d(in_channels, out_channels, 1, stride, 0,
+        self.conv4 = L.Conv2d(out_channels, 1, stride, 0,
                               nobias=True)
         self.bn4 = L.BatchNorm()
 
@@ -250,11 +250,11 @@ class BottleneckB(Layer):
     def __init__(self, in_channels, mid_channels):
         super().__init__()
         
-        self.conv1 = L.Conv2d(in_channels, mid_channels, 1, 1, 0, nobias=True)
+        self.conv1 = L.Conv2d(mid_channels, 1, 1, 0, nobias=True)
         self.bn1 = L.BatchNorm()
-        self.conv2 = L.Conv2d(mid_channels, mid_channels, 3, 1, 1, nobias=True)
+        self.conv2 = L.Conv2d(mid_channels, 3, 1, 1, nobias=True)
         self.bn2 = L.BatchNorm()
-        self.conv3 = L.Conv2d(mid_channels, in_channels, 1, 1, 0, nobias=True)
+        self.conv3 = L.Conv2d(in_channels, 1, 1, 0, nobias=True)
         self.bn3 = L.BatchNorm()
 
     def forward(self, x):
