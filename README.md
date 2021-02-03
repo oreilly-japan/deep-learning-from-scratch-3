@@ -80,4 +80,4 @@ DeZeroの他の実装例は[examples](/examples)にあります。
 
 本書の正誤情報は、[:mag_right: 正誤表ページ](../../wiki/Errata)に掲載しています。
 
-正誤表ページに掲載されていない誤植や間違いなどを見つけた方は、[:email: japan＠oreilly.co.jp](<mailto:japan@oreilly.co.jp>)までお知らせください。
+正誤表ページに掲載されていない誤植や間違いなどを見つけた方は、[:email: japan@oreilly.co.jp](<mailto:japan@oreilly.co.jp>)までお知らせください。
