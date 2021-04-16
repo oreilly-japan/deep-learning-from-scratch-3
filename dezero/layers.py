@@ -65,12 +65,10 @@ class Layer:
                 params_dict[key] = obj
 
     def save_weights(self, path):
-        self.to_cpu()
-
         params_dict = {}
         self._flatten_params(params_dict)
-        array_dict = {key: param.data for key, param in params_dict.items()
-                      if param is not None}
+        array_dict = {key: cuda.as_numpy(param.data) for key, param in
+                      params_dict.items() if param is not None}
         try:
             np.savez_compressed(path, **array_dict)
         except (Exception, KeyboardInterrupt) as e:
