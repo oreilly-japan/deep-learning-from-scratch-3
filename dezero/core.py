@@ -163,6 +163,18 @@ class Variable:
         if self.data is not None:
             self.data = dezero.cuda.as_cupy(self.data)
 
+    def item(self):
+        if self.data is None:
+            return None
+        assert self.data.size == 1, "only one element tensors can be converted to Python scalars"
+        array = dezero.cuda.as_numpy(self.data)
+        return array.item()
+
+    def tolist(self):
+        if self.data is None:
+            return None
+        array = dezero.cuda.as_numpy(self.data)
+        return array.tolist()
 
 class Parameter(Variable):
     pass
