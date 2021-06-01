@@ -604,7 +604,7 @@ def embed_id(x, W):
 
 
 # =============================================================================
-# max / min / clip
+# max / min / argmax / clip
 # =============================================================================
 class Max(Function):
     def __init__(self, axis=None, keepdims=False):
@@ -639,6 +639,22 @@ def max(x, axis=None, keepdims=False):
 
 def min(x, axis=None, keepdims=False):
     return Min(axis, keepdims)(x)
+
+
+class ArgMax(Function):
+    def __init__(self, axis=None):
+        self.axis = axis
+
+    def forward(self, x):
+        y = x.argmax(axis=self.axis)
+        return y
+
+    def backward(self, gy):
+        NotImplemented
+
+
+def argmax(x, axis=None):
+    return ArgMax(axis)(x)
 
 
 class Clip(Function):
