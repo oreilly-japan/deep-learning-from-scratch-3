@@ -65,10 +65,8 @@ class Layer:
                 params_dict[key] = obj
 
     def save_weights(self, path):
-        params_dict = {}
-        self._flatten_params(params_dict)
-        array_dict = {key: cuda.as_numpy(param.data) for key, param in
-                      params_dict.items() if param is not None}
+        array_dict = self.state_dict()
+
         try:
             np.savez_compressed(path, **array_dict)
         except (Exception, KeyboardInterrupt) as e:
@@ -82,6 +80,19 @@ class Layer:
         self._flatten_params(params_dict)
         for key, param in params_dict.items():
             param.data = npz[key]
+
+    def state_dict(self):
+        params_dict = {}
+        self._flatten_params(params_dict)
+        array_dict = {key: cuda.as_numpy(param.data) for key, param in
+                      params_dict.items() if param is not None}
+        return array_dict
+
+    def load_state_dict(self, array_dict):
+        params_dict = {}
+        self._flatten_params(params_dict)
+        for key, param in params_dict.items():
+            param.data = array_dict[key]
 
 
 # =============================================================================
