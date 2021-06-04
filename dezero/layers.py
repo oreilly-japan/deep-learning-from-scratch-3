@@ -92,7 +92,7 @@ class Layer:
         params_dict = {}
         self._flatten_params(params_dict)
         for key, param in params_dict.items():
-            param.data = array_dict[key]
+            param.data = array_dict[key].copy()
 
 
 # =============================================================================
