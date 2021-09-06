@@ -595,7 +595,7 @@ class BatchNorm(Function):
         return gx, ggamma, gbeta
 
 
-def batch_nrom(x, gamma, beta, mean, var, decay=0.9, eps=2e-5):
+def batch_norm(x, gamma, beta, mean, var, decay=0.9, eps=2e-5):
     return BatchNorm(mean, var, decay, eps)(x, gamma, beta)
 
 
