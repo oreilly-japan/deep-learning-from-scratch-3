@@ -74,8 +74,8 @@ if use_gpu:
 else:
     xp = np
 
-label_real = xp.ones(batch_size).astype(np.int)
-label_fake = xp.zeros(batch_size).astype(np.int)
+label_real = xp.ones(batch_size).astype(int)
+label_fake = xp.zeros(batch_size).astype(int)
 test_z = xp.random.randn(25, hidden_size).astype(np.float32)
 
 
