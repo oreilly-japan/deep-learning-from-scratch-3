@@ -231,7 +231,7 @@ class RNN(Layer):
         """
         super().__init__()
         self.x2h = Linear(hidden_size, in_size=in_size)
-        self.h2h = Linear(hidden_size, in_size=in_size, nobias=True)
+        self.h2h = Linear(hidden_size, in_size=hidden_size, nobias=True)
         self.h = None
 
     def reset_state(self):
