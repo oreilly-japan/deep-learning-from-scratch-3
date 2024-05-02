@@ -52,7 +52,9 @@ class Variable:
                 seen_set.add(f)
                 funcs.sort(key=lambda x: x.generation)
 
-        add_func(self.creator)
+        
+        if self.creator is not None: # skip the first variable, whose creator is none
+            add_func(self.creator)
 
         while funcs:
             f = funcs.pop()
@@ -149,3 +151,9 @@ with using_config('enable_backprop', False):
 with no_grad():
     x = Variable(np.array(2.0))
     y = square(x)
+
+with using_config('enable_backprop', False):
+    x = Variable(np.ones((100, 100, 100)))
+    y = square(square(square(x)))
+    y.backward()
+    print(x.grad)
