@@ -47,7 +47,7 @@ def get_spiral(train=True):
     num_data, num_class, input_dim = 100, 3, 2
     data_size = num_class * num_data
     x = np.zeros((data_size, input_dim), dtype=np.float32)
-    t = np.zeros(data_size, dtype=np.int)
+    t = np.zeros(data_size, dtype=int)
 
     for j in range(num_class):
         for i in range(num_data):
@@ -138,7 +138,7 @@ class CIFAR10(Dataset):
         filepath = get_file(url)
         if self.train:
             self.data = np.empty((50000, 3 * 32 * 32))
-            self.label = np.empty((50000), dtype=np.int)
+            self.label = np.empty((50000), dtype=int)
             for i in range(5):
                 self.data[i * 10000:(i + 1) * 10000] = self._load_data(
                     filepath, i + 1, 'train')
