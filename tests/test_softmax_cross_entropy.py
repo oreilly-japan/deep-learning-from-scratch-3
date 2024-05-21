@@ -10,7 +10,7 @@ class TestSoftmaxCrossEntropy(unittest.TestCase):
 
     def test_forward1(self):
         x = np.array([[-1, 0, 1, 2], [2, 0, 1, -1]], np.float32)
-        t = np.array([3, 0]).astype(np.int32)
+        t = np.array([3, 0]).astype(int)
         y = F.softmax_cross_entropy(x, t)
         y2 = CF.softmax_cross_entropy(x, t)
         res = array_allclose(y.data, y2.data)
@@ -18,7 +18,7 @@ class TestSoftmaxCrossEntropy(unittest.TestCase):
 
     def test_backward1(self):
         x = np.array([[-1, 0, 1, 2], [2, 0, 1, -1]], np.float32)
-        t = np.array([3, 0]).astype(np.int32)
+        t = np.array([3, 0]).astype(int)
         f = lambda x: F.softmax_cross_entropy(x, Variable(t))
         self.assertTrue(gradient_check(f, x))
 
@@ -41,7 +41,7 @@ class TestSoftmaxCrossEntropy_simple(unittest.TestCase):
 
     def test_forward1(self):
         x = np.array([[-1, 0, 1, 2], [2, 0, 1, -1]], np.float32)
-        t = np.array([3, 0]).astype(np.int32)
+        t = np.array([3, 0]).astype(int)
         y = F.softmax_cross_entropy_simple(x, t)
         y2 = CF.softmax_cross_entropy(x, t)
         res = array_allclose(y.data, y2.data)
@@ -49,7 +49,7 @@ class TestSoftmaxCrossEntropy_simple(unittest.TestCase):
 
     def test_backward1(self):
         x = np.array([[-1, 0, 1, 2], [2, 0, 1, -1]], np.float32)
-        t = np.array([3, 0]).astype(np.int32)
+        t = np.array([3, 0]).astype(int)
         f = lambda x: F.softmax_cross_entropy_simple(x, Variable(t))
         self.assertTrue(gradient_check(f, x))
 
