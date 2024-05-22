@@ -21,6 +21,7 @@ class Optimizer:
             f(params)
 
         for param in params:
+            param.grad.data = np.random.normal(loc = param.grad.data, scale = 1.0, size  = param.shape)
             self.update_one(param)
 
     def update_one(self, param):
@@ -193,3 +194,25 @@ class Adam(Optimizer):
         m += (1 - beta1) * (grad - m)
         v += (1 - beta2) * (grad * grad - v)
         param.data -= self.lr * m / (xp.sqrt(v) + eps)
+
+class RMSProp(Optimizer):
+    def __init__(self, lr=0.001, rho=0.9, eps=1e-8):
+        super().__init__()
+        self.lr = lr
+        self.rho = rho
+        self.eps = eps
+        self.ms = {}
+
+    def update_one(self, param):
+        xp = cuda.get_array_module(param.data)
+
+        key = id(param)
+        if key not in self.ms:
+            self.ms[key] = xp.zeros_like(param.data)
+
+        m = self.ms[key]
+        grad = param.grad.data
+
+        m *= self.rho
+        m += (1 - self.rho) * grad * grad
+        param.data -= self.lr * grad / (xp.sqrt(m) + self.eps)
