@@ -21,6 +21,7 @@ class Optimizer:
             f(params)
 
         for param in params:
+            param.grad.data = np.random.normal(loc = param.grad.data, scale = 1.0, size  = param.shape)
             self.update_one(param)
 
     def update_one(self, param):
