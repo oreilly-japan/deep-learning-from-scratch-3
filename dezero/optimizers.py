@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from dezero import cuda, Parameter
 
 
